@@ -1,0 +1,36 @@
+[package]
+name = "lit-cli"
+description = "Lit CLI"
+authors = ["David Radunz <david.radunz@litprotocol.com>"]
+version = "0.1.1"
+edition = "2021"
+
+[[bin]]
+name = "lit"
+path = "./src/main.rs"
+
+[features]
+default = ["os-full"]
+os = ["lit-cli-os"]
+os-host-core = ["os", "lit-cli-os/host-core"]
+os-host-all = ["os", "lit-cli-os/host-all"]
+os-guest-instance = ["os", "lit-cli-os/guest-instance"]
+os-guest-build = ["os", "lit-cli-os/guest-build"]
+os-guest-all = ["os", "lit-cli-os/guest-all"]
+os-full = ["os", "lit-cli-os/full"]
+
+[dependencies]
+clap = { version = "4.4.7", features = ["derive"] }
+clap_complete = { version = "4.4.4" }
+tokio = { version = "1.33.0",  features = ["full"] }
+
+[dependencies.lit-core]
+path = "../../lit-core/lit-core"
+
+[dependencies.lit-cli-core]
+path = "../../lit-core/lit-cli-core"
+
+[dependencies.lit-cli-os]
+path = "../lit-cli-os"
+optional = true
+default-features = false

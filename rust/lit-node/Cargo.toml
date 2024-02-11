@@ -1,0 +1,196 @@
+[package]
+name = "lit_node"
+version = "0.2.14"
+edition = "2021"
+default-run = "lit_node"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.develop]
+inherits = "dev"
+opt-level = 1
+debug = 1
+incremental = false
+
+[features]
+default = ["lit-actions"]
+# add celo specific values to transactions - see ethers spec.
+# this needs to happen at runtime, so is just a place holder for now.
+sign_test = ["lit-actions"] #enables unsafe endpoint allowing a test to use a PK directly .
+lit-actions = ["dep:deno_ast", "dep:deno_core", "dep:deno_runtime", "dep:libaes", "dep:once_cell"]
+
+testing = ["rtmetrics"] # enables testing features
+rtmetrics = [] # enables runtime metrics
+proxy_http = []
+
+[build-dependencies]
+# Deno v1.37.2
+deno_ast = { version = "0.29.3", features = ["transpiling"], optional = true }
+deno_runtime = { version = "0.129.0", features = ["include_js_files_for_snapshotting"], optional = true }
+
+[dependencies]
+anyhow = "1.0.41"
+arc-swap = "1.6.0"
+async-std = "1.12.0"
+async-recursion = "1.0.0"
+async-trait = "0.1.53"
+async-stream = "0.3.4"
+bech32 = "0.9.1"
+bincode = "1.3.3"
+blsful = "2.4"
+bulletproofs = { version = "4.0.0", git = "https://github.com/LIT-Protocol/bulletproofs" }
+bytes = "1.2.1"
+bs58 = "0.5.0"
+cait-sith = { git = "https://github.com/lit-protocol/cait-sith", features = ["k256"] }
+ciborium = { version = "0.2.0"  }
+chrono = "0.4.23"
+clap = { version = "4.2.2", features = ["cargo"] }
+crypto_box = { version = "0.9" }
+curve25519-dalek = { version = "4.1.1", features = ["group", "serde"], package = "curve25519-dalek-ml" }
+sodalite = "0.4.0"
+data-encoding = "2.3.2"
+derive_more = { version = "0.99.17" }
+digest = { version = "0.10.6", default-features = false, features = ["alloc", "oid"] }
+hex = { version = "0.4.3" }
+debug-ignore = "1.0.5"
+lazy_static = "1.4.0"
+
+# Deno v1.37.2
+# Note: deno_core is re-exported by deno_runtime, but we still need it for proc macros like `op`
+deno_core = { version = "0.222.0", optional = true }
+deno_runtime = { version = "0.129.0", optional = true }
+dotenv = "0.15.0"
+ed25519-dalek = { version = "2.0.0", features = ["rand_core"] }
+elliptic-curve = { version = "0.13.5", features = ["serde"] }
+env_logger = "0.10"
+ethabi = "16.0.0"
+ethers = { version = "2.0.8", features = [
+    "abigen",
+    "legacy" 
+]}
+flume = "0.11"
+futures = "0.3.17"
+glob = "0.3.1"
+hex-literal = "0.4.1"
+ipfs-hasher = "0.13.0"
+figment = "0.10.6"
+gennaro-dkg = "0.8.0"
+indexmap = { version = "2.0", optional = true }
+iri-string = "0.6"
+json = "0.12.4"
+jsonpath-plus = "0.1.9"
+k256 = { version = "0.13.0", features = ["sha256", "ecdsa", "serde", "ecdsa-core", "expose-field", "hash2curve", "schnorr"], optional = false }
+p256 = { version = "0.13", features = ["ecdsa-core", "expose-field", "hash2curve", "sha256"] }
+libaes = { version = "0.6.4", optional = true }
+libsecp256k1 = { git = "https://github.com/LIT-Protocol/libsecp256k1", branch = "master", version = "0.7.1" }
+log = { version = "0.4.17", features = ["kv_unstable", "kv_unstable_serde"] }
+mockall = "0.11.2"
+mockall_double = "0.3.0"
+moka = { version = "0.11.0", features = ["future"] }
+mpl-token-metadata = "1.2.10"
+num_cpus = { version = "1.15.0" }
+once_cell = { version = "1", optional = true }
+openssl = { version = "0.10.55" }
+rand = { version = "~0.8.5", features = ["std_rng"]}
+rand_core = "~0.6.4"
+regex = "1.7.1"
+reqwest = { version = "0.11.14", features = ["json"] }
+rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse", features = ["json"] }
+rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", rev = "985098dd8f3b052716111eaa872d184cc21a1a68"  }
+# used to verify JWTs.  must match the version in the crate overrides at the bottom of this file
+rsa = { git = "https://github.com/RustCrypto/RSA", tag = "v0.7.0-pre" }
+rusqlite = { version = "0.29.0", features = ["backup"] }
+serde = { version = "1.0.126", features = ["derive"] }
+serde_bytes = "0.11.6"
+serde-encrypt = { git = "https://github.com/LIT-protocol/serde-encrypt" }
+serde-encrypt-core = { git = "https://github.com/LIT-protocol/serde-encrypt" }
+serde_json = "1.0.64"
+sha2 = "0.10"
+sha3 = "0.10"
+siwe = "0.5.0"
+siwe-recap = { git = "https://github.com/spruceid/siwe-recap" }
+solana-client = "1.9.19"
+solana-program = "1.9.19"
+solana-sdk = "1.9.19"
+spl-associated-token-account = "1.0.3"
+temp-file = { version = "0.1.7" }
+thiserror = { version = "1.0.23" }
+tokio = { version = "1.23.0", features = ["rt-multi-thread"] }
+tokio-retry = "0.3"
+tracing = "0.1.40"
+ucan-capabilities-object = "0.1"
+url = { version = "2", features = ["serde"] }
+uuid = { version = "1.4", features = ["v4"] }
+verifiable-share-encryption = { git = "https://github.com/LIT-Protocol/verifiable-share-encryption" }
+walkdir = "2.3.2"
+webauthn-rs-core = { git = "https://github.com/LIT-Protocol/webauthn-rs" }
+webauthn-rs-proto = { git = "https://github.com/LIT-Protocol/webauthn-rs" }
+webauthn-rs = { git = "https://github.com/LIT-Protocol/webauthn-rs" }
+web3 = "0.19.0"
+xor_name = "3.0.0"                                             #2.0.0
+x25519-dalek = "2.0.0"
+zeroize = "1.5.7"
+generic-array = "0.14.0"
+serde-big-array = "0.5.1"
+soteria-rs = { version = "0.3.1", features = ["serde", "elements"] }
+xorf = { version = "0.8.1", features = ["serde"] }
+ripemd = "0.1.3"
+
+#ECDSA
+
+[dependencies.lit-core]
+path = "../lit-core/lit-core"
+features = ["ipfs", "chrono"]
+
+[dependencies.lit-core-derive]
+path = "../lit-core/lit-core-derive"
+
+[dependencies.lit-logging]
+path = "../lit-core/lit-logging"
+features = ["service"]
+
+[dependencies.lit-api-core]
+path = "../lit-core/lit-api-core"
+features = ["rocket-helper", "client-reqwest", "server"]
+
+[dependencies.lit-blockchain]
+path = "../lit-core/lit-blockchain"
+
+[dependencies.lit-attestation]
+path = "../lit-core/lit-attestation"
+features = ["generate-via-service", "kdf"]
+
+[dev-dependencies]
+base64_light = "0.1"
+command-group = "1.0.8"
+#ECDSA
+criterion = "0.5"
+lit-bls-wasm = { git = "https://github.com/LIT-Protocol/lit-bls-wasm" }
+lit-ecdsa-wasm-combine = { git = "https://github.com/LIT-Protocol/lit-ecdsa-wasm-combine" }
+rand_chacha = "0.3.1"
+surf = "2"
+async-sse = "5"
+structopt = "0.3"
+futures = "0.3"
+mockall = "0.11.2"
+once_cell = "1.17.0"
+nix = "0.26.2"
+k256 = "0.13"
+maplit = "1"
+test-case = "3.1.0"
+toml_edit = "0.20.7"
+toxiproxy_rust = "*"
+vsss-rs = { version = "3.3", features = ["std"] }
+indoc = "2"
+wiremock = "0.5"
+
+[patch.crates-io]
+
+# needed to force deno_crypto to use v0.7.0-pre and not v0.7.0-rc.0 which for some reason is missing a bunch of stuff from the -pre version
+rsa = { git = "https://github.com/RustCrypto/RSA", tag = "v0.7.0-pre" }
+rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse" }
+
+[profile.release]
+codegen-units = 1
+incremental = true
+lto = true
+opt-level = 3

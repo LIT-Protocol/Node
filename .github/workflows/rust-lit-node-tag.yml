@@ -1,0 +1,27 @@
+name: rust/lit-node-tag
+
+on:
+  push:
+    paths:
+      - rust/lit-node/**
+    branches:
+      - main
+
+jobs:
+  create-tag:
+    name: "Create Tag"
+    runs-on: LargeRunner
+    steps:
+      - name: "Check out the repo"
+        uses: actions/checkout@v3
+
+      - name: "Get tag"
+        id: "get-tag"
+        shell: bash
+        run: |
+          echo PKG_VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/["]/, "", $2); printf("%s",$2) }' rust/lit-node/Cargo.toml) >> $GITHUB_OUTPUT
+
+      - name: "Set Tag"
+        shell: bash
+        run: |
+          git tag v${{ steps.get-tag.outputs.PKG_VERSION }} && git push --tags

@@ -1,0 +1,19 @@
+[lit]
+env = "dev"
+
+[guest]
+active = true
+allowed_cfg_keys = [
+    "simple.dummy",
+    "simple.other",
+    "simple.port",
+    "top.one",
+    "top.two",
+    "top.three",
+    "top.four",
+]
+
+[simple]
+port = 1234
+dummy = "system"
+other = true

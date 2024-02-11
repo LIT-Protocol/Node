@@ -1,0 +1,14 @@
+[default.limits]
+forms = "64 kB"
+json = "1 MiB"
+msgpack = "1 MiB"
+
+[default]
+address = "0.0.0.0"
+log_level = "critical"
+
+[default.shutdown]
+ctrlc = true
+signals = ["term", "hup"]
+grace = 30
+mercy = 5

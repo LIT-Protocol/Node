@@ -1,0 +1,1009 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "ActivatorRoleRequired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "AdminRoleRequired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "BurnerRoleRequired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CreatorRoleRequired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "DeactivatorRoleRequired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidEnv",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidStatus",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReleaseNotFound",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "pubKey",
+        "type": "bytes"
+      }
+    ],
+    "name": "AllowedAdminSigningPublicKeyAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "pubKey",
+        "type": "bytes"
+      }
+    ],
+    "name": "AllowedAdminSigningPublicKeyRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "digest",
+        "type": "bytes"
+      }
+    ],
+    "name": "AllowedAuthorKeyDigestAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "digest",
+        "type": "bytes"
+      }
+    ],
+    "name": "AllowedAuthorKeyDigestRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      }
+    ],
+    "name": "AllowedEnvAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      }
+    ],
+    "name": "AllowedEnvRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "subnet",
+        "type": "address"
+      }
+    ],
+    "name": "AllowedSubnetAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "subnet",
+        "type": "address"
+      }
+    ],
+    "name": "AllowedSubnetRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "domain",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "authorKeyDigest",
+        "type": "bytes"
+      }
+    ],
+    "name": "InitCreator",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "releaseId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "ReleaseBurned",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "releaseId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ReleaseRegister.Status",
+        "name": "status",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ReleaseRegister.Type",
+        "name": "typ",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "kind",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "date",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ReleaseRegister.Platform",
+        "name": "platform",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "options",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "id_key_digest",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "public_key",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "cid",
+        "type": "bytes"
+      }
+    ],
+    "name": "ReleaseCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "releaseId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ReleaseRegister.Status",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "name": "ReleaseStatusChange",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "previousAdminRole",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "newAdminRole",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RoleAdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "RoleGranted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "RoleRevoked",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "ACTIVATOR_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ADMIN_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "BURNER_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "CREATOR_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DEACTIVATOR_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DEFAULT_ADMIN_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "RELEASE_OPTION_RO",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "RELEASE_OPTION_SSH",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "RELEASE_OPTION_USERS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "pubKey",
+        "type": "bytes"
+      }
+    ],
+    "name": "addAllowedAdminSigningPublicKey",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      }
+    ],
+    "name": "addAllowedEnv",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "subnet",
+        "type": "address"
+      }
+    ],
+    "name": "addAllowedSubnet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "releaseId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "burnRelease",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "releaseId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "enum ReleaseRegister.Status",
+        "name": "status",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ReleaseRegister.Type",
+        "name": "typ",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes",
+        "name": "kind",
+        "type": "bytes"
+      },
+      {
+        "internalType": "enum ReleaseRegister.Platform",
+        "name": "platform",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "options",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "id_key_digest",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "public_key",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "cid",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "date",
+        "type": "uint256"
+      }
+    ],
+    "name": "createRelease",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum ReleaseRegister.Type",
+        "name": "typ",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes",
+        "name": "kind",
+        "type": "bytes"
+      },
+      {
+        "internalType": "enum ReleaseRegister.Platform",
+        "name": "platform",
+        "type": "uint8"
+      }
+    ],
+    "name": "getActiveRelease",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getActiveReleases",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCreatorDomain",
+    "outputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "releaseId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getRelease",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum ReleaseRegister.Status",
+            "name": "status",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum ReleaseRegister.Env",
+            "name": "env",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum ReleaseRegister.Type",
+            "name": "typ",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes",
+            "name": "kind",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "date",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum ReleaseRegister.Platform",
+            "name": "platform",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "options",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "id_key_digest",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "public_key",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "cid",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct ReleaseRegister.Release",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getRoleAdmin",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "grantRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "pubKey",
+        "type": "bytes"
+      }
+    ],
+    "name": "hasAllowedAdminSigningPublicKey",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "digest",
+        "type": "bytes"
+      }
+    ],
+    "name": "hasAllowedAuthorKeyDigest",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      }
+    ],
+    "name": "hasAllowedEnv",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "subnet",
+        "type": "address"
+      }
+    ],
+    "name": "hasAllowedSubnet",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "hasCreatorInit",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "hasRole",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "subnetId",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "domain",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "authorKeyDigest",
+        "type": "bytes"
+      }
+    ],
+    "name": "initCreator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "pubKey",
+        "type": "bytes"
+      }
+    ],
+    "name": "removeAllowedAdminSigningPublicKey",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ReleaseRegister.Env",
+        "name": "env",
+        "type": "uint8"
+      }
+    ],
+    "name": "removeAllowedEnv",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "subnet",
+        "type": "address"
+      }
+    ],
+    "name": "removeAllowedSubnet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "renounceRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "revokeRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "releaseId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "enum ReleaseRegister.Status",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "name": "setReleaseStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

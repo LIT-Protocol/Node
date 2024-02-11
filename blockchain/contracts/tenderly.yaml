@@ -1,0 +1,7 @@
+account_id: bed0b5d3-eb06-4cad-ad8b-6ef27c2c067e
+project_slug: litnodecontracts
+projects:
+  litnodecontracts:
+    networks:
+    - "80001"
+provider: Hardhat

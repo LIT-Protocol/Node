@@ -1,0 +1,23 @@
+[lit]
+env = "dev"
+
+[guest]
+active = true
+
+[build]
+id = "371dbc89"
+type = "node"
+unix = "1673646744"
+date = "13-Jan-2023 16:52:24 EST"
+opt_ro = false
+opt_users = true
+opt_ssh = true
+
+["guest.instance"]
+id = "07f12a42"
+
+["guest.release"]
+id = "371dbc89521e39cd13e26403909ddb059dc3e84a57cd6d38"
+
+[subnet]
+id = "521e39cd13e26403909ddb059dc3e84a57cd6d38"

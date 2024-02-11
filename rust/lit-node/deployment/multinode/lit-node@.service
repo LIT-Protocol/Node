@@ -1,0 +1,20 @@
+[Unit]
+Description=LIT Node
+Requires=lit-node.service
+Before=lit-node.service
+BindsTo=lit-node.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+LimitNOFILE=64000
+LimitNPROC=64000
+WorkingDirectory=/home/ubuntu/lit-assets/rust/lit-node/
+Environment=LIT_CONFIG_FILE="./config/lit_config%i.toml"
+Environment=RUST_LOG=warn,lit_node=debug
+ExecStart=/home/ubuntu/lit-assets/rust/lit-node/lit_node
+
+[Install]
+WantedBy=lit-node.service

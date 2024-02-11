@@ -1,0 +1,26 @@
+node_modules
+
+#Hardhat files
+cache
+artifacts
+.deps
+lit_config*env
+wallets
+alias_node_configs
+node_configs
+.DS_Store
+deployments
+deployed*contracts-temp.json
+scripts/deployConfig/configs/*
+scripts/generate_wallet_and_add_as_alias_manifest.json
+
+# IDEs
+*.iml
+.idea
+*.gz
+*.core
+yarn-error.log
+npm-*.log
+typechain-types
+
+anvil.log

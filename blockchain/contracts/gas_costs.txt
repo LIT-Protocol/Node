@@ -1,0 +1,785 @@
+
+  DomainWalletOracle
+    ✓ should register uri
+
+  DomainWalletRegistry
+DiamondCutFacet deployed: 0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82
+DiamondLoupeFacetNoERC165 deployed: 0x9A676e781A523b5d0C0e43731313A708CB607508
+OwnershipFacet deployed: 0x0B306BF915C4d645ff596e518fAf3F9669b97016
+PKPNFTFacet deployed: 0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1
+DiamondCutFacet deployed: 0x3Aa5ebB10DC797CAC828524e59A333d0A371443c
+DiamondLoupeFacet deployed: 0xc6e7DF5E7b4f2A278906862b61205850344D4e7d
+OwnershipFacet deployed: 0x59b670e9fA9D0A427751Af201D676719a970857b
+PubkeyRouterFacet deployed: 0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1
+DiamondCutFacet deployed: 0x4A679253410272dd5232B3Ff7cF5dbB88f295319
+DiamondLoupeFacet deployed: 0x7a2088a1bFc9d81c55368AE168C2C02570cB814F
+OwnershipFacet deployed: 0x09635F643e140090A9A8Dcd712eD6285858ceBef
+PKPPermissionsFacet deployed: 0xc5a5C42992dECbae36851359345FE25997F5C42d
+BigNumber { value: "1" }
+    ✓ should register uri
+DiamondCutFacet deployed: 0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575
+DiamondLoupeFacetNoERC165 deployed: 0xCD8a1C3ba11CF5ECfa6267617243239504a98d90
+OwnershipFacet deployed: 0x82e01223d51Eb87e16A03E24687EDF0F294da6f1
+PKPNFTFacet deployed: 0x2bdCC0de6bE1f7D2ee689a0342D76F52E8EFABa3
+DiamondCutFacet deployed: 0xc351628EB244ec633d5f21fBD6621e1a683B1181
+DiamondLoupeFacet deployed: 0xFD471836031dc5108809D173A067e8486B9047A3
+OwnershipFacet deployed: 0xcbEAF3BDe82155F56486Fb5a1072cb8baAf547cc
+PubkeyRouterFacet deployed: 0x1429859428C0aBc9C2C47C8Ee9FBaf82cFA0F20f
+DiamondCutFacet deployed: 0x922D6956C99E12DFeB3224DEA977D0939758A1Fe
+DiamondLoupeFacet deployed: 0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f
+OwnershipFacet deployed: 0x1fA02b2d6A771842690194Cf62D91bdd92BfE28d
+PKPPermissionsFacet deployed: 0xdbC43Ba45381e02825b14322cDdd15eC4B3164E6
+    ✓ converted expirery should match registration expirery time
+DiamondCutFacet deployed: 0x7A9Ec1d04904907De0ED7b6839CcdD59c3716AC9
+DiamondLoupeFacetNoERC165 deployed: 0x49fd2BE640DB2910c2fAb69bB8531Ab6E76127ff
+OwnershipFacet deployed: 0x4631BCAbD6dF18D94796344963cB60d44a4136b6
+PKPNFTFacet deployed: 0x86A2EE8FAf9A840F7a2c64CA3d51209F9A02081D
+DiamondCutFacet deployed: 0xAA292E8611aDF267e563f334Ee42320aC96D0463
+DiamondLoupeFacet deployed: 0x5c74c94173F05dA1720953407cbb920F3DF9f887
+OwnershipFacet deployed: 0x720472c8ce72c2A2D711333e064ABD3E6BbEAdd3
+PubkeyRouterFacet deployed: 0xe8D2A1E88c91DCd5433208d4152Cc4F399a7e91d
+DiamondCutFacet deployed: 0x4b6aB5F819A515382B0dEB6935D793817bB4af28
+DiamondLoupeFacet deployed: 0xCace1b78160AE76398F486c8a18044da0d66d86D
+OwnershipFacet deployed: 0xD5ac451B0c50B9476107823Af206eD814a2e2580
+PKPPermissionsFacet deployed: 0xF8e31cb472bc70500f08Cd84917E5A1912Ec8397
+    ✓ revoked domain should not be routed
+DiamondCutFacet deployed: 0x8A93d247134d91e0de6f96547cB0204e5BE8e5D8
+DiamondLoupeFacetNoERC165 deployed: 0x40918Ba7f132E0aCba2CE4de4c4baF9BD2D7D849
+OwnershipFacet deployed: 0xF32D39ff9f6Aa7a7A64d7a4F00a54826Ef791a55
+PKPNFTFacet deployed: 0xd6e1afe5cA8D00A2EFC01B89997abE2De47fdfAf
+DiamondCutFacet deployed: 0xCA8c8688914e0F7096c920146cd0Ad85cD7Ae8b9
+DiamondLoupeFacet deployed: 0xB0f05d25e41FbC2b52013099ED9616f1206Ae21B
+OwnershipFacet deployed: 0x5FeaeBfB4439F3516c74939A9D04e95AFE82C4ae
+PubkeyRouterFacet deployed: 0x976fcd02f7C4773dd89C309fBF55D5923B4c98a1
+DiamondCutFacet deployed: 0xfcDB4564c18A9134002b9771816092C9693622e3
+DiamondLoupeFacet deployed: 0x927b167526bAbB9be047421db732C663a0b77B11
+OwnershipFacet deployed: 0x32EEce76C2C2e8758584A83Ee2F522D4788feA0f
+PKPPermissionsFacet deployed: 0x01c1DeF3b91672704716159C9041Aeca392DdFfb
+    ✓ revoked domain should not be have owner
+DiamondCutFacet deployed: 0x70bDA08DBe07363968e9EE53d899dFE48560605B
+DiamondLoupeFacetNoERC165 deployed: 0x26B862f640357268Bd2d9E95bc81553a2Aa81D7E
+OwnershipFacet deployed: 0xA56F946D6398Dd7d9D4D9B337Cf9E0F68982ca5B
+PKPNFTFacet deployed: 0x5D42EBdBBa61412295D7b0302d6F50aC449Ddb4F
+DiamondCutFacet deployed: 0xaB7B4c595d3cE8C85e16DA86630f2fc223B05057
+DiamondLoupeFacet deployed: 0xAD523115cd35a8d4E60B3C0953E0E0ac10418309
+OwnershipFacet deployed: 0x045857BDEAE7C1c7252d611eB24eB55564198b4C
+PubkeyRouterFacet deployed: 0x2b5A4e5493d4a54E717057B127cf0C000C876f9B
+DiamondCutFacet deployed: 0x821f3361D454cc98b7555221A06Be563a7E2E0A6
+DiamondLoupeFacet deployed: 0x1780bCf4103D3F501463AD3414c7f4b654bb7aFd
+OwnershipFacet deployed: 0x5133BBdfCCa3Eb4F739D599ee4eC45cBCD0E16c5
+PKPPermissionsFacet deployed: 0x71089Ba41e478702e1904692385Be3972B2cBf9e
+    ✓ registered domain should have pkp owner
+DiamondCutFacet deployed: 0x2625760C4A8e8101801D3a48eE64B2bEA42f1E96
+DiamondLoupeFacetNoERC165 deployed: 0xFE5f411481565fbF70D8D33D992C78196E014b90
+OwnershipFacet deployed: 0xD6b040736e948621c5b6E0a494473c47a6113eA8
+PKPNFTFacet deployed: 0x139e1D41943ee15dDe4DF876f9d0E7F85e26660A
+DiamondCutFacet deployed: 0xcE0066b1008237625dDDBE4a751827de037E53D2
+DiamondLoupeFacet deployed: 0x82EdA215Fa92B45a3a76837C65Ab862b6C7564a8
+OwnershipFacet deployed: 0x87006e75a5B6bE9D1bbF61AC8Cd84f05D9140589
+PubkeyRouterFacet deployed: 0x51C65cd0Cdb1A8A8b79dfc2eE965B1bA0bb8fc89
+DiamondCutFacet deployed: 0x359570B3a0437805D0a71457D61AD26a28cAC9A2
+DiamondLoupeFacet deployed: 0xc9952Fc93Fa9bE383ccB39008c786b9f94eAc95d
+OwnershipFacet deployed: 0xDde063eBe8E85D666AD99f731B4Dbf8C98F29708
+PKPPermissionsFacet deployed: 0xD5724171C2b7f0AA717a324626050BD05767e2C6
+    ✓ Should not mint if domain is registered
+DiamondCutFacet deployed: 0x71a0b8A2245A9770A4D887cE1E4eCc6C1d4FF28c
+DiamondLoupeFacetNoERC165 deployed: 0xb185E9f6531BA9877741022C92CE858cDCc5760E
+OwnershipFacet deployed: 0xAe120F0df055428E45b264E7794A18c54a2a3fAF
+PKPNFTFacet deployed: 0x193521C8934bCF3473453AF4321911E7A89E0E12
+DiamondCutFacet deployed: 0x3C1Cb427D20F15563aDa8C249E71db76d7183B6c
+DiamondLoupeFacet deployed: 0x1343248Cbd4e291C6979e70a138f4c774e902561
+OwnershipFacet deployed: 0x22a9B82A6c3D2BFB68F324B2e8367f346Dd6f32a
+PubkeyRouterFacet deployed: 0x547382C0D1b23f707918D3c83A77317B71Aa8470
+DiamondCutFacet deployed: 0x5e6CB7E728E1C320855587E1D9C6F7972ebdD6D5
+DiamondLoupeFacet deployed: 0x79E8AB29Ff79805025c9462a2f2F12e9A496f81d
+OwnershipFacet deployed: 0x0Dd99d9f56A14E9D53b2DdC62D9f0bAbe806647A
+PKPPermissionsFacet deployed: 0xeAd789bd8Ce8b9E94F5D0FCa99F8787c7e758817
+    ✓ registered domain expirey should be true
+DiamondCutFacet deployed: 0x666D0c3da3dBc946D5128D06115bb4eed4595580
+DiamondLoupeFacetNoERC165 deployed: 0x742489F22807ebB4C36ca6cD95c3e1C044B7B6c8
+OwnershipFacet deployed: 0x1D8D70AD07C8E7E442AD78E4AC0A16f958Eba7F0
+PKPNFTFacet deployed: 0xA9e6Bfa2BF53dE88FEb19761D9b2eE2e821bF1Bf
+DiamondCutFacet deployed: 0x286B8DecD5ED79c962b2d8F4346CD97FF0E2C352
+DiamondLoupeFacet deployed: 0xb868Cc77A95a65F42611724AF05Aa2d3B6Ec05F2
+OwnershipFacet deployed: 0x70E5370b8981Abc6e14C91F4AcE823954EFC8eA3
+PubkeyRouterFacet deployed: 0x4000F8820522AC96C4221b299876e3e53bCc8525
+DiamondCutFacet deployed: 0x7Cf4be31f546c04787886358b9486ca3d62B9acf
+DiamondLoupeFacet deployed: 0x33E45b187da34826aBCEDA1039231Be46f1b05Af
+OwnershipFacet deployed: 0x0c626FC4A447b01554518550e30600136864640B
+PKPPermissionsFacet deployed: 0xA21DDc1f17dF41589BC6A5209292AED2dF61Cc94
+    ✓ Should not register domain already registered
+
+  ContractResolver
+    set contract
+      with a valid environment
+        ✓ creates an address mapping
+      without role
+        ✓ produces an error
+    get contract
+      with an existing contract
+        ✓ returns a contract address
+      when no contract exists
+        ✓ returns an empty address
+    add allowed env
+      with valid env
+        ✓ will allow release for env
+    remove allowed env
+      with valid env
+        ✓ will prevent release for env
+
+  ReleaseRegister
+    init creator
+      having a valid role and called the first time
+        ✓ will succeed
+      without a valid role
+        ✓ will fail
+      when called more than once
+        ✓ will fail
+    create release
+      when no existing release
+        ✓ creates a release
+        ✓ creates a release with specific date
+        ✓ creates a custom release with a kind
+      with an existing release
+        ✓ produces an error
+      with an invalid status
+        ✓ produces an error
+      with an invalid env
+        ✓ produces an error
+      without role
+        ✓ produces an error
+    set release status
+      with Active status and release
+        ✓ will set the status
+      with Disabled status and release
+        ✓ will set the status
+      when release doesn't exist
+        ✓ produces an error
+      with an invalid status
+        ✓ produces an error
+      without ACTIVATOR role
+        ✓ produces an error
+      without DEACTIVATOR role
+        ✓ produces an error
+    burn release
+      with valid release
+        ✓ will burn the release
+      when release doesn't exist
+        ✓ produces an error
+      without role
+        ✓ produces an error
+    get active release
+      with a set of releases
+        ✓ will find an active node release
+        ✓ will find an active prov release
+        ✓ will find an active build release
+        ✓ will find an active custom salt-master release
+        ✓ will return a list of active release ids
+    add allowed env
+      with valid env
+        ✓ will allow release for env
+    remove allowed env
+      with valid env
+        ✓ will prevent release for env
+    add allowed subnet
+      with valid subnet
+        ✓ will allow release for env
+    remove allowed subnet
+      with valid subnet
+        ✓ will prevent release for env
+    add allowed admin signing public key
+      with valid public key
+        ✓ will add allowed public key
+    remove allowed admin signing public key
+      with valid public key
+        ✓ will remove allowed address
+
+  Allowlist
+    Test the Allowlist
+      unallowed by default
+        ✓ is unallowed
+      when the owner sets things
+        ✓ can allow and unallow things
+
+  LITToken
+    ✓ grants the admin role to the deployer
+    ✓ grants the minter role to the deployer
+    mint
+      when unauthorized
+        ✓ reverts
+      when authorized
+        ✓ mints and burns tokens
+        ✓ wont mint past the cap
+        ✓ wont transfer when paused
+
+  PKPHelper
+    Attempt to Mint PKP NFT via PKPHelper
+DiamondCutFacet deployed: 0x837a41023CF81234f89F956C94D676918b4791c1
+DiamondLoupeFacetNoERC165 deployed: 0x04d7478fDF318C3C22cECE62Da9D78ff94807D77
+OwnershipFacet deployed: 0xd9abC93F81394Bd161a1b24B03518e0a570bDEAd
+PKPNFTFacet deployed: 0xcB0f2a13098f8e841e6Adfa5B17Ec00508b27665
+DiamondCutFacet deployed: 0x87c470437282174b3f8368c7CF1Ac03bcAe57954
+DiamondLoupeFacet deployed: 0x746a48E39dC57Ff14B872B8979E20efE5E5100B1
+OwnershipFacet deployed: 0x96E303b6D807c0824E83f954784e2d6f3614f167
+PubkeyRouterFacet deployed: 0x9CC8B5379C40E24F374cd55973c138fff83ed214
+DiamondCutFacet deployed: 0x930b218f3e63eE452c13561057a8d5E61367d5b7
+DiamondLoupeFacet deployed: 0x721d8077771Ebf9B931733986d619aceea412a1C
+OwnershipFacet deployed: 0x38c76A767d45Fc390160449948aF80569E2C4217
+PKPPermissionsFacet deployed: 0xDC57724Ea354ec925BaFfCA0cCf8A1248a8E5CF1
+      ✓ mints successfully with permitted auth methods
+DiamondCutFacet deployed: 0x72662E4da74278430123cE51405c1e7A1B87C294
+DiamondLoupeFacetNoERC165 deployed: 0x52bad4A8584909895C22bdEcf8DBF33314468Fb0
+OwnershipFacet deployed: 0xed12bE400A07910E4d4E743E4ceE26ab1FC9a961
+PKPNFTFacet deployed: 0x1B25157F05B25438441bF7CDe38A95A55ccf8E50
+DiamondCutFacet deployed: 0x32cd5ecdA7f2B8633C00A0434DE28Db111E60636
+DiamondLoupeFacet deployed: 0xbeC6419cD931e29ef41157fe24C6928a0C952f0b
+OwnershipFacet deployed: 0x55027d3dBBcEA0327eF73eFd74ba0Af42A13A966
+PubkeyRouterFacet deployed: 0x9eb52339B52e71B1EFD5537947e75D23b3a7719B
+DiamondCutFacet deployed: 0x1Dbbf529D78d6507B0dd71F6c02f41138d828990
+DiamondLoupeFacet deployed: 0xf18774574148852771c2631d7d06E2A6c8b44fCA
+OwnershipFacet deployed: 0x9f62EE65a8395824Ee0821eF2Dc4C947a23F0f25
+PKPPermissionsFacet deployed: 0x20BBE62B175134D21b10C157498b663F048672bA
+      ✓ mints successfully with permitted auth methods using the simple non-typed function
+DiamondCutFacet deployed: 0x7c02b58029beeA7c1FcC872803dC9818f57A0E61
+DiamondLoupeFacetNoERC165 deployed: 0x3818eAb6Ca8Bf427222bfACFA706c514145F4104
+OwnershipFacet deployed: 0x4A351C6aE3249499CBb50E8FE6566E2615386Da8
+PKPNFTFacet deployed: 0xa8fcCF4D0e2f2c4451123fF2F9ddFc9be465Fa1d
+DiamondCutFacet deployed: 0x0aD6371dd7E9923d9968D63Eb8B9858c700abD9d
+DiamondLoupeFacet deployed: 0xAA5c5496e2586F81d8d2d0B970eB85aB088639c2
+OwnershipFacet deployed: 0xa95A928eEc085801d981d13FFE749872D8FD5bec
+PubkeyRouterFacet deployed: 0x575D3d18666B28680255a202fB5d482D1949bB32
+DiamondCutFacet deployed: 0x721a1ecB9105f2335a8EA7505D343a5a09803A06
+DiamondLoupeFacet deployed: 0x9852795dbb01913439f534b4984fBf74aC8AfA12
+OwnershipFacet deployed: 0x889D9A5AF83525a2275e41464FAECcCb3337fF60
+PKPPermissionsFacet deployed: 0xf274De14171Ab928A5Ec19928cE35FaD91a42B64
+      ✓ mints successfully with permitted auth methods and sends the PKP to itself
+DiamondCutFacet deployed: 0x02e8910B3B89690d4aeC9fcC0Ae2cD16fB6A4828
+DiamondLoupeFacetNoERC165 deployed: 0x564Db7a11653228164FD03BcA60465270E67b3d7
+OwnershipFacet deployed: 0x9abb5861e3a1eDF19C51F8Ac74A81782e94F8FdC
+PKPNFTFacet deployed: 0x484242986F57dFcA98EeC2C78427931C63F1C4ce
+DiamondCutFacet deployed: 0x8B342f4Ddcc71Af65e4D2dA9CD00cc0E945cFD12
+DiamondLoupeFacet deployed: 0xE2307e3710d108ceC7a4722a020a050681c835b3
+OwnershipFacet deployed: 0xD28F3246f047Efd4059B24FA1fa587eD9fa3e77F
+PubkeyRouterFacet deployed: 0x15F2ea83eB97ede71d84Bd04fFF29444f6b7cd52
+DiamondCutFacet deployed: 0x519b05b3655F4b89731B677d64CEcf761f4076f6
+DiamondLoupeFacet deployed: 0x057cD3082EfED32d5C907801BF3628B27D88fD80
+OwnershipFacet deployed: 0xb6057e08a11da09a998985874FE2119e98dB3D5D
+PKPPermissionsFacet deployed: 0xad203b3144f8c09a20532957174fc0366291643c
+      ✓ mints without setting the pkp nft address as permitted
+DiamondCutFacet deployed: 0xBe6Eb4ACB499f992ba2DaC7CAD59d56DA9e0D823
+DiamondLoupeFacetNoERC165 deployed: 0x54287AaB4D98eA51a3B1FBceE56dAf27E04a56A6
+OwnershipFacet deployed: 0xE401FBb0d6828e9f25481efDc9dd18Da9E500983
+PKPNFTFacet deployed: 0xb6aA91E8904d691a10372706e57aE1b390D26353
+DiamondCutFacet deployed: 0x4c04377f90Eb1E42D845AB21De874803B8773669
+DiamondLoupeFacet deployed: 0xf93b0549cD50c849D792f0eAE94A598fA77C7718
+OwnershipFacet deployed: 0x8CeA85eC7f3D314c4d144e34F2206C8Ac0bbadA1
+PubkeyRouterFacet deployed: 0x29023DE63D7075B4cC2CE30B55f050f9c67548d4
+DiamondCutFacet deployed: 0x7A5EC257391817ef241ef8451642cC6b222d4f8C
+DiamondLoupeFacet deployed: 0x90E75f390332356426B60FB440DF23f860F6A113
+OwnershipFacet deployed: 0x59c7D03d2E9893FB7bAa89dA50a9452e1e9B8b90
+PKPPermissionsFacet deployed: 0x834Ea01e45F9b5365314358159d92d134d89feEb
+      ✓ mints successfully with empty auth methods
+
+  PKPNFT
+    Attempt to Mint PKP NFT
+DiamondCutFacet deployed: 0x798f111c92E38F102931F34D1e0ea7e671BDBE31
+DiamondLoupeFacetNoERC165 deployed: 0xabebE9a2D62Af9a89E86EB208b51321e748640C3
+OwnershipFacet deployed: 0xf42Ec71A4440F5e9871C643696DD6Dc9a38911F8
+PKPNFTFacet deployed: 0xbc71F5687CFD36f64Ae6B4549186EE3A6eE259a4
+DiamondCutFacet deployed: 0x82A9286dB983093Ff234cefCea1d8fA66382876B
+DiamondLoupeFacet deployed: 0x41219a0a9C0b86ED81933c788a6B63Dfef8f17eE
+OwnershipFacet deployed: 0x1d460d731Bd5a0fF2cA07309dAEB8641a7b175A1
+PubkeyRouterFacet deployed: 0xF67e26649037695DdFAB19f4E22d5c9Fd1564592
+DiamondCutFacet deployed: 0x18b7CBdfFA52d1e7BB992fd50f394c5b59E20B72
+DiamondLoupeFacet deployed: 0x2f321ed425c82E74925488139e1556f9B76a2551
+OwnershipFacet deployed: 0x776D6996c8180838dC0587aE0DE5D614b1350f37
+PKPPermissionsFacet deployed: 0x3A906C603F080D96dc08f81CF2889dAB6FF299dE
+      ✓ refuses to mint for free
+DiamondCutFacet deployed: 0xcE7e5946C14Cdd1f8de4473dB9c20fd65EBd47d0
+DiamondLoupeFacetNoERC165 deployed: 0xA496E0071780CF57cd699cb1D5Ac0CdCD6cCD673
+OwnershipFacet deployed: 0x4E76FbE44fa5Dae076a7f4f676250e7941421fbA
+PKPNFTFacet deployed: 0x00B0517de6b2b09aBD3a7B69d66D85eFdb2c7d94
+DiamondCutFacet deployed: 0x06786bCbc114bbfa670E30A1AC35dFd1310Be82f
+DiamondLoupeFacet deployed: 0x72F853E9E202600c5017B5A060168603c3ed7368
+OwnershipFacet deployed: 0x82Bd83ec6D4bCC8EaB6F6cF7565efE1e41D92Ce5
+PubkeyRouterFacet deployed: 0xD61210E756f7D71Cc4F74abF0747D65Ea9d7525b
+DiamondCutFacet deployed: 0xA3b48c7b901fede641B596A4C10a4630052449A6
+DiamondLoupeFacet deployed: 0xa138575a030a2F4977D19Cc900781E7BE3fD2bc0
+OwnershipFacet deployed: 0xB8d6D6b01bFe81784BE46e5771eF017Fa3c906d8
+PKPPermissionsFacet deployed: 0xf524930660f75CF602e909C15528d58459AB2A56
+      ✓ mints successfully
+    Attempt to claim derived PKP NFT
+DiamondCutFacet deployed: 0xC54051689e0931FdCF3e708b665f521f7ab42Fb0
+DiamondLoupeFacetNoERC165 deployed: 0x00436c9F57dfFd96cECd129c04D9E488c57266cF
+OwnershipFacet deployed: 0xe4a4B3Bc2787aA913e5b4bbce907e8b213250BDe
+PKPNFTFacet deployed: 0xD962a5F050A5F0a2f8dF82aFc04CF1afFE585082
+DiamondCutFacet deployed: 0xa591098680B1e183C332Ea8e2612a2Cf2e6ABC17
+DiamondLoupeFacet deployed: 0xdABF214E5a833269c192D9d70efDdE174680628D
+OwnershipFacet deployed: 0x645D817611E0CDaF9cD43332c4E369B9E333471d
+PubkeyRouterFacet deployed: 0x81F82957608f74441E085851cA5Cc091b23d17A2
+DiamondCutFacet deployed: 0xA3E5DfE71aE3e6DeC4D98fa28821dF355d7244B3
+DiamondLoupeFacet deployed: 0x69F94e46cbC82Ab02781ac4FaFc3580d21f1a888
+OwnershipFacet deployed: 0xE0a1556ef66873d965A2F4caD06F051646BE6707
+PKPPermissionsFacet deployed: 0x5BFaaA02cAb795d576276a19CB1c2D2D2d652717
+      ✓ mints successfully
+    Test Mint Grant And Burn
+DiamondCutFacet deployed: 0x72aC6A36de2f72BD39e9c782e9db0DCc41FEbfe2
+DiamondLoupeFacetNoERC165 deployed: 0xAAd4F7BB5FB661181D500829e60010043833a85B
+OwnershipFacet deployed: 0x4Bd915C3e39cfF4eac842255965E79061c38cACD
+PKPNFTFacet deployed: 0x2B64822cf4bbDd77d386F51AA2B40c5cdbeb80b5
+DiamondCutFacet deployed: 0xBc153693BFAe1Ca202872a382aED20a1306C9200
+DiamondLoupeFacet deployed: 0xd8E4Af8145A8288537B85878bb2371fa070Aa5eF
+OwnershipFacet deployed: 0xE634d83f8E016B04e51F2516e6086b5f238675C7
+PubkeyRouterFacet deployed: 0x86c64cB21f88fA9E2c46b61c35889E75f08FDce1
+DiamondCutFacet deployed: 0x1966dc8ff30Bc4AeDEd27178642253b3cCC9AA3f
+DiamondLoupeFacet deployed: 0x5f58879Fe3a4330B6D85c1015971Ea6e5175AeDD
+OwnershipFacet deployed: 0x582957C7a35CDfeAAD1Ca4b87AE03913eAAd0Be0
+PKPPermissionsFacet deployed: 0x63ecE4C05B8fB272D16844E96702Ea2f26370982
+      ✓ mints, grants, and burns successfully
+
+  PKPPermissions
+DiamondCutFacet deployed: 0x3CA5269B5c54d4C807Ca0dF7EeB2CB7a5327E77d
+DiamondLoupeFacetNoERC165 deployed: 0x8a6E9a8E0bB561f8cdAb1619ECc4585aaF126D73
+OwnershipFacet deployed: 0xf09e7Af8b380cD01BD0d009F83a6b668A47742ec
+PKPNFTFacet deployed: 0x492844c46CEf2d751433739fc3409B7A4a5ba9A7
+DiamondCutFacet deployed: 0xe58cBE144dD5556C84874deC1b3F2d0D6Ac45F1b
+DiamondLoupeFacet deployed: 0xDC0a0B1Cd093d321bD1044B5e0Acb71b525ABb6b
+OwnershipFacet deployed: 0xDe1112a0960B9619da7F91D51fB571cdefE48B5E
+PubkeyRouterFacet deployed: 0x1D87585dF4D48E52436e26521a3C5856E4553e3F
+DiamondCutFacet deployed: 0x9A8Ec3B44ee760b629e204900c86d67414a67e8f
+DiamondLoupeFacet deployed: 0xA899118f4BCCb62F8c6A37887a4F450D8a4E92E0
+OwnershipFacet deployed: 0xb60971942E4528A811D24826768Bc91ad1383D21
+PKPPermissionsFacet deployed: 0xD185B4846E5fd5419fD4D077dc636084BEfC51C0
+    register a PKP and set routing permissions
+      when the PKP grants permission to an ETH address
+        ✓ grants permission to an eth address and then revokes it
+        ✓ grants permission to an IPFS id and then revokes it
+        ✓ registers and grants permission to a webauthn AuthMethod
+        ✓ registers and grants permission to a generic AuthMethod with scopes
+        ✓ registers and grants permission to a generic AuthMethod using batch methods
+        ✓ updates root hash and verify state
+        ✓ grants permission to an eth address and then revokes it and then burns it
+
+  PubkeyRouter
+DiamondCutFacet deployed: 0x8659DF1C638CDA8E475CD3C6481730C2b4f85873
+DiamondLoupeFacetNoERC165 deployed: 0x1f9c84B161b2c7FFB540BC5354543108cCE37df1
+OwnershipFacet deployed: 0x4D1338Fa46ca6060F1472b70599cc635Ad275EDa
+PKPNFTFacet deployed: 0x87E8f332f34984728Da4c0A008a495A5Ec4E09a2
+DiamondCutFacet deployed: 0x53DaB165b879542E9aDFC41c6474A9d797B9b042
+DiamondLoupeFacet deployed: 0x03F7F064E6ceD8e154e3FdAAF92DcCC4e818E97B
+OwnershipFacet deployed: 0x4BEA9aAe24187d6128403DC556510A18d727871a
+PubkeyRouterFacet deployed: 0x6cD036fDBD89BaA51c8722Eec0B56CeEd301cC68
+DiamondCutFacet deployed: 0x295129609d6876f5ECC62052Ba6bc082139A982c
+DiamondLoupeFacet deployed: 0xB92257D74B8815EC711071889cB506C8d66A6a06
+OwnershipFacet deployed: 0x737b8F095E3c575a6Ae5FE1711AdB8F271E20269
+PKPPermissionsFacet deployed: 0xAd3E631c01798f9aAE4692dabF791a62c226C5D4
+    store and retrieve routing data
+      when routing data is unset
+        ✓ retrieves empty routing data
+      register a PKP and set routing permissions
+        when the PKP is minted, check the ETH address
+          ✓ checks the PKP eth address and the reverse mapping
+          ✓ gets and sets root keys
+
+  RateLimitNFT
+    Test free minting of Rate Limit NFT
+DiamondCutFacet deployed: 0x2ca60d89144D4cdf85dA87af4FE12aBF9265F28C
+DiamondLoupeFacetNoERC165 deployed: 0xf4fa0d1C10c47cDe9F65D56c3eC977CbEb13449A
+OwnershipFacet deployed: 0xA343B1FC2897b8C49A72A9A0B2675cB9c7664e8c
+RateLimitNFTFacet deployed: 0x88B9Ad010A699Cc0c8C5C5EA8bAF90A0C375df1a
+      ✓ checks the signature for a free mint
+    Test minting costs and params of Rate Limit NFT
+DiamondCutFacet deployed: 0x2fe19128A8257182fdD77f90eA96D27cA342897A
+DiamondLoupeFacetNoERC165 deployed: 0x2f6f107D4Afd43c451B74DA41A6DDA53D2Bf24B1
+OwnershipFacet deployed: 0xb9b0c96e4E7181926D2A7ed331C9C346dfa59b4D
+RateLimitNFTFacet deployed: 0x905Ad472d7eeB94ed1Fc29D8ff4B53FD4D5a5Eb4
+      ✓ mints a rate limit increase nft and checks the params
+DiamondCutFacet deployed: 0xeF66010868Ff77119171628B7eFa0F6179779375
+DiamondLoupeFacetNoERC165 deployed: 0xd544d7A5EF50c510f3E90863828EAba7E392907A
+OwnershipFacet deployed: 0x103416cfCD0D0a32b904Ab4fb69dF6E5B5aaDf2b
+RateLimitNFTFacet deployed: 0x1F585372F116E1055AF2bED81a808DDf9638dCCD
+      ✓ tries to mint with some bad params
+
+  Staking
+DiamondCutFacet deployed: 0xCaC60200c1Cb424f2C1e438c7Ee1B98d487f0254
+DiamondLoupeFacet deployed: 0xABc84968376556B5e5B3C3bda750D091a06De536
+OwnershipFacet deployed: 0xFf8FA9381caf61cB3368a6ec0b3F5C788028D0Cd
+StakingBalancesFacet deployed: 0xE55cc27460B55c8aC7E73043F38b537758C9E51e
+DiamondCutFacet deployed: 0x3358F984e9B3CBBe976eEFE9B6fb92a214162932
+DiamondLoupeFacet deployed: 0x3Aa338c8d5E6cefE95831cD0322b558677abA0f1
+OwnershipFacet deployed: 0x6858dF5365ffCbe31b5FE68D9E6ebB81321F7F86
+StakingFacet deployed: 0x267fB71b280FB34B278CedE84180a9A9037C941b
+StakingViewsFacet deployed: 0x7E27bCbe2F0eDdA3E0AA12492950a6B8703b00FB
+StakingVersionFacet deployed: 0x9015957A2210BB8B10e27d8BBEEF8d9498f123eF
+DiamondCutFacet deployed: 0x02121128f1Ed0AdA5Df3a87f42752fcE4Ad63e59
+DiamondLoupeFacetNoERC165 deployed: 0x95D7fF1684a8F2e202097F28Dc2e56F773A55D02
+OwnershipFacet deployed: 0x897945A56464616a525C9e5F11a8D400a72a8f3A
+PKPNFTFacet deployed: 0x633a7eB9b8912b22f3616013F3153de687F96074
+deployer has 9998748505099133222081 eth.  Funding stakers...
+    ✓ can join as a staker
+    ✓ cannot leave as a staker if below min validator count
+    Constructor & Settings
+      ✓ should set owner on constructor
+    validators and joining
+      ✓ has the default validator set
+      ✓ works with all the batch validator retrieval methods
+      ✓ cannot stake 0
+      ✓ cannot stake less than the minimum stake
+    setting new validators
+      ✓ becomes a validator
+      ✓ leaves as a validator
+      ✓ kicks and slashes validator
+    setting new resolver contract address
+      ✓ sets the new contract address
+    Alias tests
+      ✓ Can use an alias
+    Version tests
+      ✓ Can get min and max version
+      ✓ Can set min and max version
+    only the admin can call admin functions
+      ✓ tries to call the admin functions as a non admin and fails
+    the admin can pause
+      ✓ tries to pause then unpause as admin
+    when paused
+      can call mutative functions
+        ✓ cannot lock validators for next epoch
+        ✓ cannot signal ready for next epoch
+        ✓ cannot unlock validators for next epoch
+        ✓ cannot advance epoch
+        ✓ new stakers can stake and join
+        ✓ cannot exit for a reason unrelated to paused state
+        ✓ can request to leave
+        ✓ can kick validator in next epoch
+
+·---------------------------------------------------------------|----------------------------|-------------|-----------------------------·
+|                     [90mSolc version: 0.8.17[39m                      ·  [90mOptimizer enabled: false[39m  ·  [90mRuns: 200[39m  ·  [90mBlock limit: 30000000 gas[39m  │
+································································|····························|·············|······························
+|  [32m[1mMethods[22m[39m                                                                                                                               │
+·························|······································|··············|·············|·············|···············|··············
+|  [1mContract[22m              ·  [1mMethod[22m                              ·  [32mMin[39m         ·  [32mMax[39m        ·  [32mAvg[39m        ·  [1m# calls[22m      ·  [1meur (avg)[22m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mAllowlist[39m             ·  addAdmin                            ·           -  ·          -  ·      75245  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mAllowlist[39m             ·  setAllowed                          ·           -  ·          -  ·      47764  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mAllowlist[39m             ·  setNotAllowed                       ·           -  ·          -  ·      25886  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mContractResolver[39m      ·  removeAllowedEnv                    ·           -  ·          -  ·      25654  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mContractResolver[39m      ·  renounceRole                        ·           -  ·          -  ·      25497  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mContractResolver[39m      ·  setContract                         ·       [36m32063[39m  ·      [31m51975[39m  ·      51054  ·          [90m173[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mDomainWalletOracle[39m    ·  registerDomain                      ·           -  ·          -  ·     344740  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mDomainWalletOracle[39m    ·  setAdmin                            ·           -  ·          -  ·      27158  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mDomainWalletRegistry[39m  ·  hasExpired                          ·           -  ·          -  ·      46330  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mDomainWalletRegistry[39m  ·  registerDomain                      ·           -  ·          -  ·     538438  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mDomainWalletRegistry[39m  ·  registerDomainAndMintNext           ·     [36m1227179[39m  ·    [31m1227203[39m  ·    1227199  ·           [90m13[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mDomainWalletRegistry[39m  ·  removeDomain                        ·           -  ·          -  ·     157693  ·            [90m4[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mDomainWalletRegistry[39m  ·  setAdmin                            ·           -  ·          -  ·      24796  ·            [90m8[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mLITToken[39m              ·  approve                             ·           -  ·          -  ·      46956  ·           [90m14[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mLITToken[39m              ·  burn                                ·       [36m52489[39m  ·      [31m62714[39m  ·      57602  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mLITToken[39m              ·  grantRole                           ·           -  ·          -  ·      52051  ·            [90m6[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mLITToken[39m              ·  mint                                ·      [36m124694[39m  ·     [31m124790[39m  ·     124726  ·            [90m3[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mLITToken[39m              ·  pause                               ·           -  ·          -  ·      47431  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mLITToken[39m              ·  transfer                            ·       [36m42107[39m  ·      [31m59207[39m  ·      57742  ·           [90m15[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mLITToken[39m              ·  unpause                             ·           -  ·          -  ·      25506  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPHelper[39m             ·  mintNextAndAddAuthMethods           ·           -  ·          -  ·    2105481  ·            [90m3[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPHelper[39m             ·  mintNextAndAddAuthMethodsWithTypes  ·      [36m496826[39m  ·    [31m2015517[39m  ·    1306388  ·           [90m12[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPHelper[39m             ·  setContractResolver                 ·           -  ·          -  ·      35689  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPNFTFacet[39m           ·  claimAndMint                        ·           -  ·          -  ·     450855  ·            [90m3[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPNFTFacet[39m           ·  mintGrantAndBurnNext                ·           -  ·          -  ·     587251  ·            [90m3[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPNFTFacet[39m           ·  mintNext                            ·           -  ·          -  ·     417890  ·            [90m9[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPNFTFacet[39m           ·  setFreeMintSigner                   ·           -  ·          -  ·      52698  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  addPermittedAction                  ·       [36m73874[39m  ·     [31m282268[39m  ·     186373  ·            [90m3[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  addPermittedAddress                 ·      [36m180119[39m  ·     [31m237019[39m  ·     208569  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  addPermittedAuthMethod              ·      [36m242705[39m  ·     [31m272567[39m  ·     257636  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  addPermittedAuthMethodScope         ·       [36m59509[39m  ·      [31m59557[39m  ·      59533  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  batchAddRemoveAuthMethods           ·      [36m282505[39m  ·     [31m284272[39m  ·     283389  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  removePermittedAction               ·           -  ·          -  ·      69172  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  removePermittedAddress              ·           -  ·          -  ·      68520  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  removePermittedAuthMethod           ·           -  ·          -  ·      68878  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  removePermittedAuthMethodScope      ·       [36m59489[39m  ·      [31m59537[39m  ·      59513  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPKPPermissionsFacet[39m   ·  setRootHash                         ·       [36m56884[39m  ·      [31m73984[39m  ·      65434  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mPubkeyRouterFacet[39m     ·  voteForRootKeys                     ·      [36m397919[39m  ·    [31m1575606[39m  ·     847481  ·            [90m3[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mRateLimitNFTFacet[39m     ·  mint                                ·           -  ·          -  ·     218395  ·            [90m4[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  addAllowedAdminSigningPublicKey     ·           -  ·          -  ·      51372  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  addAllowedEnv                       ·           -  ·          -  ·      47592  ·            [90m6[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  addAllowedSubnet                    ·           -  ·          -  ·      47890  ·           [90m21[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  burnRelease                         ·           -  ·          -  ·      79965  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  createRelease                       ·      [36m357444[39m  ·     [31m461078[39m  ·     395563  ·           [90m49[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  grantRole                           ·       [36m52016[39m  ·      [31m52028[39m  ·      52024  ·           [90m31[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  initCreator                         ·      [36m127264[39m  ·     [31m127420[39m  ·     127342  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  removeAllowedAdminSigningPublicKey  ·           -  ·          -  ·      29511  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  removeAllowedEnv                    ·           -  ·          -  ·      25654  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  removeAllowedSubnet                 ·           -  ·          -  ·      25921  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mReleaseRegister[39m       ·  setReleaseStatus                    ·       [36m70975[39m  ·     [31m160981[39m  ·     115978  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingBalancesFacet[39m  ·  addAlias                            ·           -  ·          -  ·      75918  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingBalancesFacet[39m  ·  addPermittedStaker                  ·           -  ·          -  ·      52791  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingBalancesFacet[39m  ·  setPermittedStakersOn               ·       [36m30474[39m  ·      [31m52386[39m  ·      41430  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  advanceEpoch                        ·      [36m556267[39m  ·     [31m785304[39m  ·     630334  ·            [90m4[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  exit                                ·           -  ·          -  ·     160584  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  kickValidatorInNextEpoch            ·       [36m69262[39m  ·     [31m248886[39m  ·     102023  ·           [90m10[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  lockValidatorsForNextEpoch          ·           -  ·          -  ·      40404  ·            [90m4[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  requestToJoin                       ·           -  ·          -  ·     242317  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  requestToLeave                      ·       [36m53025[39m  ·      [31m63054[39m  ·      58040  ·            [90m2[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  setConfig                           ·           -  ·          -  ·      55566  ·            [90m4[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  setEpochLength                      ·           -  ·          -  ·      32542  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  setEpochState                       ·       [36m35430[39m  ·      [31m35442[39m  ·      35436  ·           [90m19[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  signalReadyForNextEpoch             ·      [36m118525[39m  ·     [31m163922[39m  ·     133301  ·           [90m40[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingFacet[39m          ·  stakeAndJoin                        ·      [36m341624[39m  ·     [31m393600[39m  ·     346305  ·           [90m13[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingVersionFacet[39m   ·  setMaxVersion                       ·           -  ·          -  ·      79362  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [90mStakingVersionFacet[39m   ·  setMinVersion                       ·           -  ·          -  ·      96406  ·            [90m1[39m  ·          [32m[90m-[32m[39m  │
+·························|······································|··············|·············|·············|···············|··············
+|  [32m[1mDeployments[22m[39m                                                  ·                                          ·  [1m% of limit[22m   ·             │
+································································|··············|·············|·············|···············|··············
+|  Allowlist                                                    ·           -  ·          -  ·     898001  ·          [90m3 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  ContractResolver                                             ·           -  ·          -  ·    1703781  ·        [90m5.7 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  DevKeyDeriver                                                ·           -  ·          -  ·     350740  ·        [90m1.2 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  DiamondCutFacet                                              ·           -  ·          -  ·    1615922  ·        [90m5.4 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  DiamondInit                                                  ·           -  ·          -  ·     210098  ·        [90m0.7 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  DiamondLoupeFacet                                            ·           -  ·          -  ·    1023071  ·        [90m3.4 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  DiamondLoupeFacetNoERC165                                    ·           -  ·          -  ·     973188  ·        [90m3.2 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  DomainWalletOracle                                           ·     [36m3212862[39m  ·    [31m3212874[39m  ·    3212873  ·       [90m10.7 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  DomainWalletRegistry                                         ·     [36m3414041[39m  ·    [31m3414053[39m  ·    3414052  ·       [90m11.4 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  LITToken                                                     ·           -  ·          -  ·    5299565  ·       [90m17.7 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  OwnershipFacet                                               ·           -  ·          -  ·     257158  ·        [90m0.9 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  PKPHelper                                                    ·     [36m4820503[39m  ·    [31m4820515[39m  ·    4820513  ·       [90m16.1 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  PKPNFT                                                       ·     [36m3011250[39m  ·    [31m3011274[39m  ·    3011266  ·         [90m10 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  PKPNFTFacet                                                  ·           -  ·          -  ·    5095550  ·         [90m17 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  PKPNFTMetadata                                               ·     [36m2987679[39m  ·    [31m2987691[39m  ·    2987689  ·         [90m10 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  PKPPermissions                                               ·     [36m2745890[39m  ·    [31m2745914[39m  ·    2745908  ·        [90m9.2 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  PKPPermissionsFacet                                          ·           -  ·          -  ·    4850183  ·       [90m16.2 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  PubkeyRouter                                                 ·     [36m2377197[39m  ·    [31m2377245[39m  ·    2377237  ·        [90m7.9 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  PubkeyRouterFacet                                            ·           -  ·          -  ·    3284916  ·       [90m10.9 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  RateLimitNFT                                                 ·           -  ·          -  ·    3105540  ·       [90m10.4 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  RateLimitNFTFacet                                            ·           -  ·          -  ·    5249497  ·       [90m17.5 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  ReleaseRegister                                              ·     [36m4483682[39m  ·    [31m4483694[39m  ·    4483684  ·       [90m14.9 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  Staking                                                      ·           -  ·          -  ·    3892568  ·         [90m13 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  StakingBalances                                              ·           -  ·          -  ·    2836612  ·        [90m9.5 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  StakingBalancesFacet                                         ·           -  ·          -  ·    3250823  ·       [90m10.8 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  StakingFacet                                                 ·           -  ·          -  ·    4241115  ·       [90m14.1 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  StakingVersionFacet                                          ·           -  ·          -  ·     722851  ·        [90m2.4 %[39m  ·          [32m[90m-[32m[39m  │
+································································|··············|·············|·············|···············|··············
+|  StakingViewsFacet                                            ·           -  ·          -  ·    2052753  ·        [90m6.8 %[39m  ·          [32m[90m-[32m[39m  │
+·---------------------------------------------------------------|--------------|-------------|-------------|---------------|-------------·
+
+  99 passing (3m)
+
+Nothing to compile
+ ·-----------------------------|--------------------------------|--------------------------------·
+ |  Solc version: 0.8.17       ·  Optimizer enabled: false      ·  Runs: 200                     │
+ ······························|································|·································
+ |  Contract Name              ·  Deployed size (KiB) (change)  ·  Initcode size (KiB) (change)  │
+ ······························|································|·································
+ |  console                    ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  LibDiamond                 ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  BytesLib                   ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  Base64                     ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  Counters                   ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  ShortStrings               ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  StorageSlot                ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  Strings                    ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  LibPKPPermissionsStorage   ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  LibPubkeyRouterStorage     ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  LibRateLimitNFTStorage     ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  LibPKPNFTStorage           ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  LibStakingStorage          ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  LibStakingBalancesStorage  ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  ReentrancyGuardStorage     ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  AddressUpgradeable         ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  StringsUpgradeable         ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  ECDSA                      ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  MerkleProof                ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  Math                       ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  SafeCast                   ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  BitMaps                    ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  EnumerableSet              ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  ERC721Storage              ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  InitializableStorage       ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  MathUpgradeable            ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  SignedMathUpgradeable      ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  SignedMath                 ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  ERC721EnumerableStorage    ·                      0.084 ()  ·                      0.162 ()  │
+ ······························|································|·································
+ |  DiamondInit                ·                      0.715 ()  ·                      0.746 ()  │
+ ······························|································|·································
+ |  OwnershipFacet             ·                      0.924 ()  ·                      0.955 ()  │
+ ······························|································|·································
+ |  DevKeyDeriver              ·                      1.348 ()  ·                      1.379 ()  │
+ ······························|································|·································
+ |  DiamondMultiInit           ·                      2.002 ()  ·                      2.033 ()  │
+ ······························|································|·································
+ |  KeyDeriver                 ·                      2.581 ()  ·                      2.612 ()  │
+ ······························|································|·································
+ |  Multisender                ·                      2.993 ()  ·                      3.256 ()  │
+ ······························|································|·································
+ |  StakingVersionFacet        ·                      3.039 ()  ·                      3.070 ()  │
+ ······························|································|·································
+ |  Allowlist                  ·                      3.291 ()  ·                      3.787 ()  │
+ ······························|································|·································
+ |  WLIT                       ·                      3.759 ()  ·                      4.809 ()  │
+ ······························|································|·································
+ |  DiamondLoupeFacetNoERC165  ·                      4.167 ()  ·                      4.198 ()  │
+ ······························|································|·································
+ |  DiamondLoupeFacet          ·                      4.393 ()  ·                      4.424 ()  │
+ ······························|································|·································
+ |  ERC20                      ·                      4.546 ()  ·                      5.980 ()  │
+ ······························|································|·································
+ |  PKPNFT                     ·                      6.207 ()  ·                     14.134 ()  │
+ ······························|································|·································
+ |  RateLimitNFT               ·                      6.207 ()  ·                     14.137 ()  │
+ ······························|································|·································
+ |  StakingBalances            ·                      6.207 ()  ·                     14.133 ()  │
+ ······························|································|·································
+ |  PKPPermissions             ·                      6.220 ()  ·                     14.028 ()  │
+ ······························|································|·································
+ |  PubkeyRouter               ·                      6.220 ()  ·                     14.028 ()  │
+ ······························|································|·································
+ |  Staking                    ·                      6.220 ()  ·                     14.980 ()  │
+ ······························|································|·································
+ |  ContractResolver           ·                      7.092 ()  ·                      8.146 ()  │
+ ······························|································|·································
+ |  DiamondCutFacet            ·                      7.098 ()  ·                      7.129 ()  │
+ ······························|································|·································
+ |  ERC721Upgradeable          ·                      8.431 ()  ·                      8.462 ()  │
+ ······························|································|·································
+ |  StakingViewsFacet          ·                      9.052 ()  ·                      9.083 ()  │
+ ······························|································|·································
+ |  PKPNFTMetadata             ·                     13.179 ()  ·                     13.621 ()  │
+ ······························|································|·································
+ |  DomainWalletOracle         ·                     13.919 ()  ·                     14.904 ()  │
+ ······························|································|·································
+ |  StakingBalancesFacet       ·                     14.509 ()  ·                     14.540 ()  │
+ ······························|································|·································
+ |  PubkeyRouterFacet          ·                     14.661 ()  ·                     14.692 ()  │
+ ······························|································|·································
+ |  DomainWalletRegistry       ·                     14.732 ()  ·                     15.843 ()  │
+ ······························|································|·································
+ |  StakingFacet               ·                     18.992 ()  ·                     19.023 ()  │
+ ······························|································|·································
+ |  ReleaseRegister            ·                     19.238 ()  ·                     20.613 ()  │
+ ······························|································|·································
+ |  PKPHelper                  ·                     21.353 ()  ·                     22.025 ()  │
+ ······························|································|·································
+ |  PKPPermissionsFacet        ·                     21.725 ()  ·                     21.757 ()  │
+ ······························|································|·································
+ |  LITToken                   ·                     22.715 ()  ·                     26.154 ()  │
+ ······························|································|·································
+ |  PKPNFTFacet                ·                     22.883 ()  ·                     22.915 ()  │
+ ······························|································|·································
+ |  RateLimitNFTFacet          ·                     23.596 ()  ·                     23.628 ()  │
+ ·-----------------------------|--------------------------------|--------------------------------·

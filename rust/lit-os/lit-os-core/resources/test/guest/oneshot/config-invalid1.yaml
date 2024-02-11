@@ -1,0 +1,6 @@
+# oneshot-config
+version: 1
+some: ducks
+actions:
+  bootstrap:
+    settings: {}

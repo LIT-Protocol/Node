@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# DJR: This script comes from: https://github.com/mozilla/sccache/issues/1000
+# - It's intended to fix some issues where sometimes sccache is called from sccache.
+# - This may not be required long term (nor the symlinks in this directory to it).
+#
+
+set -e -E -u -o pipefail -o noclobber -o noglob +o braceexpand || exit -- 1
+trap -- 'printf -- "[ee]  failed:  %s\\n" "${BASH_COMMAND}" >&2 ; exit -- 1' ERR || exit -- 1
+
+if test "${#}" -eq 0 ; then
+	printf -- '[ee]  expected arguments;  aborting!\n' >&2
+	exit -- 99
+fi
+
+_sccache_bin="$HOME/.local/bin/sccache"
+test -f "${_sccache_bin}"
+test -x "${_sccache_bin}"
+
+case "${0}" in
+	( sccache | */sccache )
+		test "${#}" -ge 1
+		case "${1}" in
+			( sccache | */sccache )
+				shift -- 1
+				exec -- "${0}" "${@}"
+			;;
+		esac
+		_delegate="${1}"
+		shift -- 1
+	;;
+	
+	( cc | c++ | gcc | g++ | clang | clang++ | rustc )
+		_delegate="${0}"
+	;;
+	( */cc | */c++ | */gcc | */g++ | */clang | */clang++ | */rustc )
+		_delegate="${0##*/}"
+	;;
+	
+	( * )
+		printf -- '[%08d] [ee]  invalid tool `%s`;  aborting!\n' "${$}" "${0}" >&2
+		exit -- 99
+	;;
+esac
+
+if test "/proc/${PPID}/exe" -ef "${_sccache_bin}" ; then
+	readarray -d ':' -t -- _paths < <( printf -- '%s' "${PATH}" )
+	
+	_delegate_bin=''
+	for _path in "${_paths[@]}" ; do
+		if test -z "${_path}" ; then
+			continue
+		fi
+		_delegate_bin_0="${_path}/${_delegate}"
+		if test ! -f "${_delegate_bin_0}" -o ! -x "${_delegate_bin_0}" ; then
+			continue
+		fi
+		if test "${0}" -ef "${_delegate_bin_0}" ; then
+			continue
+		fi
+		_delegate_bin="${_delegate_bin_0}"
+		break
+	done
+	
+	if test -z "${_delegate_bin}" ; then
+		printf -- '[%08d] [ee]  failed to resolve tool `%s`;  aborting!\n' "${$}" "${_delegate}" >&2
+		exit -- 99
+	fi
+	
+	exec -- "${_delegate_bin}" "${@}"
+fi
+
+exec -- "${_sccache_bin}" "${_delegate}" "${@}"

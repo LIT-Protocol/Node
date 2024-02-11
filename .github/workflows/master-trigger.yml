@@ -1,0 +1,194 @@
+name: master-trigger
+on:
+  pull_request:
+  workflow_dispatch: {}
+
+jobs:
+  get_base_commit_hash:
+    runs-on: ubuntu-latest
+    outputs:
+      base_sha: ${{ steps.base_sha.outputs.base_sha }}
+    steps:
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v7
+
+      - name: Make sure we checked out develop, so we can get it's sha
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branch-name.outputs.base_ref_branch }}
+
+      - name: Get sha of base branch
+        id: base_sha
+        run: |
+          export BASE_SHA=$(git rev-parse HEAD)
+          echo "Base sha is $BASE_SHA"
+          echo "base_sha=$BASE_SHA" >> $GITHUB_OUTPUT
+
+  list_changed_files_and_trigger_workflows:
+    runs-on: ubuntu-latest
+    needs: [get_base_commit_hash]
+    outputs:
+      lit_node_changed: ${{ steps.changed-files-yaml.outputs.lit_node_any_modified }}
+      lit_core_changed: ${{ steps.changed-files-yaml.outputs.lit_core_any_modified }}
+      lit_os_changed: ${{ steps.changed-files-yaml.outputs.lit_os_any_modified }}
+      lit_services_changed: ${{ steps.changed-files-yaml.outputs.lit_services_any_modified }}
+      blockchain_changed: ${{ steps.changed-files-yaml.outputs.blockchain_any_modified }}
+    steps:
+      - name: Checkout lit-assets
+        uses: actions/checkout@v4
+
+      - name: Print base sha
+        run: |
+          echo "Base sha is ${{ needs.get_base_commit_hash.outputs.base_sha }}"
+
+      - name: Get changed files
+        id: changed-files-yaml
+        uses: tj-actions/changed-files@v41
+        with:
+          base_sha: ${{ needs.get_base_commit_hash.outputs.base_sha }}
+          files_yaml: |
+            lit_node:
+              - rust/lit-node/**
+              - .github/workflows/rust-lit-node-unit-tests.yml
+              - .github/workflows/rust-lit-node-integration-tests.yml
+              - .github/workflows/rust-lit-node-version-upgrade-tests.yml
+              - .github/workflows/rust-lit-node-fault-tests.yml
+              - .github/workflows/rust-lit-node-clippy.yml
+            lit_core:
+              - rust/lit-core/**
+              - .github/workflows/rust-lit-core.yml
+            blockchain:
+              - blockchain/**
+              - .github/workflows/blockchain-contracts.yml
+            lit_os: 
+              - rust/lit-os/**
+              - .github/workflows/rust-lit-os.yml
+            lit_services:
+              - rust/lit-services/**
+              - .github/workflows/rust-lit-services.yml
+            any:
+              - ./**
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files-yaml.outputs.any_all_modified_files }}; do
+            echo "$file was changed"
+          done
+
+  lit_node_unit_tests:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.lit_node_changed == 'true' }} || ${{ needs.list_changed_files_and_trigger_workflows.outputs.blockchain_changed == 'true' }}
+    uses: ./.github/workflows/rust-lit-node-unit-tests.yml
+    secrets: inherit
+
+  lit_node_integration_tests:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.lit_node_changed == 'true' }} || ${{ needs.list_changed_files_and_trigger_workflows.outputs.blockchain_changed == 'true' }}
+    uses: ./.github/workflows/rust-lit-node-integration-tests.yml
+    secrets: inherit
+
+  lit_node_version_upgrade_tests:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.lit_node_changed == 'true' }} || ${{ needs.list_changed_files_and_trigger_workflows.outputs.blockchain_changed == 'true' }}
+    uses: ./.github/workflows/rust-lit-node-version-upgrade-tests.yml
+    secrets: inherit
+
+  lit_node_fault_tests:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.lit_node_changed == 'true' }} || ${{ needs.list_changed_files_and_trigger_workflows.outputs.blockchain_changed == 'true' }}
+    uses: ./.github/workflows/rust-lit-node-fault-tests.yml
+    secrets: inherit
+
+  lit_node_perf_tests:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.lit_node_changed == 'true' }}
+    uses: ./.github/workflows/rust-lit-node-perf-tests.yml
+    secrets: inherit
+
+  lit_node_clippy:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.lit_node_changed == 'true' }} || ${{ needs.list_changed_files_and_trigger_workflows.outputs.blockchain_changed == 'true' }}
+    uses: ./.github/workflows/rust-lit-node-clippy.yml
+    secrets: inherit
+
+  lit_core:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.lit_core_changed == 'true' }}
+    uses: ./.github/workflows/rust-lit-core.yml
+    secrets: inherit
+
+  lit_os:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.lit_os_changed == 'true' }}
+    uses: ./.github/workflows/rust-lit-os.yml
+    secrets: inherit
+
+  lit_services:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.lit_services_changed == 'true' }}
+    uses: ./.github/workflows/rust-lit-services.yml
+    secrets: inherit
+
+  blockchain:
+    needs: list_changed_files_and_trigger_workflows
+    if: ${{ needs.list_changed_files_and_trigger_workflows.outputs.blockchain_changed == 'true' }}
+    uses: ./.github/workflows/blockchain-contracts.yml
+    secrets: inherit
+
+  cancel_if_clippy_fails: 
+    if: always() && needs.lit_node_clippy.result != 'skipped' && needs.lit_node_clippy.result != 'success'
+    runs-on: ubuntu-latest
+    needs: [lit_node_clippy]
+    steps: 
+      - name: cancelling
+        uses: andymckay/cancel-action@0.3
+
+  all_jobs:
+    if: ${{ always() }}
+    needs: [lit_node_unit_tests, lit_node_integration_tests, lit_node_version_upgrade_tests, lit_core, lit_os, lit_services, blockchain, lit_node_clippy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check status of all jobs
+        run: |
+          echo "lit_node_unit_tests status: ${{ needs.lit_node_unit_tests.result }}"
+          echo "lit_node_integration_tests status: ${{ needs.lit_node_integration_tests.result }}"
+          echo "lit_node_version_upgrade_tests status: ${{ needs.lit_node_version_upgrade_tests.result }}"
+          echo "lit_node_clippy status: ${{ needs.lit_node_clippy.result }}"
+          echo "lit_core status: ${{ needs.lit_core.result }}"
+          echo "lit_os status: ${{ needs.lit_os.result }}"
+          echo "lit_services status: ${{ needs.lit_services.result }}"
+          echo "blockchain status: ${{ needs.blockchain.result }}"
+          echo "----------------------"
+          if test "${{needs.lit_node_unit_tests.result}}" != "skipped" && test "${{needs.lit_node_unit_tests.result}}" != "success"; then
+            echo "lit_node_unit_tests failed"
+            exit 1
+          fi
+          if test "${{needs.lit_node_integration_tests.result}}" != "skipped" && test "${{needs.lit_node_integration_tests.result}}" != "success"; then
+            echo "lit_node_integration_tests failed"
+            exit 1
+          fi
+            if test "${{needs.lit_node_version_upgrade_tests.result}}" != "skipped" && test "${{needs.lit_node_version_upgrade_tests.result}}" != "success"; then
+            echo "lit_node_version_upgrade_tests failed"
+            exit 1
+          fi
+          if test "${{needs.lit_node_clippy.result}}" != "skipped" && test "${{needs.lit_node_clippy.result}}" != "success"; then
+            echo "lit_node_clippy failed"
+            exit 1
+          fi
+          if test "${{needs.lit_core.result}}" != "skipped" && test "${{needs.lit_core.result}}" != "success"; then
+            echo "lit_core failed"
+            exit 1
+          fi
+          if test "${{needs.lit_os.result}}" != "skipped" && test "${{needs.lit_os.result}}" != "success"; then
+            echo "lit_os failed"
+            exit 1
+          fi
+          if test "${{needs.lit_services.result}}" != "skipped" && test "${{needs.lit_services.result}}" != "success"; then
+            echo "lit_services failed"
+            exit 1
+          fi
+          if test "${{needs.blockchain.result}}" != "skipped" && test "${{needs.blockchain.result}}" != "success"; then
+            echo "blockchain failed"
+            exit 1
+          fi

@@ -1,0 +1,14 @@
+#!/usr/bin/expect
+
+set prompt "\u001b\[0;37m$\u001b\[00m "
+
+spawn ssh -o StrictHostKeyChecking=no 198.7.56.184
+
+expect $prompt
+
+send "sleep 5\n"
+
+expect $prompt
+
+send "exit\r"
+expect eof

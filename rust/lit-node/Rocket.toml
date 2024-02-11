@@ -1,0 +1,11 @@
+[default]
+address = "0.0.0.0"
+limits = { form = "64 kB", json = "100 MiB", file = "30000 MiB" }
+log_level = "critical"
+temp_dir = "/var/tmp"
+
+[default.shutdown]
+ctrlc = true
+signals = ["term", "hup"]
+grace = 30
+mercy = 5

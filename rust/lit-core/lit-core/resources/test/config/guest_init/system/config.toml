@@ -1,0 +1,7 @@
+[lit]
+env = "dev"
+
+[simple]
+port = 1234
+dummy = "system"
+other = true

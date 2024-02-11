@@ -1,0 +1,17 @@
+[lit]
+env = "dev"
+
+[blockchain]
+chain_name = "mumbai"
+
+[subnet]
+id = "changeme"
+
+[api.prov.tls_auto]
+enabled = false
+
+[api.prov.http]
+enabled = true
+
+[api.prov.https]
+enabled = false

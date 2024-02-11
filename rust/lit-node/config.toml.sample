@@ -1,0 +1,33 @@
+# NB: Do NOT deploy this with the env below (this is just for local env).
+[lit]
+env = "dev"
+
+# These values will be provided by the guest.
+[blockchain]
+chain_id = "80001"
+chain_name = "mumbai"
+wallet.default.private_key = ""
+
+# TODO: Change this.
+[subnet]
+id = "aA7aD6F5EAc8bF4bAe5CC03295559723677EcA6c"
+
+[ipfs]
+gateway = "https://cloudflare-ipfs.com/ipfs/"
+
+[node.http]
+port = "7470"
+
+[node]
+domain = "127.0.0.1"
+rpc_url = "https://rpc.ankr.com/polygon_mumbai"
+enable_rate_limiting = false
+enable_actions_allowlist = false
+enable_epoch_transitions = false
+enable_ecdsa_dkg = true
+
+staker_address = ""
+admin_address = ""
+
+coms_keys_sender_privkey = ""
+coms_keys_receiver_privkey = ""

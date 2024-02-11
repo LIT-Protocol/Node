@@ -1,0 +1,14 @@
+[workspace]
+members = [
+    "lit-core",
+    "lit-core-derive",
+    "lit-cli-core",
+    "lit-api-core",
+    "lit-blockchain",
+    "lit-attestation",
+    "lit-logging"
+]
+resolver = "2"
+
+[patch.crates-io]
+rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse" }
