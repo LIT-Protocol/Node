@@ -12,7 +12,7 @@ Integration tests contain a number of helpers to assist with configuring the net
 
 ### Supported chains
 
-Tests that involve interaction with chains can use either `Hardhat` (running in `lit-assets/blockchain/contracts`), `Anvil` or Polygon's `mumbai` network.  
+Tests that involve interaction with chains can use either `Hardhat` (running in `blockchain/contracts`), `Anvil` or Polygon's `mumbai` network.  
 
 ### Hardhat Pre-reqs:
 

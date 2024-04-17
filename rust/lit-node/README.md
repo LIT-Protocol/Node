@@ -108,7 +108,7 @@ export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/opt/libffi/lib:/opt/homebrew/Ce
 
 These are the instructions to spin up a network running locally:
 
-1. Follow the instructions [here](https://github.com/LIT-Protocol/lit-assets/blob/develop/blockchain/contracts/README.md#deploying) to deploy + configure smart contracts locally.
+1. Follow the instructions [here](https://github.com/LIT-Protocol/Node/blob/develop/blockchain/contracts/README.md#deploying) to deploy + configure smart contracts locally.
 2. Run `cp rpc-config.example.yaml rpc-config.yaml` and make sure you configure the RPC provider URLs correctly for the chain you would like to spin up the network against.
 3. Run `cargo build` in this project.
 4. If you are using AMD CPUs, set the environment variable `LIT_ATTESTATION_TYPE_OVERRIDE` to anything other than `"AMD_SEV_SNP"`. Otherwise the nodes will require AMD_SEV_SNP attestations from peers.

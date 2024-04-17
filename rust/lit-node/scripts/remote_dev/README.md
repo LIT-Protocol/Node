@@ -1,4 +1,4 @@
-Run these scripts from the lit-assets/rust/lit-node folder.  Your current local copy of the code will be copied over and compiled, so you can make changes locally and then run them remotely, without committing or pushing.
+Run these scripts from the `rust/lit-node` folder.  Your current local copy of the code will be copied over and compiled, so you can make changes locally and then run them remotely, without committing or pushing.
 
 To bootstrap the nodes (this only needs to be done once), and install rust etc, run: ./scripts/remote_dev/bootstrap.sh
 
