@@ -1,0 +1,45 @@
+[package]
+name = "lit-os-prov-api"
+description = "Lit OS Prov API"
+authors = ["David Radunz <david.radunz@litprotocol.com>"]
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "api"
+path = "./src/main.rs"
+
+[features]
+default = ["lit-attestation/generate-via-service"]
+
+[dependencies]
+log = { version = "0.4.20", features = ["kv_unstable"] }
+config = { version = "0.13.3" }
+rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse", features = ["tls", "json"] }
+rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", rev = "985098dd8f3b052716111eaa872d184cc21a1a68" }
+ipfs-api-backend-hyper = { git = "https://github.com/LIT-Protocol/rust-ipfs-api", branch = "lit-remote-pinning", features = ["with-send-sync"] }
+ipfs-hasher = { version =  "0.13.0" }
+libsecp256k1 = { git = "https://github.com/LIT-Protocol/libsecp256k1", branch = "master", version = "0.7.1" }
+tracing = "0.1.40"
+
+[dependencies.lit-core]
+path = "../../lit-core/lit-core"
+
+[dependencies.lit-logging]
+path = "../../lit-core/lit-logging"
+features = ["service"]
+
+[dependencies.lit-api-core]
+path = "../../lit-core/lit-api-core"
+
+[dependencies.lit-blockchain]
+path = "../../lit-core/lit-blockchain"
+
+[dependencies.lit-attestation]
+path = "../../lit-core/lit-attestation"
+
+[dependencies.lit-os-core]
+path = "../lit-os-core"
+
+[dependencies.lit-os-prov-core]
+path = "../lit-os-prov-core"

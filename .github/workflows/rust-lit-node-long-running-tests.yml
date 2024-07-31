@@ -1,0 +1,96 @@
+name: rust/lit-node-long-running-tests
+
+# Run long running tests if either one of the following triggers fire:
+on:
+  # Every weekday at 03:00 UTC
+  schedule:
+    - cron: "0 3 * * 1-5"
+  # Enable manual triggers
+  workflow_dispatch: {}
+  workflow_call:
+  push:
+    paths:
+      - rust/lit-node/**
+      - .github/workflows/rust-lit-node-long-running-tests.yml
+      - .github/workflows/rust-lit-node-build.yml
+      - scripts/github/**
+    branches:
+      - master
+      - develop
+      - datil
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_LOG_STYLE: always
+  RUST_LOG: warn,lit_node=debug, test=debug
+  RUST_BACKTRACE: full
+  LIT_LOGGING_SERVICE_DISABLED: 1
+  LIT_CELO_DEPLOYER_PRIVATE_KEY: "0x3178746f7ae6a309d14444b4c6c85a96a4be2f53fa8950dea241d232f3e6c166"
+  LIT_ALFAJORES_DEPLOYER_PRIVATE_KEY: "0x3178746f7ae6a309d14444b4c6c85a96a4be2f53fa8950dea241d232f3e6c166"
+  LIT_MUMBAI_DEPLOYER_PRIVATE_KEY: "0x3178746f7ae6a309d14444b4c6c85a96a4be2f53fa8950dea241d232f3e6c166"
+  LIT_POLYGON_DEPLOYER_PRIVATE_KEY: "0x3178746f7ae6a309d14444b4c6c85a96a4be2f53fa8950dea241d232f3e6c166"
+  IN_GITHUB_CI: 1
+  LIT_LOGGING_TIMESTAMP: 1 # force adding timestamp since the CI timestamps are wrong
+  CARGO_INCREMENTAL: 0
+  IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
+
+defaults:
+  run:
+    shell: bash
+    working-directory: rust/lit-node
+
+jobs:
+  # check if we need to build.  this is necessary to make this workflow file be able to be run independently of master-trigger, which builds before calling this workflow.  for example, on push to a branch, we want to run this workflow without having to run the master-trigger first.
+  build-if-needed: 
+    uses: ./.github/workflows/rust-lit-node-build-if-needed.yml
+    with:
+      build_features: lit-actions,testing
+    secrets: inherit
+
+  run-tests:
+    needs: build-if-needed
+    runs-on: warp-ubuntu-latest-x64-8x # change to LargeRunner to run on github.  Change to self-hosted to run on our own runner.  Change to buildjet-8vcpu-ubuntu-2204 to run on buildjet with 8 cpus.  Change to 8core to use github 8 core runner
+    timeout-minutes: 90
+
+    services:
+      anvil:
+        image: litptcl/anvil-lit:latest
+        ports:
+          - 8545:8545
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    steps:
+      - name: Install deps
+        working-directory: ${{ github.workspace }}
+        run: sudo apt-get update && sudo apt-get install -y zstd
+      - name: Checkout lit-assets
+        uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: buildjet/setup-node@v3
+        with:
+          node-version: 18.17.0
+          cache: npm
+          cache-dependency-path: ${{ github.workspace }}/blockchain/contracts/package-lock.json
+      - name: Cargo fmt check # why run this, you may ask?  becuase it prevents the test from running if we should be short-circuiting
+        run: cargo fmt -- --check
+      - name: Install dependencies for blockchain/contracts
+        working-directory: ${{ github.workspace }}/blockchain/contracts
+        run: npm install
+      - name: Run npx hardhat compile for blockchain/contracts
+        working-directory: ${{ github.workspace }}/blockchain/contracts
+        run: npx hardhat compile
+      - name: Install nextest
+        run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+      - name: Download archive
+        uses: actions/download-artifact@v4
+        with:
+          name: nextest-archive-lit-actions,testing
+          path: rust/lit-node/
+      - name: Unzip archive so that we can get the lit_node binary
+        run: zstd -d -c nextest-archive.tar.zst | tar xf -
+      - name: Setup local files for testing
+        run: make setup-local-files
+      - name: Run long running tests
+        run: "~/.cargo/bin/cargo-nextest nextest run --archive-file nextest-archive.tar.zst --final-status-level pass --profile long-running-tests -E 'test(/long/)' --"

@@ -1,0 +1,48 @@
+#!/usr/bin/expect
+
+set prompt {.*\$.* }
+
+set host_ip [lindex $argv 0]
+set ip_address [lindex $argv 1]
+set gw [lindex $argv 2]
+set subnet_id [lindex $argv 3]
+set staker_address [lindex $argv 4]
+set wallet_key [lindex $argv 5]
+set coms_sender_key [lindex $argv 6]
+set coms_receiver_key [lindex $argv 7]
+
+spawn ssh -o StrictHostKeyChecking=no $host_ip
+
+expect -re $prompt
+
+# disable timeout so we can wait for the command to finish
+set timeout -1
+
+
+
+# destroy existing node
+send "sudo lit os guest instance delete all\n"
+expect -re $prompt
+
+# create new node
+send "sudo lit os guest instance create node \
+--net4-ip $ip_address --net4-gw $gw \
+-f --subnet-id $subnet_id \
+--node-staker-address $staker_address \
+--node-admin-address 0x50e2dac5e78B5905CB09495547452cEE64426db2 \
+--vcpus 16 --mem 20G\n"
+
+
+expect "Enter private key to node wallet:"
+send "$wallet_key\n"
+
+expect "Enter coms sender private key:"
+send "$coms_sender_key\n"
+
+expect "Enter coms receiver private key:"
+send "$coms_receiver_key\n"
+
+expect -re {Debian GNU\/Linux 11}
+
+send "exit\n"
+expect eof

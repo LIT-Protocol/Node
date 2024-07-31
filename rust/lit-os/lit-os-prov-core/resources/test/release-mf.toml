@@ -1,0 +1,36 @@
+[meta]
+build_id = "bbc9362e"
+build_type = "node"
+build_release = "dev"
+build_date = "26-Oct-2022 12:42:44 EDT"
+build_unix = "1666802564"
+build_uname = "Linux ioflood-sev01 5.19.0-rc6-snp-host-d9bd54fea4d2 #1 SMP Fri Oct 14 16:30:36 EDT 2022 x86_64 GNU/Linux"
+
+[release]
+id = "bbc9362eaa7ad6f5eac8bf4bae5cc03295559723677eca6c"
+subnet_id = "aa7ad6f5eac8bf4bae5cc03295559723677eca6c"
+unix = "1666802564"
+
+[assets]
+"amd/OVMF.fd" = { cid = "QmREcRvpDtLFX2saAgs3xfNjJxKebbHVmqvJeNZhP3ijdD" }
+"build-meta.toml" = { cid = "QmUs5ck1uEkfLevUa77nUkjpLv2JWwiDNWpKZLF6FeakYR" }
+"build.env" = { cid = "Qme8z2NDUbMhfDp6w6tqwdNV4pSEchZcMGzPeYNETwk3N2" }
+"build.err" = { cid = "Qmd5XFjSLjS3Qsbx6rYoPAMKDP1FmSDUnYg8RePHL89WuD" }
+"build.out" = { cid = "QmXSffkZSS26Dx2YCT1CZmxNmX6L3HMXYCLKZzcb6MDRp1" }
+"guest-disk.qcow2" = { cid = "QmX3c5E5ZrVyccWAzjGjRAKBtRgQkjXanqnfi4VDiz3EpM" }
+"guest-initrd.img" = { cid = "QmcyimcqLYkzWD11BpHPjmniZxjVMhDYsoSToLX2j96e59" }
+"guest-vmlinuz" = { cid = "QmUsrnLBFa2MsfxdNPS7QBcoko55Krbrg35vvoioZPWaSP" }
+"guest-vmlinuz.cmdline" = { cid = "QmSEW8vew5meLZzyX727kZPJ9qe9uBzWda9GLu1AdRUWr7" }
+
+[measurements]
+"7be567429d945f6b92f48e648e2d5a462fcfb409c86792ba4e896803af69ba71bd77bae277b828eaf4d9f638becbb598" = { vcpu_type = "EPYC", vcpus = 1 }
+"c1c7af561a37a0f7f82354536d2753d2463e620f0e1c988767262b6edc44040da26722a83c8489a03d00aafd961b9603" = { vcpu_type = "EPYC", vcpus = 4 }
+"7eb00e68b39296db3caf8750e87ebd525977dbe24a5e9ef1d4847a79ac578995869042d632fde7312245b23ccdb63b8e" = { vcpu_type = "EPYC", vcpus = 8 }
+"67f123e2be29422eedabd0e2851c0f25d60b020aa853137762d1148fde7bbcf4046442c20a467d6274a56f514b8fd230" = { vcpu_type = "EPYC", vcpus = 16 }
+"49593ffbfbdb1da65ae30401852311b893597a730fd5c75bd4b3eacc2715995f6701eeb2abab5a533a9073e566e3a71c" = { vcpu_type = "EPYC", vcpus = 24 }
+"9fd528c2f7bea5843f26de7db246974f9160cd2541fb75664a739e6997d701e4671a6a61a04e4926d8166ae16f88a263" = { vcpu_type = "EPYC", vcpus = 32 }
+"47b552659d0960f93991bdbc737317c1ad12f41eb0afcb65d7d71bb2cf991a09bfb40e6054a59e6cd81decf77d80cfba" = { vcpu_type = "EPYC", vcpus = 64 }
+"f7c96da3ec283fe9b4ee810cf8c26e708289ef0d83f332ed30344e9ad859100942fc0d1790f8ca95d42bb6cafdffe037" = { vcpu_type = "EPYC", vcpus = 128 }
+
+[proof]
+cid = "QmbL4KU1smUwEZ6GmijnFK4zn4ekFo2CBd637iuqvSDQ28"

@@ -1,0 +1,38 @@
+#!/usr/bin/expect
+
+set prompt {.*\$.* }
+
+set host_ip [lindex $argv 0]
+set subnet_id [lindex $argv 1]
+
+set timeout -1
+
+spawn ssh -o StrictHostKeyChecking=no $host_ip
+
+expect -re $prompt
+
+# find the instance id
+
+# example output:
+# +----------+-------------------+--------+--------------------------+------+------+-----+--------------------------------------------------+------------------------------------------+
+# | id       | name              | labels | date                     | type | kind | env | release                                          | subnet                                   |
+# +----------+-------------------+--------+--------------------------+------+------+-----+--------------------------------------------------+------------------------------------------+
+# | 6bff0c42 | prov-dev-6bff0c42 | NULL   | 13-Oct-2023 17:42:08 EDT | prov | NULL | dev | 8888fb097a69125a04f49cab287384e8598df08e797c3c22 | 7a69125a04f49cab287384e8598df08e797c3c22 |
+# +----------+-------------------+--------+--------------------------+------+------+-----+--------------------------------------------------+------------------------------------------+
+
+# needed because the output of the lit os command is lowercase but the subnet id is mixed case
+set subnet_id [string tolower $subnet_id]
+
+
+send "export INSTANCE_ID=\$(sudo lit os guest instance ls -o wide | awk -F'|' '/$subnet_id/ {print \$2}' | tr -d ' ')\n"
+expect -re $prompt
+
+# send "echo \"instance id is \$INSTANCE_ID\"\n"
+
+
+send "sudo lit os guest instance delete \"\$INSTANCE_ID\"\n"
+
+expect -re $prompt
+
+send "exit\r"
+expect eof

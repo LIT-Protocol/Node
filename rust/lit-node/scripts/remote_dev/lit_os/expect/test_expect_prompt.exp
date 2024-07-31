@@ -1,0 +1,16 @@
+#!/usr/bin/expect
+
+set timeout -1
+
+set prompt {.*\$.* }
+
+spawn ssh -o StrictHostKeyChecking=no 198.7.56.184
+
+expect -re $prompt
+
+send "sleep 5\n"
+
+expect -re $prompt
+
+send "exit\r"
+expect eof

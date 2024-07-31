@@ -1,0 +1,5 @@
+# oneshot-config
+version: 1
+actions:
+  bootstrap:
+    settings: {}

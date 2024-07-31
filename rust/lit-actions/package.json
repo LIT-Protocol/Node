@@ -1,0 +1,13 @@
+{
+  "name": "Lit Actions SDK",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "docs": "./scripts/gen_docs.sh"
+  },
+  "dependencies": {
+    "documentation": "^14.0.3",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.3"
+  }
+}

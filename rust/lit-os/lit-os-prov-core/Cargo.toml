@@ -1,0 +1,48 @@
+[package]
+name = "lit-os-prov-core"
+description = "Lit OS Prov Core"
+authors = ["David Radunz <david.radunz@litprotocol.com>"]
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["lit-attestation/generate"]
+
+[dependencies]
+log = { version = "0.4.20", features = ["kv_unstable"] }
+config = { version = "0.13.3" }
+sha2 = { version = "0.10.8" }
+libsecp256k1 = { git = "https://github.com/LIT-Protocol/libsecp256k1", branch = "master", version = "0.7.1" }
+rand_chacha = { version = "0.3.1" }
+serde = { version = "1.0.189", features = ["derive"] }
+serde_json = { version = "1.0.107" }
+serde_bytes_base64 = { version = "0.1.1" }
+sev-snp-utilities = { version = "1.4.9" }
+toml = { version = "0.5.11" }
+bytes = { version = "1.5.0" }
+base64 = { version = "0.20.0-alpha.1" }
+ethers = { version = "2.0.8", features = [
+  # "celo",
+  "abigen",
+  "legacy",
+] }
+async-std = { version = "1.12.0" }
+async-trait = { version = "0.1.74" }
+derive_more = { version = "0.99.17" }
+tracing = "0.1.40"
+
+[dependencies.lit-core]
+path = "../../lit-core/lit-core"
+features = ["ipfs"]
+
+[dependencies.lit-core-derive]
+path = "../../lit-core/lit-core-derive"
+
+[dependencies.lit-blockchain]
+path = "../../lit-core/lit-blockchain"
+
+[dependencies.lit-attestation]
+path = "../../lit-core/lit-attestation"
+
+[dependencies.lit-os-core]
+path = "../lit-os-core"

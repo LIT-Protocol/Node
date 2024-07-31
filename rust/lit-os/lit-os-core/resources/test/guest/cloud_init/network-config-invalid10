@@ -1,0 +1,12 @@
+#cloud-config
+version: 2
+ethernets:
+  enp0s2:
+    dhcp4: true
+    dhcp6: false
+  enp0s3:
+    optional: false
+    dhcp4: false
+    addresses:
+      - 11.11.11.11/24
+    gateway4: 2345:425:2CA1:0000:0000:567:5673:23b5

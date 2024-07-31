@@ -1,0 +1,25 @@
+[test-groups]
+serial-tests = { max-threads = 1 }
+
+[[profile.default.overrides]]
+filter = 'test(/integration|component|acceptance|sdk|fault_tests|perf_tests|upgrades|long/)'
+platform = 'cfg(unix)'
+test-group = 'serial-tests'
+
+[profile.unit-tests]
+slow-timeout = { period = "120s", terminate-after = 2 }
+
+[profile.integration-tests]
+slow-timeout = { period = "200s", terminate-after = 2 }
+
+[profile.version-upgrade-tests]
+slow-timeout = { period = "400s", terminate-after = 3 }
+
+[profile.fault-tests]
+slow-timeout = { period = "400s", terminate-after = 2 }
+
+[profile.perf-tests]
+slow-timeout = { period = "400s", terminate-after = 2 }
+
+[profile.long-running-tests]
+slow-timeout = { period = "2700s", terminate-after = 1 }

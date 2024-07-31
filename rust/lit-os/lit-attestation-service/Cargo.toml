@@ -1,0 +1,48 @@
+[package]
+name = "lit-attestation-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = { version = "0.1.74" }
+derive_more = { version = "0.99.17" }
+hyper = { version = "0.14" }
+hyperlocal = { version = "0.8" }
+log = { version = "0.4.20", features = ["kv_unstable"] }
+moka = { version = "0.9.9", features = ["future"] }
+once_cell = { version = "1.18.0" }
+rand_chacha = { version = "0.3.1" }
+serde = { version = "1.0.189", features = ["derive"] }
+serde_bytes_base64 = { version = "0.1.1" }
+serde_json = { version = "1.0.107" }
+sev-snp-utilities = { version = "1.4.9" }
+tempfile = { version = "3.8" }
+tokio = { version = "1.33.0", features = ["full"] }
+futures = { version = "0.3.28" }
+uuid = { version = "1.5.0", features = ["v4"] }
+
+[dependencies.lit-core]
+path = "../../lit-core/lit-core"
+features = ["asn1"]
+
+[dependencies.lit-core-derive]
+path = "../../lit-core/lit-core-derive"
+
+[dependencies.lit-logging]
+path = "../../lit-core/lit-logging"
+features = ["service"]
+
+[dependencies.lit-api-core]
+path = "../../lit-core/lit-api-core"
+features = ["server-hyper"]
+
+[dependencies.lit-attestation]
+path = "../../lit-core/lit-attestation"
+features = ["generate-via-system", "service", "kdf"]
+
+[dependencies.lit-os-core]
+path = "../lit-os-core"
+
+[dev-dependencies]
+rand = "~0.7.3"
+serial_test = "*"

@@ -1,0 +1,50 @@
+version: '3.4'
+
+services:
+  dtl:
+    image: public.ecr.aws/o8e2k8j7/data-transport-layer:lit-test
+    # override with the dtl script and the env vars required for it
+    entrypoint: ./dtl.sh
+    # set the rest of the env vars for the network whcih do not
+    # depend on the docker-compose setup
+    environment:
+      # used for setting the address manager address
+      URL: http://lit-test.calderachain.xyz/addresses.json
+      # connect to the 2 layers
+      DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: https://polygon-mainnet.g.alchemy.com/v2/GVHy1QYi6r-r1SAI3iK6zU6kpvnjrfdA # Replace with your own
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: http://lit-test.calderachain.xyz/replica-http
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
+      DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 987
+      DATA_TRANSPORT_LAYER__L1_START_HEIGHT: 40320582
+      DATA_TRANSPORT_LAYER__DB_PATH: "/db"
+      DATA_TRANSPORT_LAYER__SERVER_PORT: "7878"
+      DATA_TRANSPORT_LAYER__SERVER_HOSTNAME: "0.0.0.0"
+    ports:
+      - ${DTL_PORT:-7878}:7878
+
+  replica:
+    depends_on:
+      - dtl
+    deploy:
+      replicas: 1
+    image: public.ecr.aws/o8e2k8j7/l2geth:lit-test
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./geth.env
+    environment:
+      ETH1_HTTP: https://polygon-mainnet.g.alchemy.com/v2/GVHy1QYi6r-r1SAI3iK6zU6kpvnjrfdA # Replace with your own
+      SEQUENCER_CLIENT_HTTP: http://lit-test.calderachain.xyz/replica-http
+      ROLLUP_STATE_DUMP_PATH: http://lit-test.calderachain.xyz/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l2'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      ETH1_CTC_DEPLOYMENT_HEIGHT: 40320582
+      RETRIES: 60
+      CHAIN_ID: 987
+      NETWORK_ID: 987
+
+
+    ports:
+      - ${REPLICA_HTTP_PORT:-8549}:8545
+      - ${REPLICA_WS_PORT:-8550}:8546
+

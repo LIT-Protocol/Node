@@ -1,0 +1,57 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IKeyDeriver",
+  "sourceName": "contracts/lit-node/HDKeyDeriver.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "derivedKeyId",
+          "type": "bytes32"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes",
+              "name": "pubkey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "keyType",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IPubkeyRouter.RootKey[]",
+          "name": "rootHDKeys",
+          "type": "tuple[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "keyType",
+          "type": "uint256"
+        }
+      ],
+      "name": "computeHDPubKey",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

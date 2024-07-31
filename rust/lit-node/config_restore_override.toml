@@ -1,0 +1,4 @@
+[node]
+bls_key_blinder = ""
+ecdsa_key_blinder = ""
+enter_restore_state = "false"

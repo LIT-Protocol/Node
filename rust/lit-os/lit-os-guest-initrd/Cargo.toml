@@ -1,0 +1,77 @@
+[package]
+name = "lit-os-guest-initrd"
+description = "Lit OS Guest Initrd"
+authors = ["David Radunz <david.radunz@litprotocol.com>"]
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "lit-os-init"
+path = "src/bin/init/main.rs"
+
+[[bin]]
+name = "lit-os-cache-warmer"
+path = "src/bin/cache_warmer/main.rs"
+
+[features]
+default = ["common", "type-prov", "type-node", "type-build", "type-custom"]
+type-prov = ["common"]
+type-node = ["common"]
+type-build = ["common"]
+type-custom = ["common"]
+common = [
+  "lit-os-prov-core",
+  "lit-attestation/generate-via-system",
+  "sev-snp-utilities/trust-dns",
+]
+
+[dependencies]
+log = { version = "0.4.20", features = ["kv_unstable", "kv_unstable_serde"] }
+env_logger = { git = "https://github.com/LIT-Protocol/env_logger.git" }
+temp-file = { version = "0.1.7" }
+walkdir = { version = "2.4.0" }
+blake3 = { version = "1.5.0" }
+rand_chacha = { version = "0.3.1" }
+once_cell = { version = "1.18.0" }
+tokio = { version = "1.33.0", features = ["full"] }
+futures = { version = "0.3.28" }
+async-std = { version = "1.12.0" }
+async-std-resolver = { version = "0.22.0" }
+surge-ping = { version = "0.7.3" }
+aleo-std-cpu = { version = "0.1.4" }
+sev-snp-utilities = { version = "1.4.9" }
+ipnet = { version = "2.9.0" }
+serde = { version = "1.0.189", features = ["derive"] }
+serde_json = { version = "1.0.107" }
+serde_bytes_base64 = { version = "0.1.1" }
+nix = { version = "0.26.4" }
+file-mode = { version = "0.1.2" }
+posix-acl = { version = "1.1.0" }
+users = { version = "0.11.0" }
+gpt = { git = "https://github.com/LIT-Protocol/gpt", branch = "lit-mods" }
+
+[dependencies.lit-core]
+path = "../../lit-core/lit-core"
+
+[dependencies.lit-logging]
+path = "../../lit-core/lit-logging"
+
+[dependencies.lit-attestation]
+path = "../../lit-core/lit-attestation"
+features = ["kdf"]
+
+[dependencies.lit-blockchain]
+path = "../../lit-core/lit-blockchain"
+
+[dependencies.lit-os-core]
+path = "../lit-os-core"
+
+[dependencies.lit-os-prov-core]
+path = "../lit-os-prov-core"
+optional = true
+
+[dependencies.lit-os-prov-api-client]
+path = "../lit-os-prov-api-client"
+
+[target.'cfg(not(target_os = "macos"))'.dependencies]
+libcryptsetup-rs = { version = "0.9.2" }

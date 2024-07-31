@@ -1,0 +1,23 @@
+[package]
+name = "lit-actions-ext"
+description = "Lit Actions Deno extension"
+version = { workspace = true }
+edition = { workspace = true }
+publish = { workspace = true }
+
+[lib]
+path = "lib.rs"
+test = false
+doctest = false
+
+[dependencies]
+anyhow = { workspace = true }
+atty = "0.2"
+deno_core = { workspace = true }
+ethabi = { version = "18", default-features = false, features = ["serde"] }
+flume = { workspace = true }
+lazy_static = "1"
+lit-actions-grpc = { workspace = true }
+serde_json = { workspace = true }
+tonic = { workspace = true }
+tracing = { workspace = true }

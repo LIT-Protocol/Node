@@ -1,0 +1,31 @@
+[blockchain]
+chain_id = "31337"
+chain_name = "hardhat"
+
+["blockchain.wallet.default"]
+private_key = "59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
+
+[lit]
+env = "dev"
+
+[ipfs]
+gateway = "https://cloudflare-ipfs.com/ipfs/"
+
+[node.http]
+port = "7471"
+
+[node]
+domain = "127.0.0.1"
+admin_address = "e7f1725e7734ce288f8367e1bb143e90bb3f0512"
+coms_keys_receiver_privkey = "0xfb3a6bb884584f8c1d76b2f1d38d5236a29a3d6c8f2a18ba625d46ad28bc61d3"
+coms_keys_sender_privkey = "0xbfac351223a087cd679f4ec1f5f77bc949c57b9bf8e76a03bc9879990b4edeff"
+enable_actions_allowlist = "false"
+enable_epoch_transitions = "true"
+enable_rate_limiting = "false"
+enable_ecdsa_dkg = "true"
+public_key = "02ba5734d8f7091719471e7f7ed6b9df170dc70cc661ca05e688601ad984f068b0"
+rpc_url = "http://localhost:8545"
+staker_address = "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+
+[subnet]
+id = "fA80600109BA720f7d8C4EAD46537726a0216aAf"

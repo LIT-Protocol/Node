@@ -1,0 +1,27 @@
+name: "LIT Assets Docker Image CI"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: LargeRunner
+    steps:
+      - uses: actions/checkout@v3
+      - id: pre-step
+        shell: bash
+        run: echo "release-version=$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Publish the Docker image
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: litptcl/lit-assets
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          dockerfile: docker/ubuntu2204/Dockerfile
+          tags: ${{ steps.pre-step.outputs.release-version }}

@@ -1,0 +1,92 @@
+name: "🐛 Bug Report"
+description: Create a new ticket for a bug.
+title: "🐛 [BUG] - <title>"
+labels: [
+  "bug"
+]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: Please enter an explicit description of your issue
+      placeholder: Short and explicit description of your incident...
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: "Expected Behavior"
+      description: Please describe what the expected behavior is
+      placeholder: Short description of the expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reprod
+    attributes:
+      label: "Reproduction steps"
+      description: Please enter an explicit description of your issue
+      value: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: "Screenshots"
+      description: If applicable, add screenshots to help explain your problem.
+      value: |
+        ![DESCRIPTION](LINK.png)
+      render: bash
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Logs"
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: bash
+    validations:
+      required: false
+  - type: dropdown
+    id: project
+    attributes:
+      label: "Project"
+      description: Which project are you seeing the problem?
+      multiple: true
+      options:
+        - blockchain/contracts
+        - rust/lit-core
+        - rust/lit-node
+        - rust/lit-os
+        - rust/lit-services
+    validations:
+      required: true
+  - type: textarea
+    id: os
+    attributes:
+      label: "OS"
+      description: What is the impacted environment?
+      placeholder: Describe what platform & version of your hardware, software
+    validations:
+      required: false
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: "Proposed Solution"
+      description: Please provide any ideas for possibly resolving this issue
+      placeholder: Describe the implementation details for fixing this issue
+    validations:
+      required: false
+  - type: textarea
+    id: misc
+    attributes:
+      label: "Miscellaneous"
+      description: Please enter any additional details, context or comments
+      placeholder: Description of any additional information that is useful
+    validations:
+      required: false

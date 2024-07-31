@@ -1,0 +1,47 @@
+# DO NOT RELY ON THIS FILE (for testing only)
+# REAL FILE: lit-os:components/common/salt/state/lit/core/blockchain/config/rpc-config.yaml
+chains:
+  ethereum:
+    url: https://eth.llamarpc.com
+  polygon:
+    url: "https://polygon-rpc.com"
+  mumbai:
+    url: https://matic-mumbai.chainstacklabs.com/
+  xdai:
+    url: "https://rpc.gnosischain.com"
+  bsc:
+    url: "https://bsc-dataseed.binance.org"
+  fantom:
+    url: "https://rpcapi.fantom.network"
+  arbitrum:
+    url: "https://arb1.arbitrum.io/rpc"
+  avalanche:
+    url: "https://api.avax.network/ext/bc/C/rpc"
+  harmony:
+    url: "https://rpc.s0.t.hmny.io"
+  goerli:
+    url: https://goerli.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8
+  cronos:
+    url: "https://evm-cronos.org"
+  celo:
+    url: "https://forno.celo.org"
+  optimism:
+    url: https://mainnet.optimism.io/
+  optimismGoerli:
+    url: https://optimism-goerli.publicnode.com/
+  fuji:
+    url: "https://api.avax-test.network/ext/bc/C/rpc"
+  aurora:
+    url: "https://mainnet.aurora.dev"
+  eluvio:
+    url: "https://host-76-74-28-226.contentfabric.io/eth"
+  alfajores:
+    url: "https://alfajores-forno.celo-testnet.org"
+  xdc:
+    url: "https://rpc.xinfin.network"
+  evmos:
+    url: "https://eth.bd.evmos.org:8545"
+  evmosTestnet:
+    url: "https://eth.bd.evmos.dev:8545"
+  publicGoodsNetwork:
+    - url: https://rpc.publicgoods.network

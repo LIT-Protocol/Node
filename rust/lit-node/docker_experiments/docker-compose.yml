@@ -1,0 +1,55 @@
+version: '2'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    network_mode: bridge
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - dhparam:/etc/nginx/dhparam
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /usr/share/nginx/html
+    restart: always
+
+  letsencrypt:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-le
+    network_mode: bridge
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
+    environment:
+      - DEFAULT_EMAIL=chris@litprotocol.com
+    restart: always
+
+  lit-node:
+    image: glitch003/lit-protocol
+    container_name: lit_node
+    restart: always
+    ports: 
+      - "7470:7470"
+    network_mode: bridge
+    environment:
+      - VIRTUAL_HOST=node3.litgateway.com
+      - LETSENCRYPT_HOST=node3.litgateway.com
+      - VIRTUAL_PORT=7470
+      - LETSENCRYPT_EMAIL=chris@litprotocol.com
+      - DEBUG=true
+
+
+
+volumes:
+  conf:
+  vhost:
+  dhparam:
+  certs:
+  acme:

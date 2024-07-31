@@ -1,0 +1,7 @@
+[ipfs]
+api = "http://litos-host-other:2199"
+gateway = "http://litos-host-other:2199"
+remotes = ["lit", "pinata"]
+
+[simple]
+dummy = "keyed"

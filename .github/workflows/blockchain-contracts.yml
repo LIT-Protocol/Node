@@ -1,0 +1,72 @@
+name: blockchain/contracts
+on:
+  workflow_dispatch: {}
+  workflow_call:
+  push:
+    paths:
+      - blockchain/contracts/**
+      - .github/workflows/blockchain-contracts.yml
+      - scripts/github/**
+    branches:
+      - master
+      - develop
+      - datil
+
+env:
+  IPFS_API_KEY: ${{ secrets.IPFS_API_KEY }}
+
+defaults:
+  run:
+    shell: bash
+    working-directory: blockchain/contracts
+
+jobs:
+  test_deployment_tool:
+    runs-on: warp-ubuntu-latest-x64-8x # change to LargeRunner to run on github.  Change to self-hosted to run on our own runner.  Change to buildjet-8vcpu-ubuntu-2204 to run on buildjet with 8 cpus
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: buildjet/setup-node@v3
+        with:
+          node-version: 18.17.0
+          cache: npm
+          cache-dependency-path: ${{ github.workspace }}/blockchain/contracts/package-lock.json
+      - name: Install dependencies
+        run: npm install
+      - name: Test deployment tool
+        run: npm run deploy -- --deploy-config scripts/deployConfig/configs/ci-config.json --verbose
+
+    services:
+      anvil:
+        image: litptcl/anvil-lit:latest
+        ports:
+          - 8545:8545
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  test_contracts:
+    runs-on: warp-ubuntu-latest-x64-8x # change to LargeRunner to run on github.  Change to self-hosted to run on our own runner.  Change to buildjet-8vcpu-ubuntu-2204 to run on buildjet with 8 cpus
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: buildjet/setup-node@v3
+        with:
+          node-version: 18.17.0
+          cache: npm
+          cache-dependency-path: ${{ github.workspace }}/blockchain/contracts/package-lock.json
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm run test:ci
+
+    services:
+      anvil:
+        image: litptcl/anvil-lit:latest
+        ports:
+          - 8545:8545
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}

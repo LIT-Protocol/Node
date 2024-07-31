@@ -1,0 +1,1124 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "BackupRecoveryDiamond",
+  "sourceName": "hardhat-diamond-abi/BackupRecoveryDiamond.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "_selector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "CannotAddFunctionToDiamondThatAlreadyExists",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4[]",
+          "name": "_selectors",
+          "type": "bytes4[]"
+        }
+      ],
+      "name": "CannotAddSelectorsToZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "_selector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "CannotRemoveFunctionThatDoesNotExist",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "_selector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "CannotRemoveImmutableFunction",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "_selector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "CannotReplaceFunctionThatDoesNotExists",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "_selector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4[]",
+          "name": "_selectors",
+          "type": "bytes4[]"
+        }
+      ],
+      "name": "CannotReplaceFunctionsFromFacetWithZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "_selector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "CannotReplaceImmutableFunction",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint8",
+          "name": "_action",
+          "type": "uint8"
+        }
+      ],
+      "name": "IncorrectFacetCutAction",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_initializationContractAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_calldata",
+          "type": "bytes"
+        }
+      ],
+      "name": "InitializationFunctionReverted",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_contractAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "_message",
+          "type": "string"
+        }
+      ],
+      "name": "NoBytecodeAtAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_facetAddress",
+          "type": "address"
+        }
+      ],
+      "name": "NoSelectorsProvidedForFacetForCut",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_user",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_contractOwner",
+          "type": "address"
+        }
+      ],
+      "name": "NotContractOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_facetAddress",
+          "type": "address"
+        }
+      ],
+      "name": "RemoveFacetAddressMustBeZeroAddress",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "facetAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "enum IDiamond.FacetCutAction",
+              "name": "action",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes4[]",
+              "name": "functionSelectors",
+              "type": "bytes4[]"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct IDiamond.FacetCut[]",
+          "name": "_diamondCut",
+          "type": "tuple[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_init",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "_calldata",
+          "type": "bytes"
+        }
+      ],
+      "name": "DiamondCut",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "facetAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "enum IDiamond.FacetCutAction",
+              "name": "action",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes4[]",
+              "name": "functionSelectors",
+              "type": "bytes4[]"
+            }
+          ],
+          "internalType": "struct IDiamond.FacetCut[]",
+          "name": "_diamondCut",
+          "type": "tuple[]"
+        },
+        {
+          "internalType": "address",
+          "name": "_init",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_calldata",
+          "type": "bytes"
+        }
+      ],
+      "name": "diamondCut",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "_functionSelector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "facetAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "facetAddress_",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "facetAddresses",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "facetAddresses_",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_facet",
+          "type": "address"
+        }
+      ],
+      "name": "facetFunctionSelectors",
+      "outputs": [
+        {
+          "internalType": "bytes4[]",
+          "name": "_facetFunctionSelectors",
+          "type": "bytes4[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "facets",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "facetAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes4[]",
+              "name": "functionSelectors",
+              "type": "bytes4[]"
+            }
+          ],
+          "internalType": "struct IDiamondLoupe.Facet[]",
+          "name": "facets_",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "owner_",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "publicKey",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "senderPublicKey",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "blsKey",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "senderBlsKey",
+          "type": "bytes"
+        }
+      ],
+      "name": "BackupKeysMismatch",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "peer",
+          "type": "address"
+        }
+      ],
+      "name": "BackupMemberNotMappedToNode",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "members",
+          "type": "address[]"
+        }
+      ],
+      "name": "BackupSetIncomplete",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "pubkey",
+          "type": "bytes"
+        }
+      ],
+      "name": "BackupStateAlreadyRegistered",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "BackupStateNotRegistered",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "CallerNotOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "name": "InvalidCaller",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "name": "NodesAllMappedToBackupMembers",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ProofExpired",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "WrongVerificationVersion",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes",
+              "name": "sessionId",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "bls12381G1EncKey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "secp256K1EcdsaPubKey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "partyThreshold",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address[]",
+              "name": "partyMembers",
+              "type": "address[]"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct LibBackupRecoveryStorage.BackupRecoveryState",
+          "name": "state",
+          "type": "tuple"
+        }
+      ],
+      "name": "BackupKeysRegistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "partyTheshold",
+          "type": "uint256"
+        }
+      ],
+      "name": "BackupPartyRegistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "newResolverAddress",
+          "type": "address"
+        }
+      ],
+      "name": "ContractResolverAddressSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "backupMemberAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "NodeAddress",
+          "type": "address"
+        }
+      ],
+      "name": "NodeAssignedToBackupMember",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes",
+              "name": "pubkey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "keyType",
+              "type": "uint256"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct LibBackupRecoveryStorage.RecoveryKey",
+          "name": "recoveryKey",
+          "type": "tuple"
+        }
+      ],
+      "name": "RecoveryKeySet",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "BASE_EC_OP_ADDRESS",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "_calculatePartyThreshold",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        }
+      ],
+      "name": "_checkValidatorSetForAddress",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "_getStakingViewFacet",
+      "outputs": [
+        {
+          "internalType": "contract StakingViewsFacet",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "allBackupMembersMapped",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "mapped",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getBackupPartyState",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes",
+              "name": "sessionId",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "bls12381G1EncKey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "secp256K1EcdsaPubKey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "partyThreshold",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address[]",
+              "name": "partyMembers",
+              "type": "address[]"
+            }
+          ],
+          "internalType": "struct LibBackupRecoveryStorage.BackupRecoveryState",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getDecryptionThreshold",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getMemberForNodeDkg",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "bp",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getNextBackupPartyMembers",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "backupMembers",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getNextBackupState",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address[]",
+              "name": "partyMembers",
+              "type": "address[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "bytes",
+                  "name": "pubkey",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "keyType",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct LibBackupRecoveryStorage.RecoveryKey[]",
+              "name": "registeredRecoveryKeys",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct LibBackupRecoveryStorage.NextStateDownloadable",
+          "name": "nextState",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getNodeAddressesForDkg",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "nodes",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getNodeForBackupMember",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "peer",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "sessionId",
+          "type": "bytes"
+        }
+      ],
+      "name": "getPastBackupState",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes",
+              "name": "sessionId",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "bls12381G1EncKey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "secp256K1EcdsaPubKey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "partyThreshold",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address[]",
+              "name": "partyMembers",
+              "type": "address[]"
+            }
+          ],
+          "internalType": "struct LibBackupRecoveryStorage.BackupRecoveryState",
+          "name": "partyState",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getProofSubmissionForBackupPartyMember",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getStakerAddressesForDkg",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "nodes",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isNodeForDkg",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "inSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isRecoveryDkgCompleted",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "publicKey",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "encryptedKey",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "sessionId",
+          "type": "bytes"
+        }
+      ],
+      "name": "recieveNewKeySet",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "proof",
+          "type": "bytes"
+        }
+      ],
+      "name": "recieveProofBls12381G1",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "proof",
+          "type": "bytes"
+        }
+      ],
+      "name": "recieveProofsK256",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "partyMembers",
+          "type": "address[]"
+        }
+      ],
+      "name": "registerNewBackupParty",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes",
+              "name": "pubkey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "keyType",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct LibBackupRecoveryStorage.RecoveryKey[]",
+          "name": "recoveryKeys",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "registerRecoveryKeys",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newResolverAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setContractResolver",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "setMemberForDkg",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "bp",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "CURRENT",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "clearNodeRecoveryStatus",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getNodeRecoveryStatus",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "node_address",
+              "type": "address"
+            },
+            {
+              "internalType": "enum LibBackupRecoveryStorage.NodeRecoveryStatus",
+              "name": "status",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct LibBackupRecoveryStorage.NodeRecoveryStatusMap[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum LibBackupRecoveryStorage.NodeRecoveryStatus",
+          "name": "status",
+          "type": "uint8"
+        }
+      ],
+      "name": "setNodeRecoveryStatus",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "bls12381G1EncKey",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "secp256K1EcdsaPubKey",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address[]",
+          "name": "partyMembers",
+          "type": "address[]"
+        }
+      ],
+      "name": "setBackupPartyState",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getNonSubmitingBackupMembersInNextState",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "missingRecoveryMembers",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "deployedBytecode": "",
+  "bytecode": "",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

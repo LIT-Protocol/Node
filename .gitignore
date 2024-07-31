@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# IDEs
+*.iml
+.idea
+*.gz
+*.core
+
+# Rust tags created by rusty-tags
+**/rusty-tags.vi
+**/rusty-tags.emacs
+
+# Backup and writebackup files
+**/*.un~
+**/*.swp

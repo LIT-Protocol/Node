@@ -1,0 +1,15 @@
+syntax = "proto3";
+package chatter;
+
+message NodeShareRequestProto {
+  string sender_id = 1;
+  bytes encrypted_entry = 2;
+}
+
+message NodeShareResponseProto {
+  bool success = 1;
+}
+
+service ChatterService {
+  rpc SendDirectGrpc (NodeShareRequestProto) returns (NodeShareResponseProto);
+}

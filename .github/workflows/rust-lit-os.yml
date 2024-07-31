@@ -1,0 +1,80 @@
+name: rust/lit-os
+on:
+  workflow_dispatch: {}
+  workflow_call:
+  push:
+    paths:
+      - rust/lit-os/**
+      - .github/workflows/rust-lit-os.yml
+      - scripts/github/**
+    branches:
+      - master
+      - develop
+      - datil
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_LOG_STYLE: always
+  RUST_LOG: debug
+  RUST_BACKTRACE: full
+  LIT_LOGGING_SERVICE_DISABLED: 1
+  CARGO_INCREMENTAL: 0
+
+defaults:
+  run:
+    shell: bash
+    working-directory: rust/lit-os
+
+jobs:
+  run-tests:
+    runs-on: warp-ubuntu-latest-x64-4x # change to LargeRunner to run on github.  Change to self-hosted to run on our own runner.  Change to buildjet-8vcpu-ubuntu-2204 to run on buildjet with 8 cpus
+    timeout-minutes: 45
+
+    steps:
+      - name: Clean workspace
+        working-directory: ${{ github.workspace }}
+        run: |
+          rm -rf ../../lit-assets
+          mkdir -p ${{ github.workspace }}
+      - name: Install deps
+        working-directory: ${{ github.workspace }}
+        run: sudo apt-get update && sudo apt-get install -y libcryptsetup-dev clang-13 libacl1-dev
+      - name: Checkout lit-assets
+        uses: actions/checkout@v3
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable # keep this up to date with rust/lit-os/rust-toolchain.toml
+          components: rustfmt clippy rust-src
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-provider: "buildjet"
+          workspaces: |
+            rust/lit-os
+      - name: Cargo fmt check
+        run: cargo fmt -- --check
+      - name: Cargo clippy check
+        run: |
+          cargo clippy
+          cd lit-attestation-service && cargo clippy
+      - name: Install cargo check tools
+        run: |
+          #cargo install --locked cargo-udeps || true
+          #cargo install --locked cargo-deny || true
+          #cargo install --locked cargo-outdated || true
+          #cargo install --locked cargo-audit || true
+          #cargo install --locked cargo-pants || true
+      - name: Check
+        run: |
+          # TODO: Probably enable more of these.
+          #cargo udeps --all-targets --all-features
+          #cargo deny check
+          #cargo outdated --exit-code 1
+          #rm -rf ~/.cargo/advisory-db
+          # TODO: Priority:
+          #cargo audit
+          #cargo pants
+      - name: Cargo run tests
+        run: make test

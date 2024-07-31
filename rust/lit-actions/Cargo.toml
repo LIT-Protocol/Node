@@ -1,0 +1,58 @@
+[workspace]
+members = ["cli", "ext", "grpc", "server", "snapshot", "tests"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace.dependencies]
+anyhow = "1"
+flume = "0.11"
+indoc = "2"
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+tokio-stream = { version = "0.1", features = ["net"] }
+tonic = "0.11"
+tonic-build = "0.11"
+tonic-reflection = "0.11"
+tracing = "0.1"
+
+# Deno v1.44.4
+deno_core = "=0.290.0"
+deno_runtime = "=0.166.0"
+
+lit-actions-ext = { path = "ext" }
+lit-actions-grpc = { path = "grpc" }
+lit-actions-server = { path = "server" }
+lit-actions-snapshot = { path = "snapshot" }
+lit-api-core = { path = "../lit-core/lit-api-core" }
+lit-core = { path = "../lit-core/lit-core", features = ["unix"] }
+lit-logging = { path = "../lit-core/lit-logging" }
+
+[patch.crates-io]
+# Prevent panic "Custom error class must have a builder registered: Uncaught null" that
+# happens when lit-node disconnects (e.g. op_sign_ecdsa: receiving on a closed channel)
+# Upstream PR: https://github.com/denoland/deno_core/pull/730
+deno_core = { git = "https://github.com/Lit-Protocol/deno_core", branch = "fix/deno-1444-op-panic" }
+
+[workspace.metadata.cargo-machete]
+ignored = ["log", "prost"]
+
+# Please keep all profiles in sync with lit-node
+[profile.release]
+codegen-units = 1
+incremental = true
+lto = true
+opt-level = 3
+
+[profile.develop]
+inherits = "dev"
+opt-level = 1
+debug = 1
+incremental = false
+
+# rusty-v8 needs at least -O1 to not miscompile
+[profile.dev.package.v8]
+opt-level = 1

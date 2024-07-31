@@ -1,0 +1,14 @@
+[Unit]
+Description=LIT Node Manager
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/home/ubuntu/lit-assets/rust/lit-node
+ExecStart=/bin/bash /home/ubuntu/lit-assets/rust/lit-node/scripts/multi-start.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,52 @@
+{
+    "deploymentSelection": "lit-core + lit-node",
+    "deployNodeConfig": {
+        "environment": "dev",
+        "networkName": "localchain",
+        "newOwnerAddress": "0x4259E44670053491E7b4FE4A120C70be1eAD646b",
+        "numberOfStakedAndJoinedWallets": 12,
+        "numberOfStakedOnlyWallets": 12,
+        "resolverContractAddress": "TBD",
+        "useLitCoreDeploymentResolverContractAddress": true,
+        "outputTempFilePath": "./deployed-lit-node-contracts-temp.json",
+        "copyNodeConfigsToRustProject": true,
+        "ipAddresses": [
+            "127.0.0.1:7470",
+            "127.0.0.1:7471",
+            "127.0.0.1:7472",
+            "127.0.0.1:7473",
+            "127.0.0.1:7474",
+            "127.0.0.1:7475",
+            "127.0.0.1:7476",
+            "127.0.0.1:7477",
+            "127.0.0.1:7478",
+            "127.0.0.1:7479",
+            "127.0.0.1:7480",
+            "127.0.0.1:7481",
+            "127.0.0.1:7482",
+            "127.0.0.1:7483",
+            "127.0.0.1:7484",
+            "127.0.0.1:7485",
+            "127.0.0.1:7486",
+            "127.0.0.1:7487",
+            "127.0.0.1:7488",
+            "127.0.0.1:7489",
+            "127.0.0.1:7490",
+            "127.0.0.1:7491",
+            "127.0.0.1:7492",
+            "127.0.0.1:7493"
+        ],
+        "keyTypes": [
+            1,
+            2
+        ]
+    },
+    "deployCoreConfig": {
+        "environment": "dev",
+        "networkName": "localchain",
+        "subnetOwnerAddress": "0xB77AEBbC262Bb809933D991A919A0e4A6A3b2f65",
+        "subnetAdminPublicKey": "0x045f96e860435fccf287d9c2592fa129edfca7159c8dd2260cf2def38a9d5ee627ba73afef636467bc95fe551f10c862e910f18eafb751226d6901eab7d5b2794a",
+        "subnetProvAddress": "0x3324439C8b9181eF07D54030E32d2CD22FF0C6A7",
+        "outputTempFilePath": "./deployed-lit-core-contracts-temp.json"
+    }
+}

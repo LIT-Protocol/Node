@@ -1,0 +1,24 @@
+toc:
+  - name: Welcome
+    description: |
+      Welcome to the Lit Actions SDK Docs.  These functions can be used inside a Lit Action.  You should prefix each function with "Lit.Actions." so to call "isPermittedAction()" you should do "Lit.Actions.isPermittedAction()"  To understand how these functions fit together, please view the documentation for this SDK, located at https://developer.litprotocol.com/
+
+  - name: Signing
+  - signEcdsa
+  - ethPersonalSignMessageEcdsa
+
+  - name: Checking Permissions
+  - isPermittedAction
+  - isPermittedAddress
+  - isPermittedAuthMethod
+  - getPermittedActions
+  - getPermittedAddresses
+  - getPermittedAuthMethods
+
+  - name: Utilities
+  - checkConditions
+  - setResponse
+  - call
+  - pubkeyToTokenId
+  - uint8arrayToString
+  - uint8arrayFromString

@@ -1,0 +1,154 @@
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "lit_node"
+
+# Secret Provisioning library (client-side) is preloaded
+# loader.env.LD_PRELOAD = "libsecret_prov_attest.so"
+
+#loader.env.SECRET_PROVISION_CONSTRUCTOR = "1"
+#loader.env.SECRET_PROVISION_SET_PF_KEY = "1"
+#loader.env.SECRET_PROVISION_CA_CHAIN_PATH = "certs/test-ca-sha256.crt"
+#loader.env.SECRET_PROVISION_SERVERS = "dummyserver:80;localhost:4433;anotherdummy:4433"
+
+# Request remote attestation functionality from Graphene
+sgx.remote_attestation = true
+
+
+# Graphene log level   -- was debug
+loader.log_level = "all"
+
+# Read application arguments directly from the command line. Don't use this on production!
+loader.insecure__use_cmdline_argv = true
+
+# Forward environment variables from the host. Don't use this on production!
+loader.insecure__use_host_env = true
+
+# Node.js requires eventfd2() emulation otherwise fails on `(uv_loop_init(&tracing_loop_)) == (0)'
+sys.insecure__allow_eventfd = true
+
+# Specify paths to search for libraries. The usual LD_LIBRARY_PATH syntax applies. Paths must be in-
+# Graphene visible paths, not host-OS paths (i.e., paths must be taken from fs.mount.xxx.path, not
+# fs.mount.xxx.uri).
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/lib:/usr/lib:/usr/{{ arch_libdir }}:/usr/lib/x86_64-linux-gnu/gramine/runtime/glibc"
+
+# Allow for injecting SIGTERM signal from the host.
+sys.enable_sigterm_injection = true
+
+
+fs.mount.lib.type = "chroot"
+fs.mount.lib.path = "/lib"
+fs.mount.lib.uri = "file:/usr/lib/x86_64-linux-gnu/gramine/runtime/glibc"
+
+
+fs.mount.lib2.type = "chroot"
+fs.mount.lib2.path = "/usr/lib/x86_64-linux-gnu"
+fs.mount.lib2.uri = "file:/usr/lib/x86_64-linux-gnu"
+
+fs.mounts = [
+  # Mount the nodejs binary
+  { type = "chroot", path = "{{ nodejs_dir }}/nodejs", uri = "file:{{ nodejs_dir }}/nodejs" },
+  # Mount host-OS directory to required libraries (in 'uri') into in-Graphene visible directory /lib
+  # (in 'path').
+#  { type = "chroot", path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { type = "chroot", path = "/lib", uri = "file:/usr/lib/x86_64-linux-gnu/gramine/runtime/glibc" },
+  { type = "chroot", path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+  { type = "chroot", path = "/usr{{ arch_libdir }}", uri = "file:/usr{{ arch_libdir }}" },
+  { type = "chroot", path = "/etc", uri = "file:/etc" },
+]
+
+
+# Set enclave size to 2GB. Recall that SGX v1 requires to specify enclave size at enclave creation
+# time.
+sgx.enclave_size = "2G"
+
+# Set maximum number of in-enclave threads to 32. Recall that SGX v1 requires to specify the maximum
+# number of simultaneous threads at enclave creation time.
+sgx.thread_num = 32
+sgx.rpc_thread_num = 32
+# sgx.enable_stats = true
+sgx.preheat_enclave = true
+
+
+# Specify all files used by Node.js and its dependencies (including all libs which can be loaded at
+# runtime via dlopen).
+sgx.trusted_files = [
+  "file:{{ nodejs_dir }}/nodejs",
+  "file:{{ nodejs_dir }}/node",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:{{ arch_libdir }}/",
+  "file:/usr/{{ arch_libdir }}/",
+  "file:lit_node",
+  "file:abis/",
+  "file:Rocket.toml",
+]
+
+sgx.protected_mrenclave_files = [
+  "file:secrets.bin",
+  "file:secrets_7470.bin",
+  "file:secrets_7471.bin",
+  "file:secrets_7472.bin",
+  "file:secrets_7473.bin",
+  "file:secrets_7474.bin",
+  "file:secrets_7475.bin",
+  "file:secrets_7476.bin",
+  "file:secrets_7477.bin",
+  "file:secrets_7478.bin",
+  "file:secrets_7479.bin"
+]
+
+sgx.allowed_files = [
+  "file:node.db",
+  "file:node_7470.db",
+  "file:node_7471.db",
+  "file:node_7472.db",
+  "file:node_7473.db",
+  "file:node_7474.db",
+  "file:node_7475.db",
+  "file:node_7476.db",
+  "file:node_7477.db",
+  "file:node_7478.db",
+  "file:node_7479.db",
+  "file:node_7470.db-journal",
+  "file:node_7471.db-journal",
+  "file:node_7472.db-journal",
+  "file:node_7473.db-journal",
+  "file:node_7474.db-journal",
+  "file:node_7475.db-journal",
+  "file:node_7476.db-journal",
+  "file:node_7477.db-journal",
+  "file:node_7478.db-journal",
+  "file:node_7479.db-journal",
+  "file:/etc/nsswitch.conf",
+  "file:/etc/host.conf",
+  "file:/etc/resolv.conf",
+  "file:/etc/ethers",
+  "file:/etc/hosts",
+  "file:/etc/group",
+  "file:/etc/passwd",
+  "file:/etc/gai.conf",
+  "file:/etc/ssl/openssl.cnf",
+  "file:/etc/ssl/certs/ca-certificates.crt",
+  "file:/usr/lib/x86_64-linux-gnu/gramine/libsysdb.so",
+  "file:peers_deploy_test.txt",
+  "file:ecdsa_test/ECDSA-Keys1-1-1.json",
+  "file:ecdsa_test/ECDSA-Keys1-1-2.json",
+  "file:ecdsa_test/ECDSA-Keys1-1-3.json",
+  "file:ecdsa_test/ECDSA-Keys1-1-4.json",
+  "file:ecdsa_test/ECDSA-Keys1-1-5.json",
+  "file:ecdsa_test/ECDSA-Keys1-1-6.json",
+  "file:ecdsa_test/ECDSA-Keys1-1-7.json",
+  "file:ecdsa_test/ECDSA-Keys1-1-8.json",
+  "file:ecdsa_test/ECDSA-Keys1-1-9.json",
+  "file:ecdsa_test/ECDSA-Keys1-1-10.json",
+  "file:ecdsa_test/log.txt",
+  "file:o-s-1-1-1.json",
+  "file:o-s-2-1-1.json",
+  "file:o-s-3-1-1.json",
+  "file:o-s-4-1-1.json",
+  "file:o-s-5-1-1.json",
+  "file:o-s-6-1-1.json",
+  "file:o-s-7-1-1.json",
+  "file:o-s-8-1-1.json",
+  "file:o-s-9-1-1.json",
+  "file:o-s-10-1-1.json"
+  
+]

@@ -1,0 +1,30 @@
+#!/usr/bin/expect
+
+set prompt {.*\$.* }
+
+set host_ip [lindex $argv 0]
+set subnet_id [lindex $argv 1]
+set wallet_key [lindex $argv 2]
+set admin_key [lindex $argv 3]
+
+spawn ssh -o StrictHostKeyChecking=no $host_ip
+expect -re $prompt
+
+# disable timeout so we can wait for the commands to finish
+set timeout -1
+
+send "sudo lit os guest template create node\n"
+expect -re $prompt
+
+send "export TEMPLATE_ID=\$(sudo lit os guest template ls | grep node | awk '{print \$2}' | head -n 1)\n"
+expect -re $prompt
+
+send "sudo lit os guest template release \$TEMPLATE_ID --subnet-id $subnet_id\n"
+
+expect "Enter admin key:"
+send "$admin_key\n"
+
+expect -re $prompt
+
+send "exit\r"
+expect eof

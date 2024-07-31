@@ -1,0 +1,22 @@
+[package]
+name = "lit_actions"
+description = "Run JS code in a sandboxed Deno environment"
+version = { workspace = true }
+edition = { workspace = true }
+publish = { workspace = true }
+
+[[bin]]
+path = "main.rs"
+name = "lit_actions"
+test = false
+doctest = false
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { version = "4", features = ["derive"] }
+lit-actions-server = { workspace = true }
+lit-api-core = { workspace = true }
+lit-core = { workspace = true }
+lit-logging = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }

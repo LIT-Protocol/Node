@@ -1,0 +1,103 @@
+# This workflow is triggered by a PR being created or pushed to. It checks out the develop branch and gets the sha of the develop branch. It then checks for changes in the files and triggers the appropriate workflows based on the changes. It also checks the status of all the triggered workflows and fails the build if any of the workflows fail.  It runs the test against a new temporary branch which is created by merging the PR into develop.  This means that someone pushing to develop can break your PR even if you haven't changed anything!  This is a tradeoff to ensure that the tests are run against the latest code on develop.  If you want to run the tests against the code in your PR, you can run the tests locally.
+name: master-trigger
+on:
+  workflow_call:
+    outputs:
+      lit_node_changed:
+        description: 'lit_node_changed'
+        value: ${{ jobs.list_changed_files.outputs.lit_node_changed }}
+      lit_core_changed: 
+        description: 'lit_core_changed'
+        value: ${{ jobs.list_changed_files.outputs.lit_core_changed }}
+      lit_os_changed: 
+        description: 'lit_os_changed'
+        value: ${{ jobs.list_changed_files.outputs.lit_os_changed }}
+      lit_services_changed: 
+        description: 'lit_services_changed'
+        value: ${{ jobs.list_changed_files.outputs.lit_services_changed }}
+      lit_actions_changed:
+        description: 'lit_actions_changed'
+        value: ${{ jobs.list_changed_files.outputs.lit_actions_changed }}
+      blockchain_changed: 
+        description: 'blockchain_changed'
+        value: ${{ jobs.list_changed_files.outputs.blockchain_changed }}
+  workflow_dispatch: {}
+
+
+jobs:
+  get_base_commit_hash:
+    runs-on: ubuntu-latest
+    outputs:
+      base_sha: ${{ steps.base_sha.outputs.base_sha }}
+    steps:
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v7
+
+      - name: Make sure we checked out develop, so we can get it's sha
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branch-name.outputs.base_ref_branch }}
+
+      - name: Get sha of base branch
+        id: base_sha
+        run: |
+          export BASE_SHA=$(git rev-parse HEAD)
+          echo "Base sha is $BASE_SHA"
+          echo "base_sha=$BASE_SHA" >> $GITHUB_OUTPUT
+
+  list_changed_files:
+    runs-on: ubuntu-latest
+    needs: [get_base_commit_hash]
+    outputs:
+      lit_node_changed: ${{ steps.changed-files-yaml.outputs.lit_node_any_modified }}
+      lit_core_changed: ${{ steps.changed-files-yaml.outputs.lit_core_any_modified }}
+      lit_os_changed: ${{ steps.changed-files-yaml.outputs.lit_os_any_modified }}
+      lit_services_changed: ${{ steps.changed-files-yaml.outputs.lit_services_any_modified }}
+      lit_actions_changed: ${{ steps.changed-files-yaml.outputs.lit_actions_any_modified }}
+      blockchain_changed: ${{ steps.changed-files-yaml.outputs.blockchain_any_modified }}
+    steps:
+      - name: Checkout lit-assets
+        uses: actions/checkout@v4
+
+      - name: Print base sha
+        run: |
+          echo "Base sha is ${{ needs.get_base_commit_hash.outputs.base_sha }}"
+
+      - name: Get changed files
+        id: changed-files-yaml
+        uses: tj-actions/changed-files@v41
+        with:
+          base_sha: ${{ needs.get_base_commit_hash.outputs.base_sha }}
+          files_yaml: |
+            lit_node:
+              - rust/lit-node/**
+              - .github/workflows/rust-lit-node-unit-tests.yml
+              - .github/workflows/rust-lit-node-integration-tests.yml
+              - .github/workflows/rust-lit-node-version-upgrade-tests.yml
+              - .github/workflows/rust-lit-node-fault-tests.yml
+              - .github/workflows/rust-lit-node-long-running-tests.yml
+              - .github/workflows/rust-lit-node-clippy.yml
+            lit_core:
+              - rust/lit-core/**
+              - .github/workflows/rust-lit-core.yml
+            blockchain:
+              - blockchain/**
+              - .github/workflows/blockchain-contracts.yml
+            lit_os: 
+              - rust/lit-os/**
+              - .github/workflows/rust-lit-os.yml
+            lit_services:
+              - rust/lit-services/**
+              - .github/workflows/rust-lit-services.yml
+            lit_actions:
+              - rust/lit-actions/**
+              - .github/workflows/rust-lit-actions.yml
+            any:
+              - ./**
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files-yaml.outputs.any_all_modified_files }}; do
+            echo "$file was changed"
+          done

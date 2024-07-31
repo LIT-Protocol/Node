@@ -1,0 +1,218 @@
+[package]
+name = "lit_node"
+version = "0.2.16"
+edition = "2021"
+default-run = "lit_node"
+rust-version = "1.77" # for recursion in async fn
+
+[features]
+default = ["lit-actions"]
+# add celo specific values to transactions - see ethers spec.
+# this needs to happen at runtime, so is just a place holder for now.
+sign_test = ["lit-actions"] #enables unsafe endpoint allowing a test to use a PK directly .
+lit-actions = ["dep:lit-actions-grpc", "dep:lit-actions-server", "dep:libaes"]
+lit-actions-server = ["lit-actions"] # start internal lit_actions server for testing
+
+testing = ["lit-actions-server"] # enables testing features
+rtmetrics = [] # enables runtime metrics
+proxy_http = []
+
+[build-dependencies]
+tonic-build = "0.10"
+
+[dependencies]
+anyhow = "1.0.41"
+arc-swap = "1.6.0" 
+async-std = "1.12.0"
+async-trait = "0.1.53"
+bech32 = "0.9.1"
+blsful = "2.5"
+bulletproofs = { version = "4.0.0", git = "https://github.com/LIT-Protocol/bulletproofs" }
+bytes = "1.5.0"
+bs58 = "0.5.0"
+cait-sith = { git = "https://github.com/lit-protocol/cait-sith", features = ["k256"] }
+cait-sith_v0_2_14 = { package="cait-sith", git = "https://github.com/lit-protocol/cait-sith", features = ["k256"] , rev="ad0e4cf4"}
+ciborium = { version = "0.2.0"  }
+chrono = "0.4.23"
+clap = { version = "4.2.2", features = ["cargo"] }
+crypto_box = { version = "0.9.1" }
+curve25519-dalek = { package = "curve25519-dalek-ml", version="4.2.1", features = ["group", "serde", "rand_core"] }
+
+sodalite = "0.4.0"
+data-encoding = "2.3.2"
+derive_builder = "0.12"
+derive_more = { version = "0.99.17" }
+digest = { version = "0.10.6", default-features = false, features = ["alloc", "oid"] }
+hex = { version = "0.4.3" }
+lazy_static = "1.4.0"
+tonic = { version = "0.10", features = ["transport","tls","tls-roots","tls-webpki-roots"] }
+prost = "0.12"
+jubjub = { version = "0.10", git = "https://github.com/LIT-Protocol/jubjub.git" }
+lit-frost = { git = "https://github.com/LIT-Protocol/lit-frost.git"}
+dotenv = "0.15.0"
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+ed448-goldilocks = { version = "0.11", package = "ed448-goldilocks-plus" }
+elliptic-curve = { version = "0.13.5", features = ["serde"] }
+ethabi = "16.0.0"
+ethers = { version = "2.0.8", features = [
+    "abigen",
+    "legacy" 
+]}
+flume = "0.11"
+futures = "0.3.17"
+glob = "0.3.1"
+hex-literal = "0.4.1"
+ipfs-hasher = "0.13.0"
+gennaro-dkg = "0.9.0-rc1"
+iri-string = "0.6"
+json = "0.12.4"
+jsonpath-plus = "0.1.9"
+
+k256 = { version = "0.13.0", features = ["sha256", "ecdsa", "serde", "ecdsa-core", "expose-field", "hash2curve", "schnorr"], optional = false }
+p256 = { version = "0.13", features = ["ecdsa-core", "expose-field", "hash2curve", "sha256", "serde"], optional = false }
+p384 = { version = "0.13", features = ["arithmetic", "serde"], optional = false }
+libaes = { version = "0.6.4", optional = true }
+libsecp256k1 = { git = "https://github.com/LIT-Protocol/libsecp256k1", branch = "master", version = "0.7.1" }
+log = { version = "0.4.17", features = ["kv_unstable", "kv_unstable_serde"] }
+moka = { version = "0.11.0", features = ["future"] }
+mpl-token-metadata = "1.2.10"
+num_cpus = { version = "1.15.0" }
+once_cell = { version = "1", optional = true }
+openssl = { version = "0.10.55" }
+rand = { version = "~0.8.5", features = ["std_rng"]}
+rand_core = "~0.6.4"
+regex = "1.7.1"
+reqwest = { version = "0.11.14", features = ["json"] }
+rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse", features = ["json"] }
+rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", rev = "985098dd8f3b052716111eaa872d184cc21a1a68"  }
+# used to verify JWTs.  must match the version in the crate overrides at the bottom of this file
+rsa = { git = "https://github.com/RustCrypto/RSA", tag = "v0.7.0-pre" }
+rusqlite = { version = "0.29.0", features = ["backup"] }
+semver = "1.0.22"
+serde = { version = "1.0.126", features = ["derive"] }
+serde-encrypt = { git = "https://github.com/LIT-protocol/serde-encrypt" }
+serde-encrypt-core = { git = "https://github.com/LIT-protocol/serde-encrypt" }
+serde_json = "1.0.64"
+sha2 = "0.10"
+sha3 = "0.10"
+siwe = "0.5.0"
+siwe-recap = { git = "https://github.com/spruceid/siwe-recap" }
+solana-client = "1.9.19"
+solana-program = "1.9.19"
+solana-sdk = "1.9.19"
+spl-associated-token-account = "1.0.3"
+temp-file = { version = "0.1.7" }
+thiserror = { version = "1.0.23" }
+tokio = { version = "1.23.0", features = ["rt-multi-thread"] }
+tokio-retry = "0.3"
+tracing = "0.1.40"
+ucan-capabilities-object = "0.1"
+url = { version = "2", features = ["serde"] }
+uuid = { version = "1.4", features = ["v4"] }
+verifiable-share-encryption = { git = "https://github.com/LIT-Protocol/verifiable-share-encryption" }
+vsss-rs = { version = "4.0", features = ["std"] }
+webauthn-rs-core = { git = "https://github.com/LIT-Protocol/webauthn-rs" }
+webauthn-rs-proto = { git = "https://github.com/LIT-Protocol/webauthn-rs" }
+webauthn-rs = { git = "https://github.com/LIT-Protocol/webauthn-rs" }
+web3 = "0.19.0"
+xor_name = "3.0.0"                                             #2.0.0
+generic-array = "0.14.0"
+soteria-rs = { version = "0.3.1", features = ["serde", "elements"] }
+xorf = { version = "0.8.1", features = ["serde"] }
+ripemd = "0.1.3"
+lit-bls-wasm = { git = "https://github.com/LIT-Protocol/lit-bls-wasm" }
+lit-ecdsa-wasm-combine = { git = "https://github.com/LIT-Protocol/lit-ecdsa-wasm-combine" }
+base64_light = "0.1"
+#ECDSA
+
+[dependencies.lit-core]
+path = "../lit-core/lit-core"
+features = ["ipfs", "chrono", "unix"]
+
+[dependencies.lit-core-derive]
+path = "../lit-core/lit-core-derive"
+
+[dependencies.lit-logging]
+path = "../lit-core/lit-logging"
+features = ["service"]
+
+[dependencies.lit-api-core]
+path = "../lit-core/lit-api-core"
+features = ["rocket-helper", "client-reqwest", "server"]
+
+[dependencies.lit-blockchain]
+path = "../lit-core/lit-blockchain"
+
+[dependencies.lit-attestation]
+path = "../lit-core/lit-attestation"
+features = ["generate-via-service", "kdf"]
+
+[dependencies.lit-actions-grpc]
+path = "../lit-actions/grpc"
+optional = true
+
+[dependencies.lit-actions-server]
+path = "../lit-actions/server"
+optional = true
+
+[dev-dependencies]
+base64_light = "0.1"
+command-group = "1.0.8"
+#ECDSA
+criterion = { version = "0.5", features = ["async_tokio", "html_reports"] }
+
+
+rand_chacha = "0.3.1"
+surf = "2"
+async-sse = "5"
+structopt = "0.3"
+futures = "0.3"
+mockall = "0.11.2"
+once_cell = "1.17.0"
+nix = "0.26.2"
+k256 = "0.13"
+maplit = "1"
+test-case = "3.1.0"
+toml_edit = "0.20.7"
+toxiproxy_rust = "*"
+vsss-rs = { version = "4.0", features = ["std"] }
+indoc = "2"
+wiremock = "0.5"
+pretty_assertions = "1"
+pretty_env_logger = "0.5"
+rstest = "0.19"
+ctor = "0.2"
+
+[dev-dependencies.utils]
+path = "common/utils"
+
+[[bench]]
+name = "bench_main"
+harness = false
+required-features = ["lit-actions"]
+
+[patch.crates-io]
+# needed to force deno_crypto to use v0.7.0-pre and not v0.7.0-rc.0 which for some reason is missing a bunch of stuff from the -pre version
+rsa = { git = "https://github.com/RustCrypto/RSA", tag = "v0.7.0-pre" }
+rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse" }
+# Prevent panic "Custom error class must have a builder registered: Uncaught null" that
+# happens when lit-node disconnects (e.g. op_sign_ecdsa: receiving on a closed channel)
+# Upstream PR: https://github.com/denoland/deno_core/pull/730
+deno_core = { git = "https://github.com/Lit-Protocol/deno_core", branch = "fix/deno-1444-op-panic" }
+
+# Please keep all profiles in sync with lit-actions
+[profile.release]
+codegen-units = 1
+incremental = true
+lto = true
+opt-level = 3
+
+[profile.develop]
+inherits = "dev"
+opt-level = 1
+debug = 1
+incremental = false
+
+# rusty-v8 needs at least -O1 to not miscompile
+[profile.dev.package.v8]
+opt-level = 1

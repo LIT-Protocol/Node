@@ -1,0 +1,8 @@
+{
+    "deployedNodeContractsPath": "./deployed-lit-node-contracts-temp.json",
+    "existingStakerWalletPrivateKey": "0x75800cd08302d9b20798dbb39253d558ef6446c2efb768b1a99058737e99076b",
+    "nodeConfigIpfsApiKey": "dummy-key",
+    "nodeConfigAdminAddress": "0x4259E44670053491E7b4FE4A120C70be1eAD646b",
+    "aliasIp": "127.0.0.1",
+    "aliasPort": 7473
+}

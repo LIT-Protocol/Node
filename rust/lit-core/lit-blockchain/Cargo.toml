@@ -1,0 +1,44 @@
+[package]
+name = "lit-blockchain"
+description = "Lit Blockchain"
+authors = ["David Radunz <david.radunz@litprotocol.com>"]
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = []
+env-override = []
+
+[dependencies]
+log = { version = "0.4.17", features = ["kv_unstable", "kv_unstable_serde"] }
+ethers = { version = "2.0.8", features = [
+    # "celo",
+    "abigen",
+    "legacy"
+]}
+serde = { version = "1.0.147", features = ["derive"] }
+serde_json = { version = "1.0.89" }
+serde_yaml = { version = "0.9.14" }
+arc-swap = { version = "1.6.0" }
+hex = { version = "0.4.3" }
+bs58 = { version = "0.4.0" }
+once_cell = { version = "1.16.0" }
+url = { version = "2.3.1" }
+const-str = { version = "0.5.3" }
+reqwest = { version = "0.11.16" }
+generic-array = { version = "0.14.0" }
+im = "15.1.0"
+futures = "0.3.30"
+tracing = "0.1.40"
+isahc = "1.7.2"
+
+
+[dev-dependencies]
+tokio = { version = "1.37.0", features = ["full"]}
+maplit = "1.0.2"
+toml = "0.8.12"
+anyhow = "1.0.82"
+pretty_assertions = "1.4.0"
+
+[dependencies.lit-core]
+path = "../lit-core"

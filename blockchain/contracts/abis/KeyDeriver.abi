@@ -1,0 +1,66 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "HD_KDF",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "derivedKeyId",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes",
+            "name": "pubkey",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "keyType",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IPubkeyRouter.RootKey[]",
+        "name": "rootHDKeys",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "keyType",
+        "type": "uint256"
+      }
+    ],
+    "name": "computeHDPubKey",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -1,0 +1,9 @@
+[lit]
+env = "dev"
+
+[simple]
+dummy = "default"
+other = true
+
+[oh.yes]
+moo = "cow"

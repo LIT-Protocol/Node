@@ -1,0 +1,29 @@
+name: blockchain/format
+on:
+  workflow_dispatch: {}
+  workflow_call:
+  push:
+    paths:
+      - blockchain/contracts/**
+      - .github/workflows/blockchain-prettier.yml
+
+defaults:
+  run:
+    shell: bash
+    working-directory: blockchain/contracts
+
+jobs:
+  prettier_check:
+    runs-on: warp-ubuntu-latest-x64-2x # change to LargeRunner to run on github.  Change to self-hosted to run on our own runner.  Change to buildjet-8vcpu-ubuntu-2204 to run on buildjet with 8 cpus
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: buildjet/setup-node@v3
+        with:
+          node-version: 18.17.0
+          cache: npm
+          cache-dependency-path: ${{ github.workspace }}/blockchain/contracts/package-lock.json
+      - name: Install dependencies
+        run: npm install
+      - name: Run prettier formatting check
+        run: npm run prettier:check

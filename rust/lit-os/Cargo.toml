@@ -1,0 +1,32 @@
+[workspace]
+members = [
+    "lit-os-core",
+    "lit-os-guest-initrd",
+    "lit-cli",
+    "lit-cli-os",
+    "lit-os-prov-core",
+    "lit-os-prov-api",
+    "lit-os-prov-api-client",
+    "lit-attestation-service",
+    "lit-logging-service"
+]
+default-members = [
+    "lit-os-core",
+    "lit-os-guest-initrd",
+    "lit-cli",
+    "lit-cli-os",
+    "lit-os-prov-core",
+    "lit-os-prov-api",
+    "lit-os-prov-api-client",
+    "lit-logging-service"
+]
+resolver = "2"
+
+[profile.develop]
+inherits = "dev"
+opt-level = 1
+debug = 1
+incremental = false
+
+[patch.crates-io]
+rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse" }

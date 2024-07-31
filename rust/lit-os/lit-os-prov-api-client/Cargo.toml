@@ -1,0 +1,42 @@
+[package]
+name = "lit-os-prov-api-client"
+description = "Lit OS Prov API Client"
+authors = ["David Radunz <david.radunz@litprotocol.com>"]
+version = "0.1.0"
+edition = "2021"
+exclude = ["resources/test/"]
+
+[features]
+default = ["trust-dns"]
+trust-dns = ["reqwest/trust-dns"]
+
+[dependencies]
+log = { version = "0.4.20", features = ["kv_unstable"] }
+async-std = { version = "1.12.0" }
+async-trait = { version = "0.1.74" }
+clap = { version = "4.4.7", features = ["derive"] }
+sha2 = { version = "0.10.8" }
+serde = { version = "1.0.189", features = ["derive"] }
+serde_json = { version = "1.0.107" }
+serde_bytes_base64 = { version = "0.1.1" }
+reqwest = { version = "0.11.22" }
+
+[dependencies.lit-core]
+path = "../../lit-core/lit-core"
+
+[dependencies.lit-api-core]
+path = "../../lit-core/lit-api-core"
+default-features = false
+features = ["client-reqwest"]
+
+[dependencies.lit-blockchain]
+path = "../../lit-core/lit-blockchain"
+
+[dependencies.lit-attestation]
+path = "../../lit-core/lit-attestation"
+
+[dependencies.lit-os-core]
+path = "../lit-os-core"
+
+[dependencies.lit-os-prov-core]
+path = "../lit-os-prov-core"

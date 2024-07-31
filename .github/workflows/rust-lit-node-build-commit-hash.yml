@@ -1,0 +1,56 @@
+name: rust/lit-node-build-commit-hash
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - rust/**
+      - .github/workflows/rust-lit-node-build-commit-hash.yml
+      - scripts/github/**
+    branches:
+      # Habanero release branch
+      - release-habanero-*
+      # Manzano release branch
+      - release-manzano-*
+      # Cayenne release branch
+      - release-cayenne-*
+
+defaults:
+  run:
+    shell: bash
+    working-directory: rust/lit-node
+
+jobs:
+  build:
+    runs-on: warp-ubuntu-latest-x64-8x # change to LargeRunner to run on github.  Change to self-hosted to run on our own runner.  Change to buildjet-8vcpu-ubuntu-2204 to run on buildjet with 8 cpus
+    timeout-minutes: 45
+
+    steps:
+      - name: Clean workspace
+        working-directory: ${{ github.workspace }}
+        run: |
+          rm -rf ../../lit-assets
+          mkdir -p ${{ github.workspace }}
+      - name: Checkout lit-assets
+        uses: actions/checkout@v3
+      - name: Install deps
+        working-directory: ${{ github.workspace }}
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev libsqlite3-dev cmake protobuf-compiler
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-provider: "buildjet"
+          workspaces: |
+            rust/lit-node
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable # keep this up to date with rust/lit-node/rust-toolchain.toml
+          components: rustfmt rust-src
+      - name: Build node
+        run: cargo build --features lit-actions,testing
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lit_node_${{ github.sha }}
+          path: rust/lit-node/target/debug/lit_node

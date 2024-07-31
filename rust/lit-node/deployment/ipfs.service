@@ -1,0 +1,17 @@
+[Unit]
+Description=LIT Node Manager
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/
+ExecStart=/usr/local/bin/ipfs daemon
+Type=simple
+Restart=always
+RestartSec=1
+LimitNOFILE=64000
+LimitNPROC=64000
+
+
+[Install]
+WantedBy=multi-user.target

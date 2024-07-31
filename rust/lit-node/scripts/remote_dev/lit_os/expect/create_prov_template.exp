@@ -1,0 +1,19 @@
+#!/usr/bin/expect
+
+set prompt {.*\$.* }
+
+set host_ip [lindex $argv 0]
+
+spawn ssh -o StrictHostKeyChecking=no $host_ip
+
+expect -re $prompt
+
+# disable timeout so we can wait for the commands to finish
+set timeout -1
+
+# create the template
+send "sudo lit os guest template create prov\n"
+expect -re $prompt
+
+send "exit\n"
+expect eof

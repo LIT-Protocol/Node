@@ -1,0 +1,303 @@
+syntax = "proto3";
+
+package com.litprotocol.actions;
+
+service Action {
+  rpc ExecuteJs(stream ExecuteJsRequest) returns (stream ExecuteJsResponse) {}
+}
+
+message ExecuteJsRequest {
+  oneof union {
+    ExecutionRequest execute = 1;
+    ErrorResponse report_error = 255;
+    SetResponseResponse set_response = 2;
+    PrintResponse print = 3;
+    IncrementFetchCountResponse increment_fetch_count = 4;
+    PubkeyToTokenIdResponse pubkey_to_token_id = 5;
+    PkpPermissionsGetPermittedResponse pkp_permissions_get_permitted = 6;
+    PkpPermissionsGetPermittedAuthMethodScopesResponse pkp_permissions_get_permitted_auth_method_scopes = 7;
+    PkpPermissionsIsPermittedResponse pkp_permissions_is_permitted = 8;
+    PkpPermissionsIsPermittedAuthMethodResponse pkp_permissions_is_permitted_auth_method = 9;
+    SignEcdsaResponse sign_ecdsa = 10;
+    AesDecryptResponse aes_decrypt = 11;
+    GetLatestNonceResponse get_latest_nonce = 12;
+    CheckConditionsResponse check_conditions = 13;
+    ClaimKeyIdentifierResponse claim_key_identifier = 14;
+    CallContractResponse call_contract = 15;
+    CallChildResponse call_child = 16;
+    BroadcastAndCollectResponse broadcast_and_collect = 17;
+    DecryptAndCombineResponse decrypt_and_combine = 18;
+    SignAndCombineEcdsaResponse sign_and_combine_ecdsa = 19;
+    GetRpcUrlResponse get_rpc_url = 21;
+    P2pBroadcastResponse p2p_broadcast = 22;
+    P2pCollectFromLeaderResponse p2p_collect_from_leader = 23;
+    IsLeaderResponse is_leader = 24;
+    EncryptBlsResponse encrypt_bls = 25;
+    DecryptToSingleNodeResponse decrypt_to_single_node = 26;
+  }
+
+  message ExecutionRequest {
+    string code = 1;
+    optional bytes js_params = 2;      // Option<serde_json::Value>
+    optional bytes auth_context = 3;   // Option<serde_json::Value>
+    optional uint64 timeout = 4;       // milliseconds
+    optional uint32 memory_limit = 5;  // megabytes
+    map<string, string> http_headers = 6;
+  }
+
+  message ErrorResponse {
+    string error = 1;
+  }
+
+  message SetResponseResponse {}
+
+  message PrintResponse {}
+
+  message IncrementFetchCountResponse {
+    uint32 fetch_count = 1;
+  }
+
+  message PubkeyToTokenIdResponse {
+    string token_id = 1;
+  }
+
+  message PkpPermissionsGetPermittedResponse {
+    bytes resources = 1;  // Vec<serde_json::Value>
+  }
+
+  message PkpPermissionsGetPermittedAuthMethodScopesResponse {
+    repeated bool scopes = 1;
+  }
+
+  message PkpPermissionsIsPermittedResponse {
+    bool is_permitted = 1;
+  }
+
+  message PkpPermissionsIsPermittedAuthMethodResponse {
+    bool is_permitted = 1;
+  }
+
+  message SignEcdsaResponse {
+    string success = 1;
+  }
+
+  message AesDecryptResponse {
+    string plaintext = 1;  // hex-encoded
+  }
+
+  message GetLatestNonceResponse {
+    string nonce = 1;  // hex-encoded Ethereum U256
+  }
+
+  message CheckConditionsResponse {
+    bool success = 1;
+  }
+
+  message ClaimKeyIdentifierResponse {
+    string success = 1;
+  }
+
+  message CallContractResponse {
+    string result = 1;
+  }
+
+  message CallChildResponse {
+    string response = 1;
+  }
+
+  message BroadcastAndCollectResponse {
+    string name = 1;
+    repeated string values = 2;
+  }
+
+  message DecryptAndCombineResponse {
+    string result = 1;
+  }
+
+  message SignAndCombineEcdsaResponse {
+    string result = 1;
+  }
+  message GetRpcUrlResponse {
+    string result = 1;
+  }
+
+  message P2pBroadcastResponse {
+    bool result = 1;
+  }
+
+  message P2pCollectFromLeaderResponse {
+    string name = 1;
+    string value = 2;
+  }
+
+  message IsLeaderResponse {
+    bool result = 1;
+  }
+
+  message EncryptBlsResponse {
+    string ciphertext = 1;
+    string data_to_encrypt_hash = 2;
+  }
+
+  message DecryptToSingleNodeResponse {
+    string result = 1;
+  }
+}
+
+message ExecuteJsResponse {
+  oneof union {
+    ExecutionResult result = 1;
+    SetResponseRequest set_response = 2;
+    PrintRequest print = 3;
+    IncrementFetchCountRequest increment_fetch_count = 4;
+    PubkeyToTokenIdRequest pubkey_to_token_id = 5;
+    PkpPermissionsGetPermittedRequest pkp_permissions_get_permitted = 6;
+    PkpPermissionsGetPermittedAuthMethodScopesRequest pkp_permissions_get_permitted_auth_method_scopes = 7;
+    PkpPermissionsIsPermittedRequest pkp_permissions_is_permitted = 8;
+    PkpPermissionsIsPermittedAuthMethodRequest pkp_permissions_is_permitted_auth_method = 9;
+    SignEcdsaRequest sign_ecdsa = 10;
+    AesDecryptRequest aes_decrypt = 11;
+    GetLatestNonceRequest get_latest_nonce = 12;
+    CheckConditionsRequest check_conditions = 13;
+    ClaimKeyIdentifierRequest claim_key_identifier = 14;
+    CallContractRequest call_contract = 15;
+    CallChildRequest call_child = 16;
+    BroadcastAndCollectRequest broadcast_and_collect = 17;
+    DecryptAndCombineRequest decrypt_and_combine = 18;
+    SignAndCombineEcdsaRequest sign_and_combine_ecdsa = 19;
+    GetRpcUrlRequest get_rpc_url = 21;
+    P2pBroadcastRequest p2p_broadcast = 22;
+    P2pCollectFromLeaderRequest p2p_collect_from_leader = 23;
+    IsLeaderRequest is_leader = 24;
+    EncryptBlsRequest encrypt_bls = 25;
+    DecryptToSingleNodeRequest decrypt_to_single_node = 26;
+  }
+
+  message ExecutionResult {
+    bool success = 1;
+    string error = 2;
+    string request_id = 3;
+  }
+
+  message SetResponseRequest {
+    string response = 1;
+  }
+
+  message PrintRequest {
+    string message = 1;
+  }
+
+  message IncrementFetchCountRequest {}
+
+  message PubkeyToTokenIdRequest {
+    string public_key = 1;
+  }
+
+  message PkpPermissionsGetPermittedRequest {
+    string method = 1;
+    string token_id = 2;
+  }
+
+  message PkpPermissionsGetPermittedAuthMethodScopesRequest {
+    string token_id = 1;
+    string method = 2;
+    bytes user_id = 3;
+    uint64 max_scope_id = 4;
+  }
+
+  message PkpPermissionsIsPermittedRequest {
+    string method = 1;
+    string token_id = 2;
+    bytes params = 3;  // Vec<serde_json::Value>
+  }
+
+  message PkpPermissionsIsPermittedAuthMethodRequest {
+    string token_id = 1;
+    string method = 2;
+    bytes user_id = 3;
+  }
+
+  message SignEcdsaRequest {
+    bytes to_sign = 1;
+    string public_key = 2;
+    string sig_name = 3;
+    bool eth_personal_sign = 4;
+  }
+
+  message AesDecryptRequest {
+    bytes symmetric_key = 1;
+    bytes ciphertext = 2;
+  }
+
+  message GetLatestNonceRequest {
+    string address = 1;  // hex-encoded Ethereum Address
+    string chain = 2;
+  }
+
+  message CheckConditionsRequest {
+    bytes conditions = 1;         // Vec<serde_json::Value>
+    optional bytes auth_sig = 2;  // serde_json::Value
+    optional string chain = 3;
+  }
+
+  message ClaimKeyIdentifierRequest {
+    string key_id = 1;
+  }
+
+  message CallContractRequest {
+    string chain = 1;
+    string txn = 2;
+  }
+
+  message CallChildRequest {
+    string ipfs_id = 1;
+    optional bytes params = 2;  // serde_json::Value
+  }
+
+  message BroadcastAndCollectRequest {
+    string name = 1;
+    string value = 2;
+  }
+
+  message DecryptAndCombineRequest {
+    bytes access_control_conditions = 1;
+    string ciphertext = 2;
+    string data_to_encrypt_hash = 3;
+    optional bytes auth_sig = 4;
+    string chain = 5;
+  }
+
+  message DecryptToSingleNodeRequest {
+    bytes access_control_conditions = 1;
+    string ciphertext = 2;
+    string data_to_encrypt_hash = 3;
+    optional bytes auth_sig = 4;
+    string chain = 5;
+  }
+
+  message SignAndCombineEcdsaRequest {
+    bytes to_sign = 1;
+    string public_key = 2;
+    string sig_name = 3;
+  }
+
+  message GetRpcUrlRequest {
+    string chain = 1;
+  }
+
+  message P2pBroadcastRequest {
+    string name = 1;
+    string value = 2;
+  }
+
+  message P2pCollectFromLeaderRequest {
+    string name = 1;
+  }
+
+  message EncryptBlsRequest {
+    bytes access_control_conditions = 1;
+    bytes to_encrypt = 2;
+  }
+
+  message IsLeaderRequest {}
+}

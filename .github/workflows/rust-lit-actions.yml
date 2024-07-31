@@ -1,0 +1,69 @@
+name: rust/lit-actions
+on:
+  workflow_dispatch: {}
+  workflow_call:
+  push:
+    paths:
+      - rust/lit-actions/**
+      - .github/workflows/rust-lit-actions.yml
+      - scripts/github/**
+    branches:
+      - master
+      - develop
+      - datil
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_LOG_STYLE: always
+  RUST_LOG: debug
+  RUST_BACKTRACE: full
+  LIT_LOGGING_SERVICE_DISABLED: 1
+  CARGO_INCREMENTAL: 0
+
+defaults:
+  run:
+    shell: bash
+    working-directory: rust/lit-actions
+
+jobs:
+  run-tests:
+    runs-on: warp-ubuntu-latest-x64-8x
+    timeout-minutes: 20
+
+    steps:
+      - name: Clean workspace
+        working-directory: ${{ github.workspace }}
+        run: |
+          rm -rf ../../lit-assets
+          mkdir -p ${{ github.workspace }}
+      - name: Checkout lit-assets
+        uses: actions/checkout@v3
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install tools
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest,protoc@3
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-provider: "buildjet"
+          workspaces: |
+            rust/lit-actions
+      - name: Install Node.js
+        uses: buildjet/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: ${{ github.workspace }}/rust/lit-actions/package-lock.json
+      - name: Install Node modules
+        run: npm ci
+      - name: Checks that docs are up-to-date
+        run: make check-docs
+      - name: Cargo fmt check
+        run: make check-format
+      - name: Cargo clippy check
+        run: make clippy
+      - name: Cargo run tests
+        run: make test

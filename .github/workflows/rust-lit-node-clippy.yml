@@ -1,0 +1,65 @@
+name: rust/lit-node-clippy
+on:
+  workflow_dispatch: {}
+  workflow_call:
+  push:
+    paths:
+      - rust/lit-node/**
+      - .github/workflows/rust-lit-node-clippy.yml
+      - scripts/github/**
+    branches:
+      - master
+      - develop
+      - datil
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_LOG_STYLE: always
+  RUST_LOG: warn,lit_node=debug,web_user_tests=trace,integration_tests=trace,ecdsa=trace,test=trace
+  RUST_BACKTRACE: full
+  LIT_LOGGING_SERVICE_DISABLED: 1
+  LIT_CELO_DEPLOYER_PRIVATE_KEY: "0x3178746f7ae6a309d14444b4c6c85a96a4be2f53fa8950dea241d232f3e6c166"
+  LIT_ALFAJORES_DEPLOYER_PRIVATE_KEY: "0x3178746f7ae6a309d14444b4c6c85a96a4be2f53fa8950dea241d232f3e6c166"
+  LIT_MUMBAI_DEPLOYER_PRIVATE_KEY: "0x3178746f7ae6a309d14444b4c6c85a96a4be2f53fa8950dea241d232f3e6c166"
+  LIT_POLYGON_DEPLOYER_PRIVATE_KEY: "0x3178746f7ae6a309d14444b4c6c85a96a4be2f53fa8950dea241d232f3e6c166"
+  # the above are empty, do not put money in them
+  IN_GITHUB_CI: 1
+  CARGO_INCREMENTAL: 0
+
+defaults:
+  run:
+    shell: bash
+    working-directory: rust/lit-node
+
+jobs:
+  check:
+    runs-on: warp-ubuntu-latest-x64-2x # change to LargeRunner to run on github.  Change to self-hosted to run on our own runner.  Change to buildjet-8vcpu-ubuntu-2204 to run on buildjet with 8 cpus
+    timeout-minutes: 25
+
+    steps:
+      - name: Clean workspace
+        working-directory: ${{ github.workspace }}
+        run: |
+          rm -rf ../../lit-assets
+          mkdir -p ${{ github.workspace }}
+      - name: Install deps
+        working-directory: ${{ github.workspace }}
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev libsqlite3-dev cmake protobuf-compiler
+      - name: Checkout lit-assets
+        uses: actions/checkout@v3
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable #nightly-2023-09-11 # keep this up to date with rust/lit-node/rust-toolchain.toml
+          components: rustfmt clippy rust-src
+      # - name: Rust Cache
+      #   uses: Swatinem/rust-cache@v2
+      #   with:
+      #     cache-all-crates: "true"
+      #     cache-provider: "buildjet"
+      #     workspaces: |
+      #       rust/lit-node
+      - name: Cargo fmt check
+        run: cargo fmt -- --check
+      - name: Cargo clippy check
+        run: ./scripts/run_clippy.sh

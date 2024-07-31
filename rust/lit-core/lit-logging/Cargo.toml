@@ -1,0 +1,50 @@
+[package]
+name = "lit-logging"
+description = "Lit Logging"
+authors = ["David Radunz <david.radunz@litprotocol.com>"]
+version = "0.1.0"
+edition = "2021"
+exclude = ["resources/test/"]
+
+[features]
+default = ["tracing-support", "lit-core/logging-core"]
+service = ["crossbeam-channel", "chrono", "async-trait", "tokio", "hyper", "hyperlocal",
+    "lit-api-core", "lit-api-core/client-hyper"]
+tracing-support = ["tracing", "tracing-subscriber", "lit-core/tracing-support",
+    "tracing-opentelemetry", "opentelemetry", "opentelemetry_sdk", "opentelemetry-otlp"]
+
+[dependencies]
+log = { version = "0.4.17", features = ["kv_unstable", "kv_unstable_serde"] }
+env_logger = { git = "https://github.com/LIT-Protocol/env_logger.git", features = ["fmt-internals"] }
+tracing = { version = "0.1.40", optional = true }
+tracing-subscriber = { version = "0.3.17", features = ["env-filter", "registry"], optional = true }
+tracing-opentelemetry = { version = "0.22.0", optional = true }
+opentelemetry = { version = "0.21.0", optional = true }
+opentelemetry_sdk = { version = "0.21.0", features = ["rt-tokio"], optional = true }
+opentelemetry-otlp = { version = "0.14.0", optional = true }
+termcolor = { version = "1.2.0" }
+once_cell = { version = "1.16.0" }
+arc-swap = { version = "1.6.0" }
+serde = { version = "1.0.147", features = ["derive"] }
+serde_json = { version = "1.0.89" }
+derive_more = { version = "0.99.17" }
+crossbeam-channel = { version = "0.5.6", optional = true }
+chrono = { version = "0.4.23", optional = true }
+async-trait = { version = "0.1.63", optional = true }
+tokio = { version = "*", features = ["full"], optional = true }
+hyper = { version = "0.14", optional = true }
+hyperlocal = { version = "0.8", optional = true }
+regex = { version = "1.7.0" }
+
+[dependencies.lit-core]
+path = "../lit-core"
+
+[dependencies.lit-core-derive]
+path = "../lit-core-derive"
+
+[dependencies.lit-api-core]
+path = "../lit-api-core"
+optional = true
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["crossbeam-channel", "chrono"]

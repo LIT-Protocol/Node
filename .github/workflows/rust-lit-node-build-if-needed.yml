@@ -1,0 +1,38 @@
+# Build only if needed.  This workflow checks if the artifact exists and if it does not, it will build the artifact.  If the artifact exists, it will not build the artifact.  This is necessary to allow the individual test workflows to be run independently of the master-trigger workflow.
+name: rust/lit-node-build-if-needed
+on:
+  workflow_dispatch: {}
+  workflow_call:
+    inputs:
+      build_features:
+        type: string
+        required: true
+        description: "The features to pass to the cargo build command"
+
+defaults:
+  run:
+    shell: bash
+    working-directory: rust/lit-node
+
+jobs:
+  # Does the artifact exist?
+  check-if-needed:
+    runs-on: warp-ubuntu-latest-x64-8x # change to LargeRunner to run on github.  Change to self-hosted to run on our own runner.  Change to buildjet-8vcpu-ubuntu-2204 to run on buildjet with 8 cpus
+    outputs: 
+      artifact_exists: ${{ steps.artifact_exists.outputs.exists }}
+    steps:
+        - name: Checkout lit-assets
+          uses: actions/checkout@v3
+        - name: Check if the artifact exists
+          id: artifact_exists
+          uses: LIT-Protocol/artifact-exists-action@v0
+          with: 
+            name: nextest-archive-${{ inputs.build_features }}
+
+  # If it does not exist, build the artifact
+  build:
+    needs: check-if-needed
+    if: ${{ needs.check-if-needed.outputs.artifact_exists == 'false' }}
+    uses: ./.github/workflows/rust-lit-node-build.yml
+    with:
+      build_features: ${{ inputs.build_features }}

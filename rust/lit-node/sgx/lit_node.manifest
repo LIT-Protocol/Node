@@ -1,0 +1,94 @@
+[loader]
+entrypoint = "file:/usr/lib/x86_64-linux-gnu/gramine/libsysdb.so"
+log_level = "debug"
+insecure__use_cmdline_argv = true
+insecure__use_host_env = true
+
+[libos]
+entrypoint = "lit_node"
+
+[sgx]
+remote_attestation = true
+enclave_size = "2G"
+thread_num = 32
+rpc_thread_num = 32
+preheat_enclave = true
+protected_mrenclave_files = [ "file:secrets.bin", "file:secrets_7470.bin", "file:secrets_7471.bin", "file:secrets_7472.bin", "file:secrets_7473.bin", "file:secrets_7474.bin", "file:secrets_7475.bin", "file:secrets_7476.bin", "file:secrets_7477.bin", "file:secrets_7478.bin", "file:secrets_7479.bin",]
+allowed_files = [ "file:node.db", "file:node_7470.db", "file:node_7471.db", "file:node_7472.db", "file:node_7473.db", "file:node_7474.db", "file:node_7475.db", "file:node_7476.db", "file:node_7477.db", "file:node_7478.db", "file:node_7479.db", "file:node_7470.db-journal", "file:node_7471.db-journal", "file:node_7472.db-journal", "file:node_7473.db-journal", "file:node_7474.db-journal", "file:node_7475.db-journal", "file:node_7476.db-journal", "file:node_7477.db-journal", "file:node_7478.db-journal", "file:node_7479.db-journal", "file:/etc/nsswitch.conf", "file:/etc/host.conf", "file:/etc/resolv.conf", "file:/etc/ethers", "file:/etc/hosts", "file:/etc/group", "file:/etc/passwd", "file:/etc/gai.conf", "file:/etc/ssl/openssl.cnf", "file:/etc/ssl/certs/ca-certificates.crt", "file:/usr/lib/x86_64-linux-gnu/gramine/libsysdb.so", "file:peers_deploy_test.txt",]
+isvprodid = 0
+isvsvn = 0
+debug = false
+require_avx = false
+require_avx512 = false
+require_mpx = false
+require_pkru = false
+require_amx = false
+support_exinfo = false
+nonpie_binary = false
+enable_stats = false
+[[sgx.trusted_files]]
+uri = "file:/usr/bin/nodejs"
+
+[[sgx.trusted_files]]
+uri = "file:/usr/bin/node"
+
+[[sgx.trusted_files]]
+uri = "file:/usr/lib/x86_64-linux-gnu/gramine/runtime/glibc/"
+
+[[sgx.trusted_files]]
+uri = "file:/lib/x86_64-linux-gnu/"
+
+[[sgx.trusted_files]]
+uri = "file:/usr//lib/x86_64-linux-gnu/"
+
+[[sgx.trusted_files]]
+uri = "file:lit_node"
+
+[[sgx.trusted_files]]
+uri = "file:abis/"
+
+[[sgx.trusted_files]]
+uri = "file:Rocket.toml"
+
+[sys]
+insecure__allow_eventfd = true
+enable_sigterm_injection = true
+
+[fs]
+[[fs.mounts]]
+type = "chroot"
+path = "/usr/bin/nodejs"
+uri = "file:/usr/bin/nodejs"
+
+[[fs.mounts]]
+type = "chroot"
+path = "/lib"
+uri = "file:/usr/lib/x86_64-linux-gnu/gramine/runtime/glibc"
+
+[[fs.mounts]]
+type = "chroot"
+path = "/lib/x86_64-linux-gnu"
+uri = "file:/lib/x86_64-linux-gnu"
+
+[[fs.mounts]]
+type = "chroot"
+path = "/usr/lib/x86_64-linux-gnu"
+uri = "file:/usr/lib/x86_64-linux-gnu"
+
+[[fs.mounts]]
+type = "chroot"
+path = "/etc"
+uri = "file:/etc"
+
+[loader.env]
+LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu"
+
+
+
+
+
+
+
+
+
+
