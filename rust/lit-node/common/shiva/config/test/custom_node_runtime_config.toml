@@ -1,0 +1,7 @@
+[node]
+chain_polling_interval = "2000"
+ecdsa_round_timeout = "20000"
+enable_epoch_transitions = "true"
+enable_proxied_http_client = "false"
+enable_rate_limiting = "false"
+http_client_timeout = "10"

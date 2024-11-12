@@ -1,0 +1,106 @@
+[package]
+name = "test-common"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+shiva-path = []
+# this needs to happen at runtime, so is just a place holder for now.
+sign_test = ["lit-actions"] #enables unsafe endpoint allowing a test to use a PK directly .
+lit-actions = ["dep:lit-actions-grpc", "dep:lit-actions-server", "dep:libaes"]
+lit-actions-server = ["lit-actions"] # start internal lit_actions server for testing
+testing = ["lit-actions-server"] # enables testing features
+proxy_http = ["lit_node/lit-actions", "lit_node/testing", "lit_node/proxy_http"] # enables proxy http for testing
+
+[profile.develop]
+inherits = "dev"
+opt-level = 1
+debug = 1
+incremental = false
+
+[build-dependencies]
+# Deno v1.37.2
+tonic-build = "0.10"
+
+[dependencies]
+# everything is based off of lit-node
+lit_node = {  path = "../../../lit-node", features = ["lit-actions", "testing"] }
+
+
+
+anyhow = "1.0.41"
+
+async-trait = "0.1.53"
+blsful = "2.5"
+base64_light = "0.1"
+bulletproofs = { version = "4.0.0", git = "https://github.com/LIT-Protocol/bulletproofs" }
+bytes = "1.5.0"
+bs58 = "0.5.0"
+command-group = "1.0.8"
+cait-sith = { git = "https://github.com/lit-protocol/cait-sith", features = ["k256"] }
+chrono = "0.4.23"
+curve25519-dalek = { package = "curve25519-dalek-ml", version="4.2.1", features = ["group", "serde", "rand_core"] }
+data-encoding = "2.3.2"
+digest = { version = "0.10.6", default-features = false, features = ["alloc", "oid"] }
+dotenv = "0.15.0"
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+ed448-goldilocks = { version = "0.11", package = "ed448-goldilocks-plus" }
+elliptic-curve = { version = "0.13.5", features = ["serde"] }
+ethers = { version = "2.0.8", features = [ "abigen", "legacy" ]}
+futures = "0.3.17"
+hex = { version = "0.4.3" }
+hex-literal = "0.4.1"
+jubjub = { version = "0.10", git = "https://github.com/LIT-Protocol/jubjub.git" }
+lazy_static = "1.4.0"
+libaes = { version = "0.6.4", optional = true }
+lit-bls-wasm = { git = "https://github.com/LIT-Protocol/lit-bls-wasm" }
+lit-ecdsa-wasm-combine = { git = "https://github.com/LIT-Protocol/lit-ecdsa-wasm-combine" }
+
+k256 = { version = "0.13.0", features = ["sha256", "ecdsa", "serde", "ecdsa-core", "expose-field", "hash2curve", "schnorr"], optional = false }
+p256 = { version = "0.13", features = ["ecdsa-core", "expose-field", "hash2curve", "sha256", "serde"], optional = false }
+p384 = { version = "0.13", features = ["arithmetic", "serde"], optional = false }
+libsecp256k1 = { git = "https://github.com/LIT-Protocol/libsecp256k1", branch = "master", version = "0.7.1" }
+once_cell = { version = "1" }
+rand = { version = "~0.8.5", features = ["std_rng"]}
+rand_core = "~0.6.4"
+regex = "1.7.1"
+reqwest = { version = "0.11.14", default-features = false, features = ["json", "rustls-tls"] }
+# used to verify JWTs.  must match the version in the crate overrides at the bottom of this file
+serde = { version = "1.0.126", features = ["derive"] }
+serde-encrypt-core = { git = "https://github.com/LIT-protocol/serde-encrypt" }
+serde_json = "1.0.64"
+sha2 = "0.10"
+sha3 = "0.10"
+siwe = "0.5.0"
+siwe-recap = { git = "https://github.com/spruceid/siwe-recap" }
+tokio = { version = "1.23.0", features = ["rt-multi-thread"] }
+toml_edit = "0.20.7"
+tracing = "0.1.40"
+url = { version = "2", features = ["serde"] }
+uuid = { version = "1.4", features = ["v4"] }
+vsss-rs = { version = "4.0.1", features = ["std"] }
+generic-array = "0.14.0"
+#ECDSA
+lit-core = { path = "../../../lit-core/lit-core", features = ["ipfs", "chrono"] }
+lit-logging = { path = "../../../lit-core/lit-logging", features = ["service"] }
+lit-api-core = {  path = "../../../lit-core/lit-api-core", features = ["rocket-helper", "client-reqwest", "server"] }
+lit-blockchain = { path = "../../../lit-core/lit-blockchain" }
+lit-attestation = { path = "../../../lit-core/lit-attestation", features = ["generate-via-service", "kdf"] }
+toxiproxy_rust = "*"
+
+
+[dependencies.lit-actions-grpc]
+path = "../../../lit-actions/grpc"
+optional = true
+
+[dependencies.lit-actions-server]
+path = "../../../lit-actions/server"
+optional = true
+
+
+[profile.release]
+codegen-units = 1
+incremental = true
+lto = true
+opt-level = 3

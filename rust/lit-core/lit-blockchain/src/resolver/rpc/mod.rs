@@ -338,6 +338,7 @@ fn create_provider(rpc_entry: &RpcEntry) -> Result<Provider<Http>> {
     // get a client builder
     let client = reqwest::Client::builder()
         .default_headers(header_map)
+        .use_rustls_tls()
         .build()
         .map_err(|e| config_err(e, Some("Could not create provider client".into())))?;
 

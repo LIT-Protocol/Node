@@ -5,13 +5,15 @@ use crate::auth::auth_material::JsonAuthSig;
 use crate::auth::capabilities::recap::extract_and_verify_all_capabilities;
 use crate::auth::validators::auth_sig::CapabilityAuthSigValidator;
 use crate::auth::validators::siwe::SiweValidator;
-use crate::error::{blockchain_err_code, parser_err, unexpected_err_code, Result, Unexpected, EC};
+use crate::config::LitNodeConfig;
+use crate::error::{blockchain_err_code, unexpected_err_code, Result, Unexpected, EC};
 use crate::models::auth::{LitResourcePrefix, SessionKeySignedMessage};
 use crate::rate_limiting::models::UsageEntries;
 use crate::utils::encoding;
 use chrono::{TimeZone, Utc};
 use ethers::prelude::*;
 use ethers::types::U256;
+use futures::{pin_mut, select, FutureExt};
 use lit_blockchain::resolver::contract::ContractResolver;
 use lit_core::config::LitConfig;
 use lit_core::utils::binary::bytes_to_hex;
@@ -87,6 +89,7 @@ pub(super) async fn allocate_request_to_first_nft_with_quota(
             let existing_uses = rate_limit_db
                 .delegation_uses_map
                 .get(&signature_hash_uses_key.clone())
+                .await
                 .unwrap_or(0);
             rate_limit_db
                 .delegation_uses_map
@@ -239,6 +242,7 @@ pub async fn get_authorized_rate_limit_nfts_via_delegation_signature(
                                     let already_used = rate_limit_db
                                         .delegation_uses_map
                                         .get(&delegation_signature_key)
+                                        .await
                                         .unwrap_or(0);
                                     debug!(
                                         "User uses: {} and max uses: {}",
@@ -253,14 +257,11 @@ pub async fn get_authorized_rate_limit_nfts_via_delegation_signature(
                                 if let Some(nft_id) = map.get("nft_id") {
                                     let nft_id_arr = nft_id
                                         .as_array()
-                                        .expect("nft_id is not an array of strings")
+                                        .unwrap_or(&Vec::new())
                                         .iter()
-                                        .map(|x| {
-                                            x.as_str()
-                                                .expect("Could not convert nft_id member to string")
-                                                .to_string()
-                                        })
-                                        .collect::<Vec<String>>();
+                                        .filter_map(|x| x.as_str())
+                                        .flat_map(|x| U256::from_dec_str(x).ok())
+                                        .collect::<Vec<U256>>();
                                     debug!("nft_id_arr: {:?}", nft_id_arr);
                                     nfts = fetch_rate_limit_nfts_by_ids(
                                         &nft_id_arr,
@@ -354,61 +355,63 @@ pub async fn get_authorized_rate_limit_nfts_via_payer_db(
     // loop over payers, and then collect the NFTs each payer has
     let mut authorized_rate_limit_nfts: Vec<PossiblyDelegatedRateLimitNft> = Vec::new();
     for (i, payer) in payers.iter().enumerate() {
-        let restriction = match restrictions.get(i) {
-            Some(restriction) => restriction,
-            None => {
-                return Err(unexpected_err_code(
-                    format!(
-                        "No restriction found for payer {}.  This should never happen.",
-                        bytes_to_hex(payer)
-                    ),
-                    EC::NodeBlockchainError,
-                    None,
-                ))
-            }
-        };
+        let mut delegation_uses_key = None;
+        if matches!(cfg.enable_rate_limiting_allocation(), Ok(true)) {
+            let restriction = match restrictions.get(i) {
+                Some(restriction) => restriction,
+                None => {
+                    return Err(unexpected_err_code(
+                        format!(
+                            "No restriction found for payer {}.  This should never happen.",
+                            bytes_to_hex(payer)
+                        ),
+                        EC::NodeBlockchainError,
+                        None,
+                    ))
+                }
+            };
 
-        // we need to create a hash of the current period start, the user address, and the payer address.
-        // this will be used to restrict the number of requests a user can make in a given period
-        // find the current start for the period.  the global start is jan 1st, 1970.
-        // we consider than "n" periods have elapsed since the global start, where n is the number of periods that have elapsed since the global start
-        let now_seconds = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .map_err(|e| {
-                unexpected_err_code(
-                    e,
-                    EC::NodeUnknownError,
-                    Some("There was an error getting the system time".into()),
-                )
-            })?
-            .as_secs();
-        if restriction.period_seconds > U256::from(u64::max_value()) {
-            return Err(unexpected_err_code(
+            // we need to create a hash of the current period start, the user address, and the payer address.
+            // this will be used to restrict the number of requests a user can make in a given period
+            // find the current start for the period.  the global start is jan 1st, 1970.
+            // we consider than "n" periods have elapsed since the global start, where n is the number of periods that have elapsed since the global start
+            let now_seconds = SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .map_err(|e| {
+                    unexpected_err_code(
+                        e,
+                        EC::NodeUnknownError,
+                        Some("There was an error getting the system time".into()),
+                    )
+                })?
+                .as_secs();
+            if restriction.period_seconds > U256::from(u64::max_value()) {
+                return Err(unexpected_err_code(
                 format!("Period seconds is greater than u64 max value.  This should never happen.  You may have accidently set the period seconds in the restriction to a giant number.  The number is: {}", restriction.period_seconds),
                 EC::NodeBlockchainError,
                 None,
             ));
-        }
-        // this function will panic if the number is greater than a u64, and we check above.  so this is safe
-        let period_seconds = restriction.period_seconds.as_u64();
-        let period_start = now_seconds / period_seconds * period_seconds;
+            }
+            // this function will panic if the number is greater than a u64, and we check above.  so this is safe
+            let period_seconds = restriction.period_seconds.as_u64();
+            let period_start = now_seconds / period_seconds * period_seconds;
 
-        let mut hasher = Sha256::new();
-        hasher.update(
-            [
-                user_address.as_bytes(),
-                payer.as_bytes(),
-                &period_start.to_le_bytes(),
-            ]
-            .concat(),
-        );
-        let delegation_uses_key = hasher.finalize().to_vec();
+            let mut hasher = Sha256::new();
+            hasher.update(
+                [
+                    user_address.as_bytes(),
+                    payer.as_bytes(),
+                    &period_start.to_le_bytes(),
+                ]
+                .concat(),
+            );
+            let delegation_uses_key_vec = hasher.finalize().to_vec();
 
-        // by default, they are both zero, so only check restrictions if at least 1 value is nonzero
-        // which means they set a restriction
-        if !restriction.requests_per_period.is_zero() && !restriction.period_seconds.is_zero() {
-            // this payer has restrictions - check them
-            let max_uses = match restriction.requests_per_period < U256::from(u64::max_value()) {
+            // by default, they are both zero, so only check restrictions if at least 1 value is nonzero
+            // which means they set a restriction
+            if !restriction.requests_per_period.is_zero() && !restriction.period_seconds.is_zero() {
+                // this payer has restrictions - check them
+                let max_uses = match restriction.requests_per_period < U256::from(u64::max_value()) {
                 true => restriction.requests_per_period.as_u64(),
                 false => {
                     return Err(unexpected_err_code(
@@ -422,17 +425,20 @@ pub async fn get_authorized_rate_limit_nfts_via_payer_db(
                 }
             };
 
-            let already_used = rate_limit_db
-                .delegation_uses_map
-                .get(&delegation_uses_key)
-                .unwrap_or(0);
-            debug!(
-                "Checking if payer should pay for user - User uses: {} and max uses: {}",
-                already_used, max_uses,
-            );
-            if already_used as u64 >= max_uses {
-                continue;
+                let already_used = rate_limit_db
+                    .delegation_uses_map
+                    .get(&delegation_uses_key_vec)
+                    .await
+                    .unwrap_or(0);
+                debug!(
+                    "Checking if payer should pay for user - User uses: {} and max uses: {}",
+                    already_used, max_uses,
+                );
+                if already_used as u64 >= max_uses {
+                    continue;
+                }
             }
+            delegation_uses_key = Some(delegation_uses_key_vec);
         }
 
         // all NFTs they hold are usable, and they haven't passed the restriction limit, so add them to the list
@@ -441,10 +447,16 @@ pub async fn get_authorized_rate_limit_nfts_via_payer_db(
             .iter()
             .map(|x| PossiblyDelegatedRateLimitNft {
                 nft: x.clone().nft,
-                signature_hash_uses_key: Some(delegation_uses_key.clone()),
+                signature_hash_uses_key: delegation_uses_key.clone(),
             })
             .collect::<Vec<PossiblyDelegatedRateLimitNft>>();
         authorized_rate_limit_nfts.extend(nfts);
+        if matches!(cfg.enable_rate_limiting_allocation(), Ok(false)) {
+            // early exit - we just need 1 of these
+            if !authorized_rate_limit_nfts.is_empty() {
+                return Ok(authorized_rate_limit_nfts);
+            }
+        }
     }
 
     Ok(authorized_rate_limit_nfts)
@@ -461,24 +473,49 @@ pub(super) async fn get_owned_and_authorized_rate_limit_nfts(
 ) -> Result<Vec<PossiblyDelegatedRateLimitNft>> {
     let mut all_authorized_nfts = HashSet::new();
 
-    // Get sig authorized NFTs
-    let signature_authed_nfts = get_authorized_rate_limit_nfts_via_delegation_signature(
+    let sig_future = get_authorized_rate_limit_nfts_via_delegation_signature(
         user_address,
         session_sig,
         rate_limit_db,
         cfg,
         bls_root_pubkey,
     )
-    .await?;
-    all_authorized_nfts.extend(signature_authed_nfts);
+    .fuse();
 
-    let owned_nfts = get_rate_limit_nfts_by_owner(user_address, rate_limit_db, cfg).await?;
-    all_authorized_nfts.extend(owned_nfts);
+    let owned_future = get_rate_limit_nfts_by_owner(user_address, rate_limit_db, cfg).fuse();
 
-    // Get payer DB NFTs
-    let payer_db_authed_nfts =
-        get_authorized_rate_limit_nfts_via_payer_db(user_address, rate_limit_db, cfg).await?;
-    all_authorized_nfts.extend(payer_db_authed_nfts);
+    let payer_db_future =
+        get_authorized_rate_limit_nfts_via_payer_db(user_address, rate_limit_db, cfg).fuse();
+
+    pin_mut!(sig_future, owned_future, payer_db_future);
+
+    let early_exit_enabled = matches!(cfg.enable_rate_limiting_allocation(), Ok(false));
+
+    loop {
+        select! {
+            nfts_res = sig_future => {
+                all_authorized_nfts.extend(nfts_res?);
+                if early_exit_enabled && !all_authorized_nfts.is_empty() {
+                    return Ok(all_authorized_nfts.into_iter().collect());
+                }
+            },
+            nfts_res = owned_future => {
+                all_authorized_nfts.extend(nfts_res?);
+                if early_exit_enabled && !all_authorized_nfts.is_empty() {
+                    return Ok(all_authorized_nfts.into_iter().collect());
+                }
+            },
+            nfts_res = payer_db_future => {
+                all_authorized_nfts.extend(nfts_res?);
+                if early_exit_enabled && !all_authorized_nfts.is_empty() {
+                    return Ok(all_authorized_nfts.into_iter().collect());
+                }
+            },
+            complete => {
+                break;
+            }
+        }
+    }
 
     Ok(all_authorized_nfts.into_iter().collect())
 }
@@ -490,17 +527,30 @@ pub(super) async fn get_owned_and_authorized_rate_limit_nfts(
 ///
 /// This function skips past all expired NFTs.
 pub(super) async fn fetch_rate_limit_nfts_by_ids(
-    nft_ids: &Vec<String>,
+    token_ids: &Vec<U256>,
     rate_limit_db: &RateLimitDB,
     cfg: &LitConfig,
 ) -> Result<Vec<RateLimitNft>> {
     let mut nfts = Vec::new();
-    for nft_id in nft_ids {
-        let token_id = U256::from_dec_str(nft_id.as_ref())
-            .map_err(|e| parser_err(e, Some("Unable to parse token ID".into())))?;
-        if rate_limit_db.nft_cache.contains_key(&token_id) {
-            // Try fetch from cache
-            if let Some(nft) = rate_limit_db.nft_cache.get(&token_id) {
+    for token_id in token_ids {
+        // Try fetch from cache
+        if let Some(nft) = rate_limit_db.nft_cache.get(token_id).await {
+            let token_expiry = nft.expires_at.as_u64();
+            let token_expires_at = Utc
+                .timestamp_opt(token_expiry as i64, 0)
+                .expect_or_err("failed to get timestamp")?;
+            if token_expires_at <= Utc::now() {
+                continue;
+            }
+            nfts.push(nft.clone());
+            if matches!(cfg.enable_rate_limiting_allocation(), Ok(false)) {
+                // early exit - we just need 1 of these
+                return Ok(nfts);
+            }
+        } else {
+            // Fetch from chain
+            let nft = fetch_rate_limit_nft(token_id, cfg).await?;
+            if let Some(nft) = nft {
                 let token_expiry = nft.expires_at.as_u64();
                 let token_expires_at = Utc
                     .timestamp_opt(token_expiry as i64, 0)
@@ -509,13 +559,13 @@ pub(super) async fn fetch_rate_limit_nfts_by_ids(
                     continue;
                 }
                 nfts.push(nft.clone());
+                // insert into cache
+                rate_limit_db.nft_cache.insert(*token_id, nft).await;
+                if matches!(cfg.enable_rate_limiting_allocation(), Ok(false)) {
+                    // early exit - we just need 1 of these
+                    return Ok(nfts);
+                }
             }
-        }
-
-        // Fetch from chain
-        let nft = fetch_rate_limit_nft(token_id, cfg).await?;
-        if let Some(nft) = nft {
-            nfts.push(nft);
         }
     }
     Ok(nfts)
@@ -524,14 +574,14 @@ pub(super) async fn fetch_rate_limit_nfts_by_ids(
 /// This function fetches rate limit NFT data from chain per the given NFT ID.
 ///
 /// This function returns None if the NFT is expired.
-async fn fetch_rate_limit_nft(token_id: U256, cfg: &LitConfig) -> Result<Option<RateLimitNft>> {
+async fn fetch_rate_limit_nft(token_id: &U256, cfg: &LitConfig) -> Result<Option<RateLimitNft>> {
     let resolver = ContractResolver::try_from(cfg)
         .map_err(|e| unexpected_err_code(e, EC::NodeContractResolverConversionFailed, None))?;
 
     let contract = resolver.rate_limit_nft_contract(cfg).await?;
     debug!("Getting token info from contract {:?}", contract);
     let token_info = contract
-        .capacity(token_id)
+        .capacity(*token_id)
         .call()
         .await
         .map_err(|e| blockchain_err_code(e, EC::NodeBlockchainError, None))?;
@@ -549,138 +599,18 @@ async fn fetch_rate_limit_nft(token_id: U256, cfg: &LitConfig) -> Result<Option<
 
     // get token owner
     let token_owner = contract
-        .owner_of(token_id)
+        .owner_of(*token_id)
         .call()
         .await
         .map_err(|e| blockchain_err_code(e, EC::NodeBlockchainError, None))?;
 
     Ok(Some(RateLimitNft {
-        id: token_id,
+        id: *token_id,
         requests_per_kilosecond: token_info.requests_per_kilosecond,
         expires_at: token_info.expires_at,
         owner: token_owner,
     }))
 }
-
-/// This function operates similar to a write-through cache. It will first check whether it is time to
-/// update the NFT ownership cache for this owner. If it is, it will hit the chain and update the cache.
-/// If it is not time to update the cache, it will return the cached NFTs for this owner.
-// pub(super) async fn get_rate_limit_nfts_by_owner(
-//     owner: Address,
-//     rate_limit_db: &RateLimitDB,
-//     cfg: &LitConfig,
-// ) -> Result<Vec<RateLimitNft>> {
-//     let owner_address_string = encoding::bytes_to_hex(owner);
-
-//     // First check whether cache is still fresh for this user address.
-//     if !rate_limit_db
-//         .latest_cache_miss_map
-//         .contains_key(&owner_address_string)
-//     {
-//         // Write-through cache behavior: Hit the chain, cache the results
-
-//         // Update cache since we're getting the rate limit from the chain
-//         rate_limit_db
-//             .latest_cache_miss_map
-//             .insert(owner_address_string, true)
-//             .await;
-
-//         debug!("get_and_cache_rate_limit_nfts for owner: {}", owner);
-//         let resolver = ContractResolver::try_from(cfg)
-//             .map_err(|e| unexpected_err_code(e, EC::NodeContractResolverConversionFailed, None))?;
-
-//         let contract = resolver.rate_limit_nft_contract(cfg).await?;
-//         debug!("Getting token balance from contract {:?}", contract);
-//         let token_balance = (contract
-//             .balance_of(owner)
-//             .call()
-//             .await
-//             .map_err(|e| blockchain_err_code(e, EC::NodeBlockchainError, None))?)
-//         .as_u64();
-//         if token_balance == 0 {
-//             return Ok(vec![]);
-//         }
-//         debug!("got token balance of {}", token_balance);
-//         let mut nft_ids = vec![];
-//         let mut nfts: Vec<RateLimitNft> = Vec::new();
-//         let now = Utc::now();
-//         for i in 0..token_balance {
-//             let token_id = contract
-//                 .token_of_owner_by_index(owner, U256([i, 0, 0, 0]))
-//                 .call()
-//                 .await
-//                 .map_err(|e| blockchain_err_code(e, EC::NodeBlockchainError, None))?;
-//             debug!("Got token id {}", token_id);
-//             nft_ids.push(token_id);
-//             let token_info = contract
-//                 .capacity(token_id)
-//                 .call()
-//                 .await
-//                 .map_err(|e| blockchain_err_code(e, EC::NodeBlockchainError, None))?;
-//             debug!("Got token info {:?}", token_info);
-
-//             // only push unexpired ones into the cache
-//             let expires_at = Utc
-//                 .timestamp_opt(token_info.expires_at.as_u64() as i64, 0)
-//                 .expect_or_err("failed to get timestamp")?;
-//             if expires_at > now {
-//                 nfts.push(RateLimitNft {
-//                     id: token_id,
-//                     requests_per_kilosecond: token_info.requests_per_kilosecond,
-//                     expires_at: token_info.expires_at,
-//                     owner,
-//                 });
-//             }
-//         }
-
-//         // feels weird to loop again but this time we aren't awaiting any http requests, so we will hold the lock for a much shorter time
-//         trace!("rate limit nfts before removing stale ones: {:?}", nfts);
-
-//         // Cache results + remove stale entries
-
-//         // stale nfts are ones with the incorrect owner stored in the cache
-//         let mut stale_nfts: Vec<(U256, Address)> = Vec::new();
-//         for nft in nfts.iter() {
-//             if let Some(old_entry) = rate_limit_db.nft_cache.get(&nft.id) {
-//                 if old_entry.owner != nft.owner {
-//                     stale_nfts.push((nft.id, old_entry.owner));
-//                 }
-//             }
-//             rate_limit_db.nft_cache.insert(nft.id, nft.clone()).await;
-//         }
-
-//         trace!(
-//             "Inserted rate limit nfts into cache and stale nfts are: {:?}",
-//             stale_nfts
-//         );
-//         rate_limit_db
-//             .owner_to_nft_id_map
-//             .insert(owner, nft_ids)
-//             .await;
-
-//         // remove stale nfts from the cache.  these owners don't own these NFT ids anymore
-//         for (nft_id, owner) in stale_nfts {
-//             if let Some(owned_nfts) = rate_limit_db.owner_to_nft_id_map.get(&owner).as_mut() {
-//                 owned_nfts.retain(|&x| x != nft_id);
-//                 rate_limit_db
-//                     .owner_to_nft_id_map
-//                     .insert(owner, owned_nfts.to_owned())
-//                     .await;
-//             }
-//         }
-
-//         return Ok(nfts);
-//     }
-
-//     // Cache hit, so we just return the NFTs from the cache.
-//     Ok(rate_limit_db
-//         .owner_to_nft_id_map
-//         .get(&owner)
-//         .unwrap_or_default()
-//         .iter()
-//         .filter_map(|nft_id| rate_limit_db.nft_cache.get(nft_id))
-//         .collect::<Vec<RateLimitNft>>())
-// }
 
 // Simply get all the rate limit NFTs that this user owns
 pub(super) async fn get_rate_limit_nfts_by_owner(
@@ -695,6 +625,7 @@ pub(super) async fn get_rate_limit_nfts_by_owner(
         .map_err(|e| unexpected_err_code(e, EC::NodeContractResolverConversionFailed, None))?;
 
     let contract = resolver.rate_limit_nft_contract(cfg).await?;
+
     debug!("Getting token balance from contract {:?}", contract);
     let token_balance = (contract
         .balance_of(owner)
@@ -705,6 +636,7 @@ pub(super) async fn get_rate_limit_nfts_by_owner(
     if token_balance == 0 {
         return Ok(vec![]);
     }
+
     debug!("got token balance of {}", token_balance);
     let mut nft_ids = vec![];
     let mut nfts: Vec<PossiblyDelegatedRateLimitNft> = Vec::new();
@@ -717,27 +649,20 @@ pub(super) async fn get_rate_limit_nfts_by_owner(
             .map_err(|e| blockchain_err_code(e, EC::NodeBlockchainError, None))?;
         debug!("Got token id {}", token_id);
         nft_ids.push(token_id);
-        let token_info = contract
-            .capacity(token_id)
-            .call()
-            .await
-            .map_err(|e| blockchain_err_code(e, EC::NodeBlockchainError, None))?;
-        debug!("Got token info {:?}", token_info);
+        let nft_infos = fetch_rate_limit_nfts_by_ids(&vec![token_id], rate_limit_db, cfg).await?;
+        if nft_infos.is_empty() {
+            // this can happen if the NFT is expired.  skip it.
+            continue;
+        }
+        let nft = nft_infos[0].clone();
+        nfts.push(PossiblyDelegatedRateLimitNft {
+            nft,
+            signature_hash_uses_key: None,
+        });
 
-        // only return unexpired ones
-        let expires_at = Utc
-            .timestamp_opt(token_info.expires_at.as_u64() as i64, 0)
-            .expect_or_err("failed to get timestamp")?;
-        if expires_at > now {
-            nfts.push(PossiblyDelegatedRateLimitNft {
-                nft: RateLimitNft {
-                    id: token_id,
-                    requests_per_kilosecond: token_info.requests_per_kilosecond,
-                    expires_at: token_info.expires_at,
-                    owner,
-                },
-                signature_hash_uses_key: None,
-            });
+        if !nfts.is_empty() && matches!(cfg.enable_rate_limiting_allocation(), Ok(false)) {
+            // early exit - we just need 1 of these
+            return Ok(nfts);
         }
     }
 

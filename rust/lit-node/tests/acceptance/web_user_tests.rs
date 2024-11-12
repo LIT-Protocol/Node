@@ -1,33 +1,28 @@
 use std::sync::Arc;
 
-use crate::common::auth_sig::get_auth_sig_for_session_sig;
-use crate::common::auth_sig::get_session_sigs_for_pkp;
-use crate::common::lit_actions::assert_signed_action;
-use crate::common::lit_actions::execute_lit_action_session_sigs;
-use crate::common::lit_actions::sign_lit_action;
-use crate::common::lit_actions::HELLO_WORLD_LIT_ACTION_CODE;
-use crate::common::node_collection::get_network_pubkey;
-use crate::common::node_collection::hit_endpoints_with_json_body;
-use crate::common::node_collection::hit_endpoints_with_json_body_per_port;
-use crate::common::pkp::add_permitted_address_to_pkp_with_wallet;
-use crate::common::pkp::mint_next_pkp_with_wallet;
-use crate::common::testnet::actions::Actions;
-use crate::common::testnet::contracts::StakingContractConfig;
-use crate::common::testnet::node_config::CustomNodeRuntimeConfig;
-use crate::common::testnet::rate_limit_nfts::create_payment_delegation_entry;
-use crate::common::testnet::rate_limit_nfts::fund_wallet;
-use crate::common::testnet::rate_limit_nfts::mint_rate_limit_nft;
-use crate::common::testnet::Testnet;
-use crate::common::validator::ValidatorCollection;
+use test_common::auth_sig::get_auth_sig_for_session_sig;
+use test_common::auth_sig::get_session_sigs_for_pkp;
+use test_common::lit_actions::assert_signed_action;
+use test_common::lit_actions::execute_lit_action_session_sigs;
+use test_common::lit_actions::sign_lit_action;
+use test_common::lit_actions::HELLO_WORLD_LIT_ACTION_CODE;
+use test_common::node_collection::get_network_pubkey;
+use test_common::node_collection::hit_endpoints_with_json_body;
+use test_common::node_collection::hit_endpoints_with_json_body_per_port;
+use test_common::pkp::add_permitted_address_to_pkp_with_wallet;
+use test_common::pkp::mint_next_pkp_with_wallet;
+use test_common::testnet::actions::Actions;
+use test_common::testnet::contracts::StakingContractConfig;
+use test_common::testnet::node_config::CustomNodeRuntimeConfig;
+use test_common::testnet::rate_limit_nfts::{
+    create_payment_delegation_entry, fund_wallet, mint_rate_limit_nft, set_restrictions,
+};
+use test_common::testnet::Testnet;
+use test_common::validator::ValidatorCollection;
 
 #[allow(dead_code)]
-use super::super::common;
 use base64_light::base64_decode;
 use blsful::Bls12381G2Impl;
-use common::auth_sig::{
-    generate_authsig, get_auth_sig_with_rli_nft_resources, get_session_sigs_for_auth,
-};
-use common::new_node_collection;
 use ethers::middleware::SignerMiddleware;
 use ethers::signers::LocalWallet;
 use ethers::signers::Signer;
@@ -36,6 +31,10 @@ use lit_blockchain::contracts::rate_limit_nft::RateLimitNFT;
 use lit_node::tss::common::curve_type::CurveType;
 use rand_core::OsRng;
 use sha2::{Digest, Sha256};
+use test_common::auth_sig::{
+    generate_authsig, get_auth_sig_with_rli_nft_resources, get_session_sigs_for_auth,
+};
+use test_common::new_node_collection;
 
 use lit_node::auth::auth_material::AuthSigItem;
 use lit_node::auth::auth_material::JsonAuthSig;
@@ -764,7 +763,7 @@ async fn test_lit_action_session_sigs(
 
 #[tokio::test]
 async fn test_everything_as_web_user() {
-    common::init_test_config();
+    test_common::init_test_config();
     // use initial_node_setup if you don't have a DKG result saved.
     let num_nodes = 6;
 
@@ -792,13 +791,14 @@ async fn test_everything_as_web_user() {
 
 #[tokio::test]
 async fn test_rate_limit_nft() {
-    common::init_test_config();
+    test_common::init_test_config();
     let num_staked_and_joined_validators = 3;
     let mut testnet = Testnet::builder()
         .num_staked_and_joined_validators(num_staked_and_joined_validators)
         .custom_node_runtime_config(
             CustomNodeRuntimeConfig::builder()
                 .enable_rate_limiting("true".into())
+                .enable_rate_limiting_allocation("true".into())
                 .build(),
         )
         .force_deploy_in_ci(true)
@@ -882,7 +882,9 @@ async fn test_rate_limit_nft() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -982,7 +984,9 @@ async fn test_rate_limit_nft() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -1093,7 +1097,9 @@ async fn test_rate_limit_nft() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -1172,7 +1178,9 @@ async fn test_rate_limit_nft() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -1209,7 +1217,9 @@ async fn test_rate_limit_nft() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -1227,13 +1237,14 @@ async fn test_rate_limit_nft() {
 
 #[tokio::test]
 async fn test_rate_limit_nft_with_pkp() {
-    common::init_test_config();
+    test_common::init_test_config();
     let num_staked_and_joined_validators = 3;
     let mut testnet = Testnet::builder()
         .num_staked_and_joined_validators(num_staked_and_joined_validators)
         .custom_node_runtime_config(
             CustomNodeRuntimeConfig::builder()
                 .enable_rate_limiting("true".into())
+                .enable_rate_limiting_allocation("true".into())
                 .build(),
         )
         .force_deploy_in_ci(true)
@@ -1372,7 +1383,9 @@ async fn test_rate_limit_nft_with_pkp() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -1462,7 +1475,9 @@ async fn test_rate_limit_nft_with_pkp() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -1581,7 +1596,9 @@ async fn test_rate_limit_nft_with_pkp() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -1635,6 +1652,55 @@ async fn test_rate_limit_nft_with_pkp() {
         &provider,
         &payment_delegation_rate_limit_holder_wallet,
         pkp_eth_address,
+        0,
+        0,
+    )
+    .await;
+
+    // try and make more requests - we should be able to make unlimited requests now so let's try 10
+    // make some requests and count how many we can make
+    let mut count_after = 0;
+    loop {
+        info!(
+            "Sending request after payment delegation entry {}",
+            count_after
+        );
+        // Retrieve decrypted key
+        let decryption_resp = retrieve_decryption_key_session_sigs(
+            &validator_collection,
+            None,
+            None,
+            None,
+            unified_access_control_conditions.clone(),
+            Some(CHAIN_LOCALCHAIN.to_string()),
+            data_to_encrypt_hash.clone(),
+            &session_sigs,
+        )
+        .await;
+        info!("Responses: {:?}", decryption_resp);
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || count_after > 10
+            || decryption_resp[0].contains("error")
+        {
+            break;
+        }
+
+        count_after += 1;
+    }
+    info!(
+        "We made {} requests after minting the NFT and delegating using the PaymentDelegation contract with 0 restrictions before we hit the rate limit again",
+        count_after
+    );
+    assert!(
+        count_after >= 10,
+        "We delegated a rate limit nft using the PaymentDelegation contract, it should give us at least 10 more requests, but it gave us {}", count_after
+    );
+
+    // test with restrictions set to 0
+    set_restrictions(
+        payment_delegation_contract_address,
+        &provider,
+        &payment_delegation_rate_limit_holder_wallet,
         3,
         10,
     )
@@ -1660,7 +1726,9 @@ async fn test_rate_limit_nft_with_pkp() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -1697,7 +1765,9 @@ async fn test_rate_limit_nft_with_pkp() {
         )
         .await;
         info!("Responses: {:?}", decryption_resp);
-        if decryption_resp[0].contains("Rate limit exceeded.") {
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
             break;
         }
 
@@ -1709,6 +1779,538 @@ async fn test_rate_limit_nft_with_pkp() {
     );
     assert!(
         count_after >= 3,
-        "We delegated a rate limit nft using the PaymentDelegation contract, it should give us more 10 requests, but it gave us {}", count_after
+        "We delegated a rate limit nft using the PaymentDelegation contract, it should give us more 3 requests, but it gave us {}", count_after
+    );
+}
+
+#[tokio::test]
+async fn test_rate_limit_nft_with_pkp_and_no_allocation() {
+    test_common::init_test_config();
+    let num_staked_and_joined_validators = 3;
+    let mut testnet = Testnet::builder()
+        .num_staked_and_joined_validators(num_staked_and_joined_validators)
+        .custom_node_runtime_config(
+            CustomNodeRuntimeConfig::builder()
+                .enable_rate_limiting("true".into())
+                .enable_rate_limiting_allocation("false".into())
+                .build(),
+        )
+        .force_deploy_in_ci(true)
+        .build()
+        .await;
+
+    let testnet_contracts = Testnet::setup_contracts(
+        &mut testnet,
+        Some(
+            StakingContractConfig::builder()
+                .epoch_length(U256::from(300))
+                .build(),
+        ),
+    )
+    .await
+    .expect("Failed to setup contracts");
+
+    let actions = testnet.actions(testnet_contracts.contracts());
+
+    let validator_collection = ValidatorCollection::builder()
+        .num_staked_nodes(num_staked_and_joined_validators)
+        .build(&testnet, &actions)
+        .await
+        .expect("Failed to build validator collection");
+
+    let wallet = LocalWallet::new(&mut OsRng).with_chain_id(testnet.chain_id);
+    let provider = validator_collection.actions().deployer_provider();
+    let client = Arc::new(SignerMiddleware::new(provider.clone(), wallet.clone()));
+    fund_wallet(&provider, &wallet, "100000000000000000000").await;
+
+    let pkp_info = mint_next_pkp_with_wallet(client.clone(), validator_collection.actions())
+        .await
+        .expect("Could not mint next pkp");
+    let pubkey = pkp_info.0;
+    let token_id = pkp_info.1;
+    let pkp_eth_address = pkp_info.2;
+
+    // add the PKP itself as a permitted address, so that our session sig from the PKP will be able to sign with it
+    add_permitted_address_to_pkp_with_wallet(
+        client.clone(),
+        validator_collection.actions(),
+        &hex::encode(pkp_eth_address),
+        token_id,
+        &[U256::from(1)],
+    )
+    .await
+    .expect("Could not add permitted address to pkp");
+
+    // Get session sig for auth
+    let session_sigs = get_session_sigs_for_pkp(
+        validator_collection.actions(),
+        pubkey.clone(),
+        pkp_eth_address,
+        vec![LitResourceAbilityRequest {
+            resource: LitResourceAbilityRequestResource {
+                resource: "*".to_string(),
+                resource_prefix: "lit-litaction".to_string(),
+            },
+            ability: LitAbility::LitActionExecution.to_string(),
+        }],
+        &validator_collection.addresses(),
+        wallet.clone(),
+        None,
+        CurveType::BLS,
+        None,
+        None,
+        2,
+    )
+    .await
+    .expect("Could not get session sigs");
+
+    let to_encrypt = "hello this is a test";
+
+    // sha256 the plaintext
+    let mut hasher = Sha256::new();
+    hasher.update(to_encrypt.as_bytes());
+    let data_to_encrypt_hash = bytes_to_hex(hasher.finalize());
+
+    let chain = Some(CHAIN_LOCALCHAIN.to_string());
+    let unified_access_control_conditions = Some(vec![
+        lit_node::models::UnifiedAccessControlConditionItem::Condition(
+            lit_node::models::UnifiedAccessControlCondition::JsonAccessControlCondition(
+                models::JsonAccessControlCondition {
+                    contract_address: "".to_string(),
+                    chain: CHAIN_LOCALCHAIN.to_string(),
+                    standard_contract_type: "".to_string(),
+                    method: "".to_string(),
+                    parameters: vec![":userAddress".to_string()],
+                    return_value_test: models::JsonReturnValueTest {
+                        comparator: "=".to_string(),
+                        value: format!("0x{}", hex::encode(pkp_eth_address)),
+                    },
+                },
+            ),
+        ),
+    ]);
+
+    // encrypt something
+    let network_pubkey = get_network_pubkey(validator_collection.actions()).await;
+    let message_bytes = to_encrypt.as_bytes();
+    let hashed_access_control_conditions = hash_access_control_conditions(RequestConditions {
+        access_control_conditions: None,
+        evm_contract_conditions: None,
+        sol_rpc_conditions: None,
+        unified_access_control_conditions: unified_access_control_conditions.clone(),
+    })
+    .unwrap();
+    let identity_param = AccessControlConditionResource::new(format!(
+        "{}/{}",
+        hashed_access_control_conditions, data_to_encrypt_hash
+    ))
+    .get_resource_key()
+    .into_bytes();
+    let ciphertext = lit_bls_wasm::encrypt_time_lock::<Bls12381G2Impl>(
+        &network_pubkey,
+        message_bytes.to_vec(),
+        identity_param.clone(),
+    )
+    .expect("Unable to encrypt");
+    info!("ciphertext: {:?}", ciphertext);
+
+    // send requests until we hit the rate limit
+    let mut count = 0;
+    loop {
+        info!("Sending request {}", count);
+        // Retrieve decrypted key
+        let decryption_resp = retrieve_decryption_key_session_sigs(
+            &validator_collection,
+            None,
+            None,
+            None,
+            unified_access_control_conditions.clone(),
+            Some(CHAIN_LOCALCHAIN.to_string()),
+            data_to_encrypt_hash.clone(),
+            &session_sigs,
+        )
+        .await;
+        info!("Responses: {:?}", decryption_resp);
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
+            break;
+        }
+
+        count += 1;
+    }
+    info!("We made {} requests before we hit the rate limit", count);
+
+    // how many are we suposed to be able to make?
+    let free_requests_per_rate_limit_window = validator_collection
+        .actions()
+        .contracts()
+        .rate_limit_nft
+        .free_requests_per_rate_limit_window()
+        .await
+        .unwrap();
+    assert!(
+        U256::from(count) == free_requests_per_rate_limit_window,
+        "We should be able to make exactly {} requests before hitting the rate limit",
+        free_requests_per_rate_limit_window
+    );
+
+    // 1. show that the user can mint a rate limit nft and it will work
+    info!("Testing that the user can mint a rate limit NFT");
+    let provider = testnet.provider.clone();
+    fund_wallet(&provider, &wallet, "100000000000000000000").await;
+
+    // mint a rate limit increase nft
+    let rate_limit_nft_contract_address = validator_collection
+        .actions()
+        .contracts()
+        .rate_limit_nft
+        .address();
+    let rate_limit_increase = 1;
+    let nft_id = mint_rate_limit_nft(
+        rate_limit_nft_contract_address,
+        &provider,
+        &wallet,
+        rate_limit_increase,
+    )
+    .await;
+    // transfer rate limit NFT to the PKP
+    let client = SignerMiddleware::new(provider.clone(), wallet.clone());
+    let rate_limit_nft_contract =
+        RateLimitNFT::new(rate_limit_nft_contract_address, Arc::new(client));
+    let contract_call =
+        rate_limit_nft_contract.transfer_from(wallet.address(), pkp_eth_address, nft_id);
+    let transfer_tx = contract_call
+        .send()
+        .await
+        .expect("Could not transfer rate limit NFT to PKP");
+    let receipt = transfer_tx.await.expect("Could not get transfer receipt");
+
+    let resources = vec![
+        LitResourceAbilityRequest {
+            resource: LitResourceAbilityRequestResource {
+                resource: "*".to_string(),
+                resource_prefix: LitResourcePrefix::ACC.to_string(),
+            },
+            ability: LitAbility::AccessControlConditionDecryption.to_string(),
+        },
+        LitResourceAbilityRequest {
+            resource: LitResourceAbilityRequestResource {
+                resource: "*".to_string(),
+                resource_prefix: LitResourcePrefix::LA.to_string(),
+            },
+            ability: LitAbility::LitActionExecution.to_string(),
+        },
+    ];
+
+    // send 10 more requests
+    let mut count_after = 0;
+    for _ in 0..10 {
+        info!(
+            "Sending request after rate limit nft minted {}",
+            count_after
+        );
+        // Retrieve decrypted key
+        let decryption_resp = retrieve_decryption_key_session_sigs(
+            &validator_collection,
+            None,
+            None,
+            None,
+            unified_access_control_conditions.clone(),
+            Some(CHAIN_LOCALCHAIN.to_string()),
+            data_to_encrypt_hash.clone(),
+            &session_sigs,
+        )
+        .await;
+        info!("Responses: {:?}", decryption_resp);
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
+            break;
+        }
+
+        count_after += 1;
+    }
+    info!(
+        "We made {} requests after minting the NFT before we hit the rate limit again",
+        count_after
+    );
+    assert!(
+        count_after == 10,
+        "We bought a rate limit nft, it should give us at least 10 more requests, but it gave us {}", count_after
+    );
+
+    info!("User minting own rate limit nft worked!");
+
+    // 2. show that someone else can mint a rate limit NFT and delegate it to the user
+    info!("Testing that someone else can mint a rate limit NFT and delegate it to the user");
+    let rate_limit_holder_wallet = LocalWallet::new(&mut OsRng).with_chain_id(testnet.chain_id);
+
+    fund_wallet(
+        &provider,
+        &rate_limit_holder_wallet,
+        "100000000000000000000",
+    )
+    .await;
+
+    // mint a rate limit increase nft
+    let nft_id = mint_rate_limit_nft(
+        rate_limit_nft_contract_address,
+        &provider,
+        &rate_limit_holder_wallet,
+        rate_limit_increase,
+    )
+    .await;
+
+    // delegate the nft to the user
+    // to do this, we create a signature from the holder of the NFT
+    // which is rate_limit_holder_wallet
+    // and then we stick that signature into the capabilities section of the SIWE
+    let delegation_signature = get_auth_sig_with_rli_nft_resources(
+        rate_limit_holder_wallet.clone(),
+        nft_id.to_string(),
+        bytes_to_hex(pkp_eth_address),
+    );
+    info!("Delegation signature: {:?}", delegation_signature);
+    // show that we cannot use the inner delegation signature as a top level auth sig
+    let decryption_resp = retrieve_decryption_key(
+        validator_collection.actions(),
+        None,
+        None,
+        None,
+        unified_access_control_conditions.clone(),
+        Some(CHAIN_LOCALCHAIN.to_string()),
+        data_to_encrypt_hash.clone(),
+        &delegation_signature,
+    )
+    .await;
+    assert!(
+        decryption_resp[0].contains("NodeInvalidAuthSig"),
+        "We should not be able to use a delegation sig as a top level auth sig"
+    );
+    let session_sigs = get_session_sigs_for_pkp(
+        validator_collection.actions(),
+        pubkey.clone(),
+        pkp_eth_address,
+        vec![LitResourceAbilityRequest {
+            resource: LitResourceAbilityRequestResource {
+                resource: format!(
+                    "{}/{}",
+                    hashed_access_control_conditions, data_to_encrypt_hash
+                ),
+                resource_prefix: "lit-accesscontrolcondition".to_string(),
+            },
+            ability: LitAbility::AccessControlConditionDecryption.to_string(),
+        }],
+        &validator_collection.addresses(),
+        wallet.clone(),
+        Some(vec![delegation_signature.clone()]),
+        CurveType::BLS,
+        None,
+        None,
+        2,
+    )
+    .await
+    .expect("Could not get session sigs");
+
+    // send requests until we hit the rate limit
+    let mut count_after = 0;
+    for _ in 0..10 {
+        info!(
+            "Sending request after rate limit nft minted {}",
+            count_after
+        );
+
+        let decryption_resp = retrieve_decryption_key_session_sigs(
+            &validator_collection,
+            None,
+            None,
+            None,
+            unified_access_control_conditions.clone(),
+            Some(CHAIN_LOCALCHAIN.to_string()),
+            data_to_encrypt_hash.clone(),
+            &session_sigs,
+        )
+        .await;
+        info!("Responses: {:?}", decryption_resp);
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
+            break;
+        }
+
+        count_after += 1;
+    }
+    info!(
+        "We made {} requests after minting the NFT and delegating it before we hit the rate limit again",
+        count_after
+    );
+    assert!(
+        count_after == 10,
+        "We bought a rate limit nft, it should give us at least 10 more requests, but it gave us {}", count_after
+    );
+
+    info!("User using delegated rate limit nft worked!");
+
+    // 3. do the delegation using the PaymentDelegation contract
+    // let's start with a new wallet
+    let payment_delegation_rate_limit_holder_wallet =
+        LocalWallet::new(&mut OsRng).with_chain_id(testnet.chain_id);
+    fund_wallet(
+        &provider,
+        &payment_delegation_rate_limit_holder_wallet,
+        "100000000000000000000",
+    )
+    .await;
+
+    // mint another rate limit increase nft
+    let _nft_id = mint_rate_limit_nft(
+        rate_limit_nft_contract_address,
+        &provider,
+        &payment_delegation_rate_limit_holder_wallet,
+        10,
+    )
+    .await;
+
+    // delegate using the payment delegation contract
+    let payment_delegation_contract_address = validator_collection
+        .actions()
+        .contracts()
+        .payment_delegation
+        .address();
+
+    create_payment_delegation_entry(
+        payment_delegation_contract_address,
+        &provider,
+        &payment_delegation_rate_limit_holder_wallet,
+        pkp_eth_address,
+        0,
+        0,
+    )
+    .await;
+
+    // try and make more requests - we should be able to make unlimited requests now so let's try 10
+    // make some requests and count how many we can make
+    let mut count_after = 0;
+    for _ in 0..10 {
+        info!(
+            "Sending request after payment delegation entry {}",
+            count_after
+        );
+        // Retrieve decrypted key
+        let decryption_resp = retrieve_decryption_key_session_sigs(
+            &validator_collection,
+            None,
+            None,
+            None,
+            unified_access_control_conditions.clone(),
+            Some(CHAIN_LOCALCHAIN.to_string()),
+            data_to_encrypt_hash.clone(),
+            &session_sigs,
+        )
+        .await;
+        info!("Responses: {:?}", decryption_resp);
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || count_after > 10
+            || decryption_resp[0].contains("error")
+        {
+            break;
+        }
+
+        count_after += 1;
+    }
+    info!(
+        "We made {} requests after minting the NFT and delegating using the PaymentDelegation contract with 0 restrictions before we hit the rate limit again",
+        count_after
+    );
+    assert!(
+        count_after == 10,
+        "We delegated a rate limit nft using the PaymentDelegation contract, it should give us at least 10 more requests, but it gave us {}", count_after
+    );
+
+    // test with restrictions set to 0
+    set_restrictions(
+        payment_delegation_contract_address,
+        &provider,
+        &payment_delegation_rate_limit_holder_wallet,
+        3,
+        10,
+    )
+    .await;
+
+    // make some requests and count how many we can make
+    let mut count_after = 0;
+    for _ in 0..10 {
+        info!(
+            "Sending request after payment delegation entry {}",
+            count_after
+        );
+        // Retrieve decrypted key
+        let decryption_resp = retrieve_decryption_key_session_sigs(
+            &validator_collection,
+            None,
+            None,
+            None,
+            unified_access_control_conditions.clone(),
+            Some(CHAIN_LOCALCHAIN.to_string()),
+            data_to_encrypt_hash.clone(),
+            &session_sigs,
+        )
+        .await;
+        info!("Responses: {:?}", decryption_resp);
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
+            break;
+        }
+
+        count_after += 1;
+    }
+    info!(
+        "We made {} requests after minting the NFT and delegating using the PaymentDelegation contract before we hit the rate limit again",
+        count_after
+    );
+    assert!(
+        count_after == 10,
+        "We delegated a rate limit nft using the PaymentDelegation contract, it should give us more 10 requests but it gave us {}", count_after
+    );
+
+    // we have a 10 second period, so, after 10 seconds we should be able to make 10 more requests.  let's try it
+    tokio::time::sleep(tokio::time::Duration::from_secs(11)).await;
+    // make some requests and count how many we can make
+    let mut count_after = 0;
+    for _ in 0..10 {
+        info!(
+            "Sending request after payment delegation entry {}",
+            count_after
+        );
+        // Retrieve decrypted key
+        let decryption_resp = retrieve_decryption_key_session_sigs(
+            &validator_collection,
+            None,
+            None,
+            None,
+            unified_access_control_conditions.clone(),
+            Some(CHAIN_LOCALCHAIN.to_string()),
+            data_to_encrypt_hash.clone(),
+            &session_sigs,
+        )
+        .await;
+        info!("Responses: {:?}", decryption_resp);
+        if decryption_resp[0].contains("Rate limit exceeded.")
+            || decryption_resp[0].contains("error")
+        {
+            break;
+        }
+
+        count_after += 1;
+    }
+    info!(
+        "We made {} requests after minting the NFT and delegating using the PaymentDelegation contract before we hit the rate limit again",
+        count_after
+    );
+    assert!(
+        count_after == 10,
+        "We delegated a rate limit nft using the PaymentDelegation contract, it should give us at least 10 requests, but it gave us {}", count_after
     );
 }

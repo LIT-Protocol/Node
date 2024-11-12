@@ -20,7 +20,6 @@ pub(crate) struct RateLimitDB {
     // pub owner_to_nft_id_map: Cache<Address, Vec<U256>>,
     // maps rate limit NFT ID to rate limit data
     pub nft_cache: Cache<U256, RateLimitNft>,
-
     /// Maps Rate Limit NFT ID to all authorized usage data against it (across all wallet addresses)
     pub nft_usage_map: RwLock<HashMap<U256, UsageEntries>>,
 
@@ -41,19 +40,20 @@ impl RateLimitDB {
         chain_data_config_manager: Arc<ChainDataConfigManager>,
     ) -> Self {
         Self {
-            // owner_to_nft_id_map: Cache::builder().build(),
-            // 7 day TTL
-            nft_cache: Cache::builder()
-                .time_to_live(Duration::from_secs(7 * 24 * 60 * 60))
-                .build(),
+            // owner_to_nft_id_map: Cache::builder()
+            //     .build()
+            //     .time_to_live(Duration::from_secs(86400)),
+            // 1m item max capacity.  each item is a RateLimitNft which is 116 bytes, so our max memory usage is 116mb.
+            nft_cache: Cache::builder().max_capacity(1_000_000).build(),
             nft_usage_map: RwLock::new(HashMap::new()),
             // latest_cache_miss_map: Cache::builder()
             //     .time_to_live(Duration::from_secs(60))
             //     .build(),
             chain_data_config_manager,
-            // 7 day TTL
+            // 30 day TTL
             delegation_uses_map: Cache::builder()
-                .time_to_live(Duration::from_secs(7 * 24 * 60 * 60))
+                .time_to_live(Duration::from_secs(30 * 24 * 60 * 60))
+                .max_capacity(1000000)
                 .build(),
         }
     }

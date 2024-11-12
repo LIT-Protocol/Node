@@ -6,7 +6,7 @@ if [ -z "$1" ]
     exit 1
 fi
 
-ssh -A ubuntu@datil-dev.litgateway.com /bin/bash << EOF
+ssh datil-dev /bin/bash << EOF
 source .profile
 cd lit-assets/rust/lit-node
 git pull

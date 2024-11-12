@@ -512,15 +512,17 @@ impl ChainDataConfigManager {
         Ok(())
     }
 
-    pub fn get_min_version_requirement(&self) -> Result<Version> {
+    pub async fn get_min_version_requirement(&self) -> Result<Version> {
         self.version_requirements
             .get(&U256::from(0))
+            .await
             .expect_or_err("Minimum version requirement not found")
     }
 
-    pub fn get_max_version_requirement(&self) -> Result<Version> {
+    pub async fn get_max_version_requirement(&self) -> Result<Version> {
         self.version_requirements
             .get(&U256::from(1))
+            .await
             .expect_or_err("Maximum version requirement not found")
     }
 

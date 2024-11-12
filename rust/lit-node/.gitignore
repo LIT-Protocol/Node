@@ -40,3 +40,5 @@ stytch
 test_logs
 tests/chain_state_cache
 unsafe_triples/*
+/tmp
+archive.zip

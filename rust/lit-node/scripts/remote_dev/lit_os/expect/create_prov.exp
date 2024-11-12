@@ -16,7 +16,7 @@ set timeout -1
 
 # create the instance
 send "sudo lit os guest instance create prov \
-  --net4-ip 207.244.86.89/27 --net4-gw 207.244.86.94 \
+  --net4-ip 207.244.86.72/27 --net4-gw 207.244.86.94 \
   --api-domain $subnet_id.getlit.sh -f --subnet-id $subnet_id --bootstrap --vcpus 4 --mem 4g\n"
 
 expect "Enter private key to node wallet:"

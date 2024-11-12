@@ -2,9 +2,11 @@ use std::collections::BTreeMap;
 
 use indoc::{formatdoc, indoc};
 use lit_actions_server::TestServer;
+use moka::future::Cache;
 use pretty_assertions::assert_eq;
 use rstest::*;
 use serde_json::json;
+use std::sync::Arc;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -121,7 +123,7 @@ async fn js_params(server: TestServer) {
 
     let res = client
         .execute_js(ExecutionOptions {
-            code: code.to_string(),
+            code: Arc::new(code.to_string()),
             globals: Some(json!({"hello": "hello", "WORLD": [2, 0, 2, 3]})),
             ..Default::default()
         })
@@ -144,7 +146,7 @@ async fn auth_context(server: TestServer) {
 
     let res = client
         .execute_js(ExecutionOptions {
-            code: code.to_string(),
+            code: Arc::new(code.to_string()),
             action_ipfs_id: Some("some-ipfs-id".to_string()),
             ..Default::default()
         })
@@ -284,6 +286,8 @@ async fn call_child(server: TestServer) {
         })()
     "#};
 
+    let ipfs_cache: Cache<String, Arc<String>> = Cache::new(4096);
+
     // Start fake IPFS server returning child code
     let mock_server = MockServer::start().await;
     Mock::given(method("GET"))
@@ -300,6 +304,7 @@ async fn call_child(server: TestServer) {
                 .build()
                 .unwrap(),
         ),
+        ipfs_cache: Some(ipfs_cache),
         ..Default::default()
     };
 
@@ -381,7 +386,7 @@ async fn get_latest_nonce(server: TestServer) {
 
     let res = client
         .execute_js(ExecutionOptions {
-            code: code.to_string(),
+            code: Arc::new(code.to_string()),
             globals: Some(json!({
                 "address": "0xb794f5ea0ba39494ce839613fffba74279579268",
                 "chain": "ethereum",

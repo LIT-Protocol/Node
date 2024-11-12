@@ -1,0 +1,48 @@
+[package]
+name = "shiva"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.develop]
+inherits = "dev"
+opt-level = 1
+debug = 1
+incremental = false
+
+[dependencies]
+# Do we need any of the node directly?  It will be included with test-common.
+# lit_node = {path = "../../../lit-node", features = ["lit-actions", "testing"]}
+test-common = {path = "../test-common" , features=["shiva-path"]}
+ts-rs = "8.1"
+anyhow = "1.0.41"
+chrono = "0.4.23"
+hex = { version = "0.4.3" }
+ethers = { version = "2.0.8", features = ["abigen", "legacy" ]}
+flume = "0.11"
+json = "0.12.4"
+rand = { version = "~0.8.5", features = ["std_rng"]}
+rocket = { version = "0.5.1", features = ["json"] }
+# rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", version = "0.6"}
+serde = { version = "1.0.126", features = ["derive"] }
+serde_json = "1.0.64"
+tokio = { version = "1.23.0", features = ["rt-multi-thread"] }
+tracing = "0.1.40"
+signal-hook = {version = "0.3.17", features = ["extended-siginfo"] }
+
+[patch.crates-io]
+# Prevent panic "Custom error class must have a builder registered: Uncaught null" that
+# happens when lit-node disconnects (e.g. op_sign_ecdsa: receiving on a closed channel)
+# Upstream PR: https://github.com/denoland/deno_core/pull/730
+deno_core = { git = "https://github.com/Lit-Protocol/deno_core", branch = "fix/deno-1444-op-panic" }
+# Hotfix for yanked wgpu crate versions, see https://github.com/gfx-rs/wgpu/issues/5837
+wgpu-core = { git = "https://github.com/gfx-rs/wgpu", tag = "v0.20.0" }
+wgpu-types = { git = "https://github.com/gfx-rs/wgpu", tag = "v0.20.0" }
+
+
+[profile.release]
+codegen-units = 1
+incremental = true
+lto = true
+opt-level = 3

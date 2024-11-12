@@ -1,4 +1,5 @@
-use crate::common::{
+use ethers::types::U256;
+use test_common::{
     new_node_collection_with_custom_config,
     testnet::{
         contracts_repo::fetch_node_config_file_from_node_account,
@@ -6,13 +7,12 @@ use crate::common::{
     },
     validator::{Node, ValidatorCollection},
 };
-use ethers::types::U256;
 use tracing::info;
 
 #[tokio::test]
 #[doc = "This test is used to test the DKG reshare process when a new node is added and the threshold stays the same."]
 pub async fn add_one_node_and_keep_threshold() {
-    crate::common::init_test_config();
+    test_common::init_test_config();
 
     let num_staked_and_joined_validators = 6;
     let num_staked_only_validators = 1;
@@ -40,7 +40,7 @@ pub async fn add_one_node_and_keep_threshold() {
 #[tokio::test]
 #[doc = "This test is used to test the DKG reshare process when a new node is added and the threshold changes."]
 pub async fn add_one_node_and_change_threshold() {
-    crate::common::init_test_config();
+    test_common::init_test_config();
 
     let num_staked_and_joined_validators = 4;
     let num_staked_only_validators = 1;
@@ -68,7 +68,7 @@ pub async fn add_one_node_and_change_threshold() {
 #[tokio::test]
 #[doc = "This test is used to test the DKG reshare process when a new node is removed."]
 pub async fn remove_one_node_and_change_threshold() {
-    crate::common::init_test_config();
+    test_common::init_test_config();
 
     let num_staked_and_joined_validators = 5;
     let num_staked_only_validators = 0;

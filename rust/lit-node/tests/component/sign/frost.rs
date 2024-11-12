@@ -1,7 +1,5 @@
 use std::marker::PhantomData;
 
-use crate::common;
-use crate::common::interpolation::load_key_share;
 use crate::component::dkg::initial_dkg;
 use elliptic_curve::group::GroupEncoding;
 use elliptic_curve::Group;
@@ -15,6 +13,7 @@ use lit_node::tss::common::signing_scheme::SigningScheme;
 use lit_node::tss::common::tss_state::TssState;
 use lit_node::tss::frost::FrostState;
 use test_case::test_case;
+use test_common::interpolation::load_key_share;
 use tokio::task::JoinHandle;
 use tracing::info;
 use vsss_rs::curve25519::{WrappedEdwards, WrappedRistretto};
@@ -97,7 +96,7 @@ pub async fn sign_with_typeof_pubkey<G>(
 ) where
     G: Group + GroupEncoding + Default,
 {
-    common::init_test_config();
+    test_common::init_test_config();
     info!("Starting test: sign with frost using {:?}", &signing_scheme);
     let num_nodes = 5;
     let curve_type = signing_scheme.curve_type();

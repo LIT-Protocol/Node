@@ -62,7 +62,8 @@ describe('ReleaseRegister', function () {
           '0xd5a9b78e23b91ea9cba1623781a35de5ff9b0c0ddb3442d1a3ffa48364e625c9452ac4bfe97f5335a4748b0bf76bcc1e'
         );
 
-        expect(await registerContract.hasCreatorInit()).equals(true);
+        // creatorInit is disabled for now
+        // expect(await registerContract.hasCreatorInit()).equals(true);
         expect(await registerContract.getCreatorDomain()).equals(
           '0x6465762e6765746c69742e7368'
         );
@@ -121,16 +122,17 @@ describe('ReleaseRegister', function () {
           '0xd5a9b78e23b91ea9cba1623781a35de5ff9b0c0ddb3442d1a3ffa48364e625c9452ac4bfe97f5335a4748b0bf76bcc1e'
         );
 
-        expect(await registerContract.hasCreatorInit()).equals(true);
+        // creatorInit is disabled for now
+        // expect(await registerContract.hasCreatorInit()).equals(true);
 
-        await expect(
-          registerContract.initCreator(
-            ENV_PROD,
-            '0xcD63735A432B55B73d50c9FB140cc12e3d100d7C',
-            '0x6465762e6765746c69742e7368',
-            '0xd5a9b78e23b91ea9cba1623781a35de5ff9b0c0ddb3442d1a3ffa48364e625c9452ac4bfe97f5335a4748b0bf76bcc1e'
-          )
-        ).to.be.revertedWith('initCreator() may only be called once');
+        // await expect(
+        //   registerContract.initCreator(
+        //     ENV_PROD,
+        //     '0xcD63735A432B55B73d50c9FB140cc12e3d100d7C',
+        //     '0x6465762e6765746c69742e7368',
+        //     '0xd5a9b78e23b91ea9cba1623781a35de5ff9b0c0ddb3442d1a3ffa48364e625c9452ac4bfe97f5335a4748b0bf76bcc1e'
+        //   )
+        // ).to.be.revertedWith('initCreator() may only be called once');
       });
     });
   });

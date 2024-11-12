@@ -553,6 +553,138 @@ pub mod staking {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned(
+                        "getActiveUnkickedValidatorStructs",
+                    ),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "getActiveUnkickedValidatorStructs",
+                            ),
+                            inputs: ::std::vec![],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Array(
+                                        ::std::boxed::Box::new(
+                                            ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                                ::std::vec![
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(32usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(128usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(32usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Address,
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned(
+                                            "struct LibStakingStorage.Validator[]",
+                                        ),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned(
+                        "getActiveUnkickedValidatorStructsAndCounts",
+                    ),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "getActiveUnkickedValidatorStructsAndCounts",
+                            ),
+                            inputs: ::std::vec![],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                        ::std::vec![
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                        ],
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned(
+                                            "struct LibStakingStorage.Epoch",
+                                        ),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
+                                        256usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("uint256"),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Array(
+                                        ::std::boxed::Box::new(
+                                            ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                                ::std::vec![
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(32usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(128usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(32usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Address,
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned(
+                                            "struct LibStakingStorage.Validator[]",
+                                        ),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("getActiveUnkickedValidators"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "getActiveUnkickedValidators",
+                            ),
+                            inputs: ::std::vec![],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Array(
+                                        ::std::boxed::Box::new(
+                                            ::ethers::core::abi::ethabi::ParamType::Address,
+                                        ),
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address[]"),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("getKeyTypes"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -3670,6 +3802,36 @@ pub mod staking {
         ) -> ::ethers::contract::builders::ContractCall<M, ::std::vec::Vec<Facet>> {
             self.0
                 .method_hash([122, 14, 214, 39], ())
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `getActiveUnkickedValidatorStructs` (0x069596ea) function
+        pub fn get_active_unkicked_validator_structs(
+            &self,
+        ) -> ::ethers::contract::builders::ContractCall<M, ::std::vec::Vec<Validator>> {
+            self.0
+                .method_hash([6, 149, 150, 234], ())
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `getActiveUnkickedValidatorStructsAndCounts` (0xc51d020e) function
+        pub fn get_active_unkicked_validator_structs_and_counts(
+            &self,
+        ) -> ::ethers::contract::builders::ContractCall<
+            M,
+            (Epoch, ::ethers::core::types::U256, ::std::vec::Vec<Validator>),
+        > {
+            self.0
+                .method_hash([197, 29, 2, 14], ())
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `getActiveUnkickedValidators` (0x9d8b588a) function
+        pub fn get_active_unkicked_validators(
+            &self,
+        ) -> ::ethers::contract::builders::ContractCall<
+            M,
+            ::std::vec::Vec<::ethers::core::types::Address>,
+        > {
+            self.0
+                .method_hash([157, 139, 88, 138], ())
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `getKeyTypes` (0xf1b877a8) function
@@ -6997,6 +7159,60 @@ pub mod staking {
     )]
     #[ethcall(name = "facets", abi = "facets()")]
     pub struct FacetsCall;
+    ///Container type for all input parameters for the `getActiveUnkickedValidatorStructs` function with signature `getActiveUnkickedValidatorStructs()` and selector `0x069596ea`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(
+        name = "getActiveUnkickedValidatorStructs",
+        abi = "getActiveUnkickedValidatorStructs()"
+    )]
+    pub struct GetActiveUnkickedValidatorStructsCall;
+    ///Container type for all input parameters for the `getActiveUnkickedValidatorStructsAndCounts` function with signature `getActiveUnkickedValidatorStructsAndCounts()` and selector `0xc51d020e`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(
+        name = "getActiveUnkickedValidatorStructsAndCounts",
+        abi = "getActiveUnkickedValidatorStructsAndCounts()"
+    )]
+    pub struct GetActiveUnkickedValidatorStructsAndCountsCall;
+    ///Container type for all input parameters for the `getActiveUnkickedValidators` function with signature `getActiveUnkickedValidators()` and selector `0x9d8b588a`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(
+        name = "getActiveUnkickedValidators",
+        abi = "getActiveUnkickedValidators()"
+    )]
+    pub struct GetActiveUnkickedValidatorsCall;
     ///Container type for all input parameters for the `getKeyTypes` function with signature `getKeyTypes()` and selector `0xf1b877a8`
     #[derive(
         Clone,
@@ -7916,6 +8132,11 @@ pub mod staking {
         FacetAddresses(FacetAddressesCall),
         FacetFunctionSelectors(FacetFunctionSelectorsCall),
         Facets(FacetsCall),
+        GetActiveUnkickedValidatorStructs(GetActiveUnkickedValidatorStructsCall),
+        GetActiveUnkickedValidatorStructsAndCounts(
+            GetActiveUnkickedValidatorStructsAndCountsCall,
+        ),
+        GetActiveUnkickedValidators(GetActiveUnkickedValidatorsCall),
         GetKeyTypes(GetKeyTypesCall),
         GetKickedValidators(GetKickedValidatorsCall),
         GetMaxVersion(GetMaxVersionCall),
@@ -8065,6 +8286,24 @@ pub mod staking {
             if let Ok(decoded)
                 = <FacetsCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Facets(decoded));
+            }
+            if let Ok(decoded)
+                = <GetActiveUnkickedValidatorStructsCall as ::ethers::core::abi::AbiDecode>::decode(
+                    data,
+                ) {
+                return Ok(Self::GetActiveUnkickedValidatorStructs(decoded));
+            }
+            if let Ok(decoded)
+                = <GetActiveUnkickedValidatorStructsAndCountsCall as ::ethers::core::abi::AbiDecode>::decode(
+                    data,
+                ) {
+                return Ok(Self::GetActiveUnkickedValidatorStructsAndCounts(decoded));
+            }
+            if let Ok(decoded)
+                = <GetActiveUnkickedValidatorsCall as ::ethers::core::abi::AbiDecode>::decode(
+                    data,
+                ) {
+                return Ok(Self::GetActiveUnkickedValidators(decoded));
             }
             if let Ok(decoded)
                 = <GetKeyTypesCall as ::ethers::core::abi::AbiDecode>::decode(data) {
@@ -8381,6 +8620,15 @@ pub mod staking {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::Facets(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetActiveUnkickedValidatorStructs(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::GetActiveUnkickedValidatorStructsAndCounts(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::GetActiveUnkickedValidators(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
                 Self::GetKeyTypes(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -8564,6 +8812,15 @@ pub mod staking {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::Facets(element) => ::core::fmt::Display::fmt(element, f),
+                Self::GetActiveUnkickedValidatorStructs(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+                Self::GetActiveUnkickedValidatorStructsAndCounts(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+                Self::GetActiveUnkickedValidators(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::GetKeyTypes(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetKickedValidators(element) => {
                     ::core::fmt::Display::fmt(element, f)
@@ -8764,6 +9021,22 @@ pub mod staking {
     impl ::core::convert::From<FacetsCall> for StakingCalls {
         fn from(value: FacetsCall) -> Self {
             Self::Facets(value)
+        }
+    }
+    impl ::core::convert::From<GetActiveUnkickedValidatorStructsCall> for StakingCalls {
+        fn from(value: GetActiveUnkickedValidatorStructsCall) -> Self {
+            Self::GetActiveUnkickedValidatorStructs(value)
+        }
+    }
+    impl ::core::convert::From<GetActiveUnkickedValidatorStructsAndCountsCall>
+    for StakingCalls {
+        fn from(value: GetActiveUnkickedValidatorStructsAndCountsCall) -> Self {
+            Self::GetActiveUnkickedValidatorStructsAndCounts(value)
+        }
+    }
+    impl ::core::convert::From<GetActiveUnkickedValidatorsCall> for StakingCalls {
+        fn from(value: GetActiveUnkickedValidatorsCall) -> Self {
+            Self::GetActiveUnkickedValidators(value)
         }
     }
     impl ::core::convert::From<GetKeyTypesCall> for StakingCalls {
@@ -9197,6 +9470,54 @@ pub mod staking {
     pub struct FacetsReturn {
         pub facets: ::std::vec::Vec<Facet>,
     }
+    ///Container type for all return fields from the `getActiveUnkickedValidatorStructs` function with signature `getActiveUnkickedValidatorStructs()` and selector `0x069596ea`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct GetActiveUnkickedValidatorStructsReturn(pub ::std::vec::Vec<Validator>);
+    ///Container type for all return fields from the `getActiveUnkickedValidatorStructsAndCounts` function with signature `getActiveUnkickedValidatorStructsAndCounts()` and selector `0xc51d020e`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct GetActiveUnkickedValidatorStructsAndCountsReturn(
+        pub Epoch,
+        pub ::ethers::core::types::U256,
+        pub ::std::vec::Vec<Validator>,
+    );
+    ///Container type for all return fields from the `getActiveUnkickedValidators` function with signature `getActiveUnkickedValidators()` and selector `0x9d8b588a`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct GetActiveUnkickedValidatorsReturn(
+        pub ::std::vec::Vec<::ethers::core::types::Address>,
+    );
     ///Container type for all return fields from the `getKeyTypes` function with signature `getKeyTypes()` and selector `0xf1b877a8`
     #[derive(
         Clone,

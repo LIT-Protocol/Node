@@ -7,7 +7,7 @@ use tracing::info;
 #[tokio::test]
 #[doc = "Test that signs a message using BLS in a set of virtual nodes."]
 pub async fn sign_with_pubkey() {
-    crate::common::init_test_config();
+    test_common::init_test_config();
     info!("Starting test: BLS Sign with Pubkey.");
     let num_nodes = 3;
     let mut vnc = VirtualNodeCollection::new(num_nodes).await;

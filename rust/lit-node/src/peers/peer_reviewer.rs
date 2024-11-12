@@ -110,6 +110,7 @@ impl PeerReviewer {
                 .chain_data_manager
                 .complaint_reason_to_config
                 .get(&U256::from(1))
+                .await
                 .expect("No config found for complaint reason 1");
             complaint_config.interval_secs
         };
@@ -123,6 +124,7 @@ impl PeerReviewer {
                         .chain_data_manager
                         .complaint_reason_to_config
                         .get(&U256::from(1))
+                        .await
                         .expect("No config found for complaint reason 1");
                     complaint_config.interval_secs
                 };
@@ -177,6 +179,7 @@ impl PeerReviewer {
                 .chain_data_manager
                 .complaint_reason_to_config
                 .get(&U256::from(complaint.issue.value()))
+                .await
                 .expect_or_err(format!(
                     "No config found for complaint reason number {} which contains {:?}",
                     complaint.issue.value(),
@@ -214,10 +217,12 @@ impl PeerReviewer {
                 .send()
                 .await
             {
-                Ok(_) => trace!("voted to kick peer"),
+                Ok(_) => warn!("voted to kick peer. Final complaint was: {:?}", complaint),
+                // NOTE: the below is trace because inactive nodes also kickvote, but the TX will revert which is intended
                 Err(e) => trace!(
-                    "failed to vote to kick peer w/ err {:?}",
-                    decode_revert(&e, staking_contract.abi())
+                    "failed to vote to kick peer w/ err {:?}. Final complaint was {:?}",
+                    decode_revert(&e, staking_contract.abi()),
+                    complaint
                 ),
             },
             Err(e) => {

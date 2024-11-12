@@ -9,6 +9,3 @@ members = [
     "lit-logging"
 ]
 resolver = "2"
-
-[patch.crates-io]
-rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse" }

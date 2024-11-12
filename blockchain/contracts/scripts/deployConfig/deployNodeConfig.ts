@@ -39,7 +39,9 @@ export async function askDeployNodeConfig(
     await askForIpAddresses(
       numberOfStakedAndJoinedWallets + numberOfStakedOnlyWallets
     )
-  ).split(',');
+  )
+    .split(',')
+    .filter((a) => a.length > 0);
 
   let existingContracts = undefined;
   if (await askToKeepExistingContracts()) {

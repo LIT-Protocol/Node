@@ -1,0 +1,4 @@
+/node_keys
+/test_logs
+node_*.db
+rpc-config.yaml

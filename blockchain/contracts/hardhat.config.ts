@@ -13,7 +13,7 @@ import '@kingdomstudios/hardhat-diamond-abi';
 // FIXME: There is an unresolved issue whether running the npm run deploy script with
 // the tracer enabled will prevent the child process from exiting.
 // Issue: https://github.com/zemse/hardhat-tracer/issues/57
-// import "hardhat-tracer";
+import 'hardhat-tracer';
 
 import { HardhatUserConfig } from 'hardhat/types';
 // import "hardhat-tracer";
@@ -126,7 +126,7 @@ const config: HardhatUserConfig = {
           process.env.LIT_STYLUS_K256_CONTRACT_ADDRESS ||
           '0x28ca4b9b360ed4f918081c921b8a299fd491e96a',
       },
-      wLitAddress: '0xA03EBF5f029DeAb13615E27E8f75D644698de46f',
+      wlitAddress: '0xA03EBF5f029DeAb13615E27E8f75D644698de46f',
     },
     yellowstone: {
       url: 'https://yellowstone-rpc.litprotocol.com',
@@ -143,7 +143,7 @@ const config: HardhatUserConfig = {
           process.env.LIT_STYLUS_K256_CONTRACT_ADDRESS ||
           '0x28ca4b9b360ed4f918081c921b8a299fd491e96a',
       },
-      wLitAddress: '0xd78089bAAe410f5d0eae31D0D56157c73a3Ff98B',
+      wlitAddress: '0xd78089bAAe410f5d0eae31D0D56157c73a3Ff98B',
     },
     etna: {
       url: 'https://etna-testnet.rpc.caldera.xyz/http',

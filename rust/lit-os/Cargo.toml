@@ -27,6 +27,3 @@ inherits = "dev"
 opt-level = 1
 debug = 1
 incremental = false
-
-[patch.crates-io]
-rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse" }

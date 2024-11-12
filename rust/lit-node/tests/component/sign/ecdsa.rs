@@ -1,4 +1,3 @@
-use crate::common;
 use crate::component::dkg::reshare_dkg;
 use crate::component::{dkg::dkg, utils::virtual_node_collection::VirtualNodeCollection};
 use cait_sith::protocol::Participant;
@@ -40,7 +39,7 @@ pub async fn sign_with_pubkey_and_different_indexed_triple(
 }
 
 pub async fn do_sign_with_pubkey(num_nodes: usize, node_change: i16) {
-    common::init_test_config();
+    test_common::init_test_config();
     info!("Starting test: ecdsa_dkg");
     let epoch = 1;
     let threshold = get_threshold_count(num_nodes);

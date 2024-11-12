@@ -425,6 +425,20 @@ pub mod payment_delegation {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("setDefaultRestriction"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "setDefaultRestriction",
+                            ),
+                            inputs: ::std::vec![],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("setRestriction"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -1135,6 +1149,14 @@ pub mod payment_delegation {
         > {
             self.0
                 .method_hash([141, 165, 203, 91], ())
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `setDefaultRestriction` (0xb03533da) function
+        pub fn set_default_restriction(
+            &self,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([176, 53, 51, 218], ())
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `setRestriction` (0x6ceb53de) function
@@ -2218,6 +2240,21 @@ pub mod payment_delegation {
     )]
     #[ethcall(name = "owner", abi = "owner()")]
     pub struct OwnerCall;
+    ///Container type for all input parameters for the `setDefaultRestriction` function with signature `setDefaultRestriction()` and selector `0xb03533da`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "setDefaultRestriction", abi = "setDefaultRestriction()")]
+    pub struct SetDefaultRestrictionCall;
     ///Container type for all input parameters for the `setRestriction` function with signature `setRestriction((uint256,uint256))` and selector `0x6ceb53de`
     #[derive(
         Clone,
@@ -2330,6 +2367,7 @@ pub mod payment_delegation {
         GetRestriction(GetRestrictionCall),
         GetUsers(GetUsersCall),
         Owner(OwnerCall),
+        SetDefaultRestriction(SetDefaultRestrictionCall),
         SetRestriction(SetRestrictionCall),
         SupportsInterface(SupportsInterfaceCall),
         TransferOwnership(TransferOwnershipCall),
@@ -2398,6 +2436,12 @@ pub mod payment_delegation {
                 return Ok(Self::Owner(decoded));
             }
             if let Ok(decoded)
+                = <SetDefaultRestrictionCall as ::ethers::core::abi::AbiDecode>::decode(
+                    data,
+                ) {
+                return Ok(Self::SetDefaultRestriction(decoded));
+            }
+            if let Ok(decoded)
                 = <SetRestrictionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::SetRestriction(decoded));
             }
@@ -2463,6 +2507,9 @@ pub mod payment_delegation {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::Owner(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::SetDefaultRestriction(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
                 Self::SetRestriction(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -2502,6 +2549,9 @@ pub mod payment_delegation {
                 Self::GetRestriction(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetUsers(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Owner(element) => ::core::fmt::Display::fmt(element, f),
+                Self::SetDefaultRestriction(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::SetRestriction(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SupportsInterface(element) => ::core::fmt::Display::fmt(element, f),
                 Self::TransferOwnership(element) => ::core::fmt::Display::fmt(element, f),
@@ -2572,6 +2622,11 @@ pub mod payment_delegation {
     impl ::core::convert::From<OwnerCall> for PaymentDelegationCalls {
         fn from(value: OwnerCall) -> Self {
             Self::Owner(value)
+        }
+    }
+    impl ::core::convert::From<SetDefaultRestrictionCall> for PaymentDelegationCalls {
+        fn from(value: SetDefaultRestrictionCall) -> Self {
+            Self::SetDefaultRestriction(value)
         }
     }
     impl ::core::convert::From<SetRestrictionCall> for PaymentDelegationCalls {

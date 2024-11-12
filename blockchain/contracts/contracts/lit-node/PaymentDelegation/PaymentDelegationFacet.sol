@@ -68,6 +68,7 @@ contract PaymentDelegationFacet {
     function delegatePayments(address user) public {
         s().payers[user].add(msg.sender); // this guarantees the auth - that the payer made this txn, because msg.sender is authed.
         s().users[msg.sender].add(user);
+        setDefaultRestriction();
     }
 
     function undelegatePayments(address user) public {
@@ -84,6 +85,7 @@ contract PaymentDelegationFacet {
             s().payers[users[i]].add(msg.sender);
             s().users[msg.sender].add(users[i]);
         }
+        setDefaultRestriction();
     }
 
     function undelegatePaymentsBatch(address[] memory users) public {
@@ -100,7 +102,24 @@ contract PaymentDelegationFacet {
     function setRestriction(
         LibPaymentDelegationStorage.Restriction memory r
     ) public {
+        // due to a divide by zero bug in Datil v0.2.16,
+        // we need to prevent the period from being set to 0
+        // so we set the default period of 1 day if the period is 0
+        if (r.periodSeconds == 0) {
+            r.periodSeconds = 86400;
+        }
         s().restrictions[msg.sender] = r;
+    }
+
+    function setDefaultRestriction() public {
+        LibPaymentDelegationStorage.Restriction memory r = s().restrictions[
+            msg.sender
+        ];
+        if (r.requestsPerPeriod == 0 && r.periodSeconds == 0) {
+            r.requestsPerPeriod = 1000000000;
+            r.periodSeconds = 86400;
+            s().restrictions[msg.sender] = r;
+        }
     }
 
     /* ========== EVENTS ========== */

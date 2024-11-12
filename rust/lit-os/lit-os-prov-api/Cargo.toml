@@ -15,8 +15,8 @@ default = ["lit-attestation/generate-via-service"]
 [dependencies]
 log = { version = "0.4.20", features = ["kv_unstable"] }
 config = { version = "0.13.3" }
-rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse", features = ["tls", "json"] }
-rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", rev = "985098dd8f3b052716111eaa872d184cc21a1a68" }
+rocket = { version = "0.5.1", features = ["json", "tls"] }
+rocket_cors = { version = "0.6.0"  }
 ipfs-api-backend-hyper = { git = "https://github.com/LIT-Protocol/rust-ipfs-api", branch = "lit-remote-pinning", features = ["with-send-sync"] }
 ipfs-hasher = { version =  "0.13.0" }
 libsecp256k1 = { git = "https://github.com/LIT-Protocol/libsecp256k1", branch = "master", version = "0.7.1" }

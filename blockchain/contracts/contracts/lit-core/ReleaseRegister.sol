@@ -171,11 +171,11 @@ contract ReleaseRegister is AccessControl {
             revert InvalidEnv();
         }
 
-        if (env != Env.Dev && env != Env.Staging) {
-            require(!creatorInit, "initCreator() may only be called once");
-        }
+        // if (env != Env.Dev && env != Env.Staging) {
+        //     require(!creatorInit, "initCreator() may only be called once");
+        // }
 
-        creatorInit = true;
+        // creatorInit = true;
         creatorDomain = domain;
 
         allowedSubnets[subnetId] = true;

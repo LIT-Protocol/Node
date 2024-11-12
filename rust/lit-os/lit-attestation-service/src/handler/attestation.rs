@@ -25,7 +25,7 @@ pub(crate) async fn handle_req(req: Request) -> Result<Response> {
     let attestation = req.attestation;
     let cache_key = cache_key_session(&req.session_id);
 
-    match CACHE.get(&cache_key) {
+    match CACHE.get(&cache_key).await {
         Some(value) => {
             match value.as_attestation() {
                 Some(existing_attestation) => {

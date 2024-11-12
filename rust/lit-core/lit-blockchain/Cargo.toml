@@ -25,7 +25,7 @@ bs58 = { version = "0.4.0" }
 once_cell = { version = "1.16.0" }
 url = { version = "2.3.1" }
 const-str = { version = "0.5.3" }
-reqwest = { version = "0.11.16" }
+reqwest = { version = "0.11.16", default-features = false, features = ["json", "rustls-tls"] }
 generic-array = { version = "0.14.0" }
 im = "15.1.0"
 futures = "0.3.30"

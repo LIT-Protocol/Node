@@ -318,6 +318,16 @@ describe('PKPPermissions', function () {
           expect(pkpIds.length).equal(1);
           expect(pkpIds[0]).equal(tokenId);
 
+          // Confirm that the reverse lookup and public key derivation is correct
+          let pkpPublicKeys = await pkpPermissions.getPKPPubKeysByAuthMethod(
+            authMethodType,
+            userId
+          );
+          expect(pkpPublicKeys.length).greaterThan(0);
+          // Check the pub keys match when looked up with a token id
+          let pkpPublicKey = await pkpPermissions.getPubkey(tokenId);
+          expect(pkpPublicKey).equal(pkpPublicKeys[0]);
+
           // try changing the pubkey
           expect(
             // attempt to permit it

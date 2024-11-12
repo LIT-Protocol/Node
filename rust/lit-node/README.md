@@ -436,7 +436,7 @@ const contractContext = {
   ],
   environment: 0,
   provider: new ethersv5.providers.JsonRpcProvider(
-    'https://vesuvius-rpc.litprotocol.com'
+    'https://yellowstone-rpc.litprotocol.com'
   ),
 };
 
@@ -446,7 +446,7 @@ const litNodeClient = new LitJsSdk.LitNodeClientNodeJs({
   checkNodeAttestation: false,
   debug: false,
   contractContext,
-  rpcUrl: 'https://vesuvius-rpc.litprotocol.com',
+  rpcUrl: 'https://yellowstone-rpc.litprotocol.com',
 });
 ```
 

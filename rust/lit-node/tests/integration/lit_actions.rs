@@ -28,20 +28,7 @@ pub mod litactions {
     use std::collections::HashMap;
 
     use crate::acceptance::web_user_tests::prepare_test_encryption_parameters;
-    use crate::common;
-    use crate::common::auth_sig::{generate_authsig, generate_authsig_item};
-    use crate::common::lit_actions::{
-        assert_signed_action, execute_lit_action, prepare_sign_from_file_parameters,
-        sign_lit_action,
-    };
-    use crate::common::node_collection::get_network_pubkey;
-    use crate::common::pkp::mint_next_pkp;
-    use crate::common::testnet::actions::Actions;
     use blsful::Bls12381G2Impl;
-    use common::lit_actions::{
-        sign_from_file_system, sign_hello_world, sign_using_child_lit_action,
-    };
-    use common::new_node_collection;
     use ethers::signers::LocalWallet;
     use ethers::utils::keccak256;
     use ipfs_hasher::IpfsHasher;
@@ -62,11 +49,23 @@ pub mod litactions {
     use serde_json::Value;
     use sha2::{Digest, Sha256};
     use test_case::test_case;
+    use test_common::auth_sig::{generate_authsig, generate_authsig_item};
+    use test_common::lit_actions::{
+        assert_signed_action, execute_lit_action, prepare_sign_from_file_parameters,
+        sign_lit_action,
+    };
+    use test_common::lit_actions::{
+        sign_from_file_system, sign_hello_world, sign_using_child_lit_action,
+    };
+    use test_common::new_node_collection;
+    use test_common::node_collection::get_network_pubkey;
+    use test_common::pkp::mint_next_pkp;
+    use test_common::testnet::actions::Actions;
     use tracing::info;
 
     #[tokio::test]
     pub async fn lit_action_call_child_action() {
-        common::init_test_config();
+        test_common::init_test_config();
         info!("Starting test: lit_action_call_child_action");
         let num_nodes = 3;
         let (_testnet, validator_collection) = new_node_collection(num_nodes, false).await;
@@ -79,7 +78,7 @@ pub mod litactions {
 
     #[tokio::test]
     pub async fn lit_action_happy_path() {
-        common::init_test_config();
+        test_common::init_test_config();
         info!("Starting test: lit_action_happy_path");
         let num_nodes = 3;
         let (testnet, validator_collection) = new_node_collection(num_nodes, false).await;
@@ -97,7 +96,7 @@ pub mod litactions {
     #[test_case("simple_run_once_and_collect_responses", false)]
     #[tokio::test]
     pub async fn lit_action_from_file(file_name: &str, assert_sig: bool) {
-        common::init_test_config();
+        test_common::init_test_config();
         info!("Starting test: lit_action_from_file: {}.js", file_name);
         let file_name = &format!("./tests/lit_action_scripts/{}.js", file_name);
         let num_nodes = 3;
@@ -118,7 +117,7 @@ pub mod litactions {
         file_name: &str,
         _assert_sig: bool,
     ) {
-        common::init_test_config();
+        test_common::init_test_config();
         info!(
             "Starting test: test_lit_actions_signing_from_file: {}.js",
             file_name
@@ -184,7 +183,7 @@ pub mod litactions {
         file_name: &str,
         _assert_sig: bool,
     ) {
-        common::init_test_config();
+        test_common::init_test_config();
         info!(
             "Starting test: lit_action_from_file_with_encryption_with_auth_sig: {}.js",
             file_name
@@ -287,7 +286,7 @@ pub mod litactions {
         file_name: &str,
         _assert_sig: bool,
     ) {
-        common::init_test_config();
+        test_common::init_test_config();
         info!(
             "Starting test: lit_action_from_file_with_encryption_without_auth_sig: {}.js",
             file_name
@@ -374,7 +373,7 @@ pub mod litactions {
     #[test_case("decrypt_and_combine_with_access_denied", false)]
     #[tokio::test]
     pub async fn lit_action_from_file_with_access_denied(file_name: &str, _assert_sig: bool) {
-        common::init_test_config();
+        test_common::init_test_config();
         info!(
             "Starting test: lit_action_from_file_with_access_denied: {}.js",
             file_name
@@ -467,7 +466,7 @@ pub mod litactions {
     #[test_case("current_ipfs_id_substitution", false)]
     #[tokio::test]
     pub async fn test_current_ipfs_id_substitution(file_name: &str, _assert_sig: bool) {
-        common::init_test_config();
+        test_common::init_test_config();
         info!(
             "Starting test: test_current_ipfs_id_substitution: {}.js",
             file_name
@@ -551,7 +550,7 @@ pub mod litactions {
     #[test_case("decrypt_and_combine_with_jsparams", false)]
     #[tokio::test]
     pub async fn test_lit_action_evm_contract_conditions(file_name: &str, _assert_sig: bool) {
-        common::init_test_config();
+        test_common::init_test_config();
         info!(
             "Starting test: test_lit_action_evm_contract_conditions: {}.js",
             file_name
@@ -750,13 +749,13 @@ pub mod litactions {
 
     #[tokio::test]
     async fn test_pkp_permissions_is_cid_registered_and_can_it_sign() {
-        common::init_test_config();
+        test_common::init_test_config();
         let num_nodes = 3;
 
         let (_testnet, validator_collection) = new_node_collection(num_nodes, false).await;
         const IPFS_CID: &str = "QmRwN9GKHvCn4Vk7biqtr6adjXMs7PzzYPCzNCRjPFiDjm";
 
-        let res = common::lit_actions::generate_pkp_check_get_permitted_pkp_action(
+        let res = test_common::lit_actions::generate_pkp_check_get_permitted_pkp_action(
             IPFS_CID,
             &validator_collection,
         )
@@ -847,13 +846,13 @@ pub mod litactions {
     #[tokio::test]
     #[ignore]
     async fn test_pkp_is_permissions_is_permitted_action() {
-        common::init_test_config();
+        test_common::init_test_config();
         let num_nodes = 3;
 
         let (_testnet, validator_collection) = new_node_collection(num_nodes, false).await;
         const IPFS_CID: &str = "QmZuSixiCCkttPDvHKZdAw2gNby111rNEq1aHTozkqztSg";
 
-        let res = common::lit_actions::generate_pkp_check_is_permitted_pkp_action(
+        let res = test_common::lit_actions::generate_pkp_check_is_permitted_pkp_action(
             IPFS_CID,
             &validator_collection,
         )

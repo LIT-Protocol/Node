@@ -1,4 +1,6 @@
-use crate::common::{
+use ethers::types::H160;
+use lit_node::{peers::peer_reviewer::Issue, utils::consensus::get_threshold_count};
+use test_common::{
     assertions::NetworkIntegrityChecker,
     init_test_config,
     node_collection::get_node_versions,
@@ -14,9 +16,12 @@ use crate::common::{
     version::{get_crate_version, update_node_crate_version},
 };
 
-use anyhow::{Ok, Result};
+// use anyhow::{Ok, Result};
 use ethers::types::U256;
-use lit_blockchain::resolver::rpc::{RpcHealthcheckPoller, ENDPOINT_MANAGER};
+use lit_blockchain::{
+    contracts::staking::ComplaintConfig,
+    resolver::rpc::{RpcHealthcheckPoller, ENDPOINT_MANAGER},
+};
 use lit_core::utils::binary::bytes_to_hex;
 use rand::seq::SliceRandom;
 use std::{fs, process::Command, time::Duration};
@@ -25,6 +30,109 @@ use tracing::info;
 
 fn setup() {
     init_test_config();
+}
+
+/// Tests when an inactive validator that comes online with an invalid version, and then the staker requests to join,
+/// that the node should eventually be kicked for non-participation.
+#[tokio::test]
+async fn node_boot_invalid_version() {
+    setup();
+
+    info!("TEST: node_boot_invalid_version");
+
+    // Set up a network with 6 nodes.
+    let num_nodes = 6;
+    // set epoch length to 30 mins so it never elapses unless we advance the clock
+    let epoch_length = 1800;
+    let mut testnet = Testnet::builder()
+        .num_staked_and_joined_validators(num_nodes)
+        .num_staked_only_validators(1)
+        .build()
+        .await;
+
+    let testnet_contracts = Testnet::setup_contracts(
+        &mut testnet,
+        Some(
+            StakingContractConfig::builder()
+                .epoch_length(U256::from(epoch_length))
+                .max_triple_count(U256::from(0))
+                .min_triple_count(U256::from(0))
+                .build(),
+        ),
+    )
+    .await
+    .expect("Failed to setup contracts");
+
+    let actions = testnet.actions(testnet_contracts.contracts());
+
+    let mut validator_collection = ValidatorCollection::builder()
+        .num_staked_nodes(num_nodes)
+        .build(&testnet, &actions)
+        .await
+        .expect("Failed to build validator collection");
+
+    let network_checker = NetworkIntegrityChecker::new(&actions).await;
+
+    // Upgrade the node crate to a new version
+    let _crate_version_handle = update_node_crate_version("2.9999.9999".to_string());
+
+    // Update version requirements by setting a max version requirement, rendering the new node version invalid.
+    let max_version = "2.9999.9998";
+    actions
+        .set_staking_max_version(max_version)
+        .await
+        .expect("Failed to set max version");
+
+    // Lower the configured threshold for non-participation complaints.
+    info!("Lowering the configured threshold for non-participation complaints");
+    actions
+        .set_complaint_reason_config(
+            U256::from(Issue::NonParticipation.value()),
+            ComplaintConfig {
+                tolerance: U256::from(2),
+                interval_secs: U256::from(120),
+                kick_penalty_percent: U256::from(10),
+            },
+        )
+        .await
+        .expect("Failed to set complaint config");
+
+    // Spin up a new node with the new node version
+    info!("Spinning up a new node with the new node version");
+    let validator_to_kick = validator_collection
+        .add_one(false, Some(test_common::validator::BuildMode::UseNewBuild))
+        .await
+        .expect("Failed to add new node");
+    let staker_address_to_kick = validator_to_kick.account().staker_address;
+
+    // Fast forward time to allow the network to attempt to deal in the new node with the new node version
+    // before voting to kick it out due to non-participation.
+    info!("Fast forwarding time to allow the network to attempt to deal in the new node with the new node version");
+    actions.increase_blockchain_timestamp(epoch_length).await;
+
+    // Wait for kick
+    let voting_status = validator_collection
+        .actions()
+        .wait_for_voting_status_to_kick_validator(
+            U256::from(2),
+            staker_address_to_kick,
+            H160::random(), // For simplicity, we only care about asserting the number of votes.
+            get_threshold_count(num_nodes),
+        )
+        .await;
+    assert!(voting_status.is_ok());
+
+    // Wait for new epoch
+    info!("Waiting for epoch 3");
+    actions.wait_for_epoch(U256::from(3)).await;
+
+    // Run network checks
+    info!("Checking network state");
+    assert_eq!(
+        actions.get_current_validator_count().await as usize,
+        num_nodes
+    );
+    network_checker.check(&validator_collection).await;
 }
 
 /// Tests the version requirement change such that an active validator is running a node version that is incompatible,
@@ -74,10 +182,7 @@ async fn active_validator_invalid_version() {
     // Spin up a new node with the new node version
     info!("Spinning up a new node with the new node version");
     let new_validator = validator_collection
-        .add_one(
-            false,
-            Some(crate::common::validator::BuildMode::UseNewBuild),
-        )
+        .add_one(false, Some(test_common::validator::BuildMode::UseNewBuild))
         .await
         .expect("Failed to add new node");
     let new_validator_staker_address = new_validator.account().staker_address;
@@ -231,7 +336,7 @@ async fn test_version_upgrade_against_old_version(target_branch: &str) {
                 false,
                 alias_node_config_path,
                 &get_latest_alias_node_account(0, &testnet),
-                Some(crate::common::validator::BuildMode::UseNewBuild)
+                Some(test_common::validator::BuildMode::UseNewBuild)
             )
             .await
             .is_ok());

@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use crate::error::Result;
 
-pub(crate) const LOG_SERVICE_DEVICE: &str = "/dev/ttyS1";
+pub(crate) const LOG_SERVICE_DEVICE: &str = "/dev/virtio-ports/com.litprotocol.logging.port0";
 
 pub trait LitLoggingServiceConfig {
     fn try_new() -> Result<LitConfig>;

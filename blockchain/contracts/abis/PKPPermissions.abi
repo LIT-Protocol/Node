@@ -755,6 +755,30 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "authMethodType",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "id",
+        "type": "bytes"
+      }
+    ],
+    "name": "getPKPPubKeysByAuthMethod",
+    "outputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "",
+        "type": "bytes[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
       }

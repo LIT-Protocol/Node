@@ -20,6 +20,7 @@ use lazy_static::lazy_static;
 use lit_core::config::{LitConfig, ReloadableLitConfig};
 use lit_core::error::Unexpected;
 use lit_core::utils::binary::bytes_to_hex;
+use moka::future::Cache;
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::serde::json::json;
@@ -61,6 +62,15 @@ pub enum EndpointVersion {
     V1,
 }
 
+impl EndpointVersion {
+    pub fn as_str(&self) -> &str {
+        match self {
+            EndpointVersion::Initial => "",
+            EndpointVersion::V1 => "/v1",
+        }
+    }
+}
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for ConcurrencyGuard<'r> {
     type Error = std::io::Error;
@@ -90,8 +100,8 @@ impl<'r> FromRequest<'r> for ConcurrencyGuard<'r> {
 
         let cfg = match request.guard::<&State<ReloadableLitConfig>>().await {
             Outcome::Success(cfg) => cfg,
-            Outcome::Failure(e) => {
-                return Outcome::Failure((
+            Outcome::Error(e) => {
+                return Outcome::Error((
                     Status::InternalServerError,
                     std::io::Error::new(
                         std::io::ErrorKind::Other,
@@ -99,7 +109,7 @@ impl<'r> FromRequest<'r> for ConcurrencyGuard<'r> {
                     ),
                 ))
             }
-            Outcome::Forward(_) => return Outcome::Failure((
+            Outcome::Forward(_) => return Outcome::Error((
                 Status::InternalServerError,
                 std::io::Error::new(
                     std::io::ErrorKind::Other,
@@ -111,7 +121,7 @@ impl<'r> FromRequest<'r> for ConcurrencyGuard<'r> {
         let patience = match cfg.load_full().http_client_patience() {
             Ok(patience) => Duration::from_secs(patience),
             Err(e) => {
-                return Outcome::Failure((
+                return Outcome::Error((
                     Status::InternalServerError,
                     std::io::Error::new(
                         std::io::ErrorKind::Other,
@@ -124,7 +134,7 @@ impl<'r> FromRequest<'r> for ConcurrencyGuard<'r> {
         let permit = match get_conc_permit(&CONCURRENCY_SEMAPHORE, patience).await {
             Ok(permit) => permit,
             Err(e) => {
-                return Outcome::Failure((
+                return Outcome::Error((
                     Status::TooManyRequests,
                     std::io::Error::new(
                         std::io::ErrorKind::Other,
@@ -372,7 +382,9 @@ pub async fn get_auth_context(
         for method in methods {
             // check the cache first
             let cache_key = format!("{}-{}", method.auth_method_type, method.access_token);
-            if let Some(auth_method_context) = auth_context_cache.auth_contexts.get(&cache_key) {
+            if let Some(auth_method_context) =
+                auth_context_cache.auth_contexts.get(&cache_key).await
+            {
                 debug!(
                     "Found auth method context in cache: {:?}",
                     auth_method_context
@@ -604,8 +616,26 @@ pub fn pubkey_bytes_to_eth_address_bytes(pubkey: Vec<u8>) -> Result<[u8; 20]> {
 //     return address;
 // }
 
-#[instrument]
-pub async fn get_ipfs_file(ipfs_id: &String, cfg: &LitConfig) -> Result<String> {
+#[instrument(skip(cfg, ipfs_cache))]
+pub async fn get_ipfs_file(
+    ipfs_id: &String,
+    cfg: &LitConfig,
+    ipfs_cache: Cache<String, Arc<String>>,
+) -> Result<Arc<String>> {
+    // check the cache first
+    if let Some(cached_file) = ipfs_cache.get(ipfs_id).await {
+        // cache hit
+        return Ok(cached_file);
+    }
+    // cache miss
+    let text_result = Arc::new(retrieve_from_ipfs(ipfs_id, cfg).await?);
+    ipfs_cache
+        .insert(ipfs_id.clone(), text_result.clone())
+        .await;
+    Ok(text_result)
+}
+
+async fn retrieve_from_ipfs(ipfs_id: &String, cfg: &LitConfig) -> Result<String> {
     let gateway = cfg.ipfs_gateway();
 
     let start_time = SystemTime::now();
@@ -613,6 +643,7 @@ pub async fn get_ipfs_file(ipfs_id: &String, cfg: &LitConfig) -> Result<String> 
     let url = gateway.replace("{}", ipfs_id.as_str());
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(30))
+        .use_rustls_tls()
         .build()
         .map_err(|e| ipfs_err(e, Some("Failed to build request".into())))?;
     let req = client.get(&url).send().await

@@ -25,19 +25,22 @@ pub enum SigningScheme {
     SchnorrK256Taproot,
 }
 
-impl From<SigningScheme> for lit_frost::Scheme {
-    fn from(value: SigningScheme) -> Self {
+impl TryFrom<SigningScheme> for lit_frost::Scheme {
+    type Error = &'static str;
+    fn try_from(value: SigningScheme) -> std::result::Result<lit_frost::Scheme, &'static str> {
         match value {
-            SigningScheme::Bls12381 => lit_frost::Scheme::Unknown,
-            SigningScheme::EcdsaK256Sha256 => lit_frost::Scheme::Unknown,
-            SigningScheme::SchnorrEd25519Sha512 => lit_frost::Scheme::Ed25519Sha512,
-            SigningScheme::SchnorrK256Sha256 => lit_frost::Scheme::K256Sha256,
-            SigningScheme::SchnorrP256Sha256 => lit_frost::Scheme::P256Sha256,
-            SigningScheme::SchnorrP384Sha384 => lit_frost::Scheme::P384Sha384,
-            SigningScheme::SchnorrRistretto25519Sha512 => lit_frost::Scheme::Ristretto25519Sha512,
-            SigningScheme::SchnorrEd448Shake256 => lit_frost::Scheme::Ed448Shake256,
-            SigningScheme::SchnorrRedJubjubBlake2b512 => lit_frost::Scheme::RedJubjubBlake2b512,
-            SigningScheme::SchnorrK256Taproot => lit_frost::Scheme::K256Taproot,
+            SigningScheme::Bls12381 => Err("BLS12381 is not supported by FROST"),
+            SigningScheme::EcdsaK256Sha256 => Err("ECDSA K256 SHA256 is not supported by FROST"),
+            SigningScheme::SchnorrEd25519Sha512 => Ok(lit_frost::Scheme::Ed25519Sha512),
+            SigningScheme::SchnorrK256Sha256 => Ok(lit_frost::Scheme::K256Sha256),
+            SigningScheme::SchnorrP256Sha256 => Ok(lit_frost::Scheme::P256Sha256),
+            SigningScheme::SchnorrP384Sha384 => Ok(lit_frost::Scheme::P384Sha384),
+            SigningScheme::SchnorrRistretto25519Sha512 => {
+                Ok(lit_frost::Scheme::Ristretto25519Sha512)
+            }
+            SigningScheme::SchnorrEd448Shake256 => Ok(lit_frost::Scheme::Ed448Shake256),
+            SigningScheme::SchnorrRedJubjubBlake2b512 => Ok(lit_frost::Scheme::RedJubjubBlake2b512),
+            SigningScheme::SchnorrK256Taproot => Ok(lit_frost::Scheme::K256Taproot),
         }
     }
 }

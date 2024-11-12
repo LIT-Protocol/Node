@@ -1,5 +1,4 @@
 use super::channel_mapper::setup_background_channels;
-use crate::common::testnet::Testnet;
 use arc_swap::ArcSwap;
 use ethers::{prelude::*, utils::secret_key_to_address};
 use flume::Receiver;
@@ -40,7 +39,9 @@ use std::{
     str::FromStr,
     sync::{Arc, Mutex},
 };
+use test_common::testnet::Testnet;
 use tracing::debug;
+
 use xor_name::XorName;
 
 pub struct VirtualNodeCollection {
@@ -84,8 +85,8 @@ impl VirtualNodeCollection {
         if num_nodes == 0 {
             panic!("num_nodes must be greater than 0");
         }
-        let testnet = crate::common::testnet::Testnet::builder()
-            .which_testnet(crate::common::testnet::WhichTestnet::NoChain)
+        let testnet = test_common::testnet::Testnet::builder()
+            .which_testnet(test_common::testnet::WhichTestnet::NoChain)
             .build()
             .await;
 
@@ -388,7 +389,7 @@ impl VirtualNodeCollection {
 // loads the default values for a virtual node
 async fn load_virtual_node_defaults(
     port: u16,
-    testnet: &crate::common::testnet::Testnet,
+    testnet: &test_common::testnet::Testnet,
     staker_address: H160,
 ) -> (
     TssState,
@@ -445,7 +446,7 @@ async fn new_peer_state(
     cfg: Arc<LitConfig>,
     chain_data_config_manager: Arc<ChainDataConfigManager>,
     http_client: reqwest::Client,
-    testnet: &crate::common::testnet::Testnet,
+    testnet: &test_common::testnet::Testnet,
     bm_tx: flume::Sender<BeaverMessage>,
 ) -> PeerState {
     let secret_key = SigningKey::from_bytes(GenericArray::from_slice(

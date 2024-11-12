@@ -1,0 +1,35 @@
+[blockchain]
+chain_id = "80001"
+chain_name = "mumbai"
+
+["blockchain.wallet.default"]
+"address: " = "0x02d7456485d203bbbe5a10db053a4c52c53b0332cabddb37d535d4713d9f29103c"
+private_key = "0x054795037b7d225997e41c3ae4531ea7f184945a99228723dcb867a71b9315fb"
+"public key: " = "0x02d7456485d203bbbe5a10db053a4c52c53b0332cabddb37d535d4713d9f29103c"
+
+[ipfs]
+gateway = "https://cloudflare-ipfs.com/ipfs/"
+
+[lit]
+env = "dev"
+
+[node]
+address = "127.0.0.1"
+admin_address = "0xb1a5b03f9d4e94f165e64bbb4b141c38fa52f083"
+coms_keys_receiver_privkey = "0xfb3a6bb884584f8c1d76b2f1d38d5236a29a3d6c8f2a18ba625d46ad28bc61d3"
+coms_keys_sender_privkey = "0xbfac351223a087cd679f4ec1f5f77bc949c57b9bf8e76a03bc9879990b4edeff"
+domain = "127.0.0.1"
+enable_actions_allowlist = "false"
+enable_ecdsa_dkg = "true"
+enable_epoch_transitions = "true"
+enable_rate_limiting = "false"
+rpc_url = "https://polygon-mumbai.g.alchemy.com/v2/onvoLvV97DDoLkAmdi0Cj7sxvfglKqDh"
+staker_address = "0x0000000000000000000000000000000000000000"
+enable_ecdsa_dkg_batch_sending = "true"
+ecdsa_batch_send_interval="100"
+
+["node.http"]
+port = "7470"
+
+[subnet]
+id = "24774a1ba7eadb5c692f213e984470de92ddc669"

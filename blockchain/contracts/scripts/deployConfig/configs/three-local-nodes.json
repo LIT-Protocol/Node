@@ -2,7 +2,7 @@
     "deploymentSelection": "lit-core + lit-node",
     "deployNodeConfig": {
         "environment": "dev",
-        "networkName": "vesuvius",
+        "networkName": "yellowstone",
         "newOwnerAddress": "0x046BF7BB88E0e0941358CE3F5A765C9acddA7B9c",
         "newDomainWalletAdminAddress": "0x046BF7BB88E0e0941358CE3F5A765C9acddA7B9c",
         "numberOfStakedOnlyWallets": 0,
@@ -25,7 +25,7 @@
     },
     "deployCoreConfig": {
         "environment": "dev",
-        "networkName": "vesuvius",
+        "networkName": "yellowstone",
         "subnetOwnerAddress": "0xB77AEBbC262Bb809933D991A919A0e4A6A3b2f65",
         "subnetAdminPublicKey": "0x045f96e860435fccf287d9c2592fa129edfca7159c8dd2260cf2def38a9d5ee627ba73afef636467bc95fe551f10c862e910f18eafb751226d6901eab7d5b2794a",
         "subnetProvAddress": "0x3324439C8b9181eF07D54030E32d2CD22FF0C6A7",

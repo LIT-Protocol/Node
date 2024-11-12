@@ -1,4 +1,4 @@
-// Full command: HARDHAT_NETWORK<NETWORK> npx ts-node --files scripts/deployContract.ts --deployer-private-key <PRIVATE_KEY> --new-contract-name <NEW_CONTRACT_NAME>
+// Full command: HARDHAT_NETWORK=<NETWORK> npx ts-node --files scripts/deployContract.ts --deployer-private-key <PRIVATE_KEY> --new-contract-name <NEW_CONTRACT_NAME>
 
 import hre from 'hardhat';
 import yargs from 'yargs';

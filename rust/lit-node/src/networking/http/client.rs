@@ -38,6 +38,7 @@ impl HttpClientFactory {
     fn new_default_client(cfg: &LitConfig) -> Result<Client> {
         reqwest::Client::builder()
             .timeout(std::time::Duration::from_secs(cfg.http_client_timeout()?))
+            .use_rustls_tls()
             .build()
             .map_err(|e| unexpected_err(e, Some("Unable to init default client".into())))
     }
@@ -45,6 +46,7 @@ impl HttpClientFactory {
     #[cfg(all(feature = "proxy_http", feature = "testing"))]
     fn new_proxied_client(cfg: &LitConfig) -> Result<Client> {
         let mut builder = reqwest::Client::builder()
+            .use_rustls_tls()
             .timeout(std::time::Duration::from_secs(cfg.http_client_timeout()?));
 
         // Check if config file for proxy mappings exists.

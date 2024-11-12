@@ -44,8 +44,8 @@ describe('PaymentDelegation', function () {
     expect(restrictions.length).to.equal(1);
     expect(restrictions[0].length).to.equal(1);
     let [requestsPerPeriod, periodSeconds] = restrictions[0][0];
-    expect(requestsPerPeriod).to.equal(0);
-    expect(periodSeconds).to.equal(0);
+    expect(requestsPerPeriod).to.equal(1000000000);
+    expect(periodSeconds).to.equal(86400);
     expect(payers[0].length).to.equal(1);
     expect(payers[0][0]).to.equal(aPayer.address);
 

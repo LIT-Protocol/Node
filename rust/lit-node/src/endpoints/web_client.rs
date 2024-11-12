@@ -6,6 +6,7 @@ use lit_api_core::context::{with_context, SdkVersion, Tracing, TracingRequired};
 use lit_api_core::error::ApiError;
 use lit_blockchain::resolver::rpc::{RpcHealthcheckPoller, ENDPOINT_MANAGER};
 use lit_core::config::{LitConfig, ReloadableLitConfig};
+use moka::future::Cache;
 use rocket::http::Status;
 use rocket::response::status;
 use rocket::serde::json::{serde_json::json, Json, Value};
@@ -76,6 +77,7 @@ pub(crate) async fn signing_access_control_condition(
     session: &State<Arc<TssState>>,
     remote_addr: SocketAddr,
     rate_limit_db: &State<Arc<RateLimitDB>>,
+    ipfs_cache: &State<Cache<String, Arc<String>>>,
     cfg: &State<ReloadableLitConfig>,
     signing_access_control_condition_request: Json<models::SigningAccessControlConditionRequest>,
     tracing: Tracing,
@@ -214,7 +216,8 @@ pub(crate) async fn signing_access_control_condition(
             tracing.clone().correlation_id().to_string(),
             &bls_root_pubkey,
             &endpoint_version,
-            None
+            None,
+            ipfs_cache,
         ).await;
         timing.insert("check access control conditions".to_string(), before.elapsed());
 
@@ -337,6 +340,7 @@ pub(crate) async fn encryption_sign(
     session: &Arc<TssState>,
     remote_addr: SocketAddr,
     rate_limit_db: &Arc<RateLimitDB>,
+    ipfs_cache: &State<Cache<String, Arc<String>>>,
     cfg: &ReloadableLitConfig,
     encryption_sign_request: Json<models::EncryptionSignRequest>,
     tracing: Tracing,
@@ -475,6 +479,7 @@ pub(crate) async fn encryption_sign(
             &bls_root_pubkey,
             &endpoint_version,
             None,
+            ipfs_cache,
         ).await;
         timing.insert("check access control conditions".to_string(), before.elapsed());
         let result = match check_result {
@@ -583,14 +588,26 @@ pub async fn handshake(
 
     let before = std::time::Instant::now();
     // run the attestation
-    let attestation = match create_attestation(cfg, challenge.as_str())
-        .await
-        .map_err(|e| unexpected_err(e, Some("error producing attestation".into())))
+    let attestation = match tokio::time::timeout(
+        Duration::from_secs(cfg.http_client_timeout().expect(
+            "http_client_timeout is required, and defined in defaults, so this should never happen",
+        )),
+        create_attestation(cfg, challenge.as_str()),
+    )
+    .await
+    .map_err(|e| unexpected_err(e, Some("error producing attestation".into())))
     {
-        Ok(attestation) => Some(attestation),
+        Ok(attestation) => match attestation {
+            Ok(attestation) => Some(attestation),
+            Err(e) => {
+                #[cfg(not(feature = "testing"))]
+                warn!("Error creating attestation: {:?}", e);
+                None
+            }
+        },
         Err(e) => {
             #[cfg(not(feature = "testing"))]
-            warn!("Error creating attestation: {:?}", e);
+            warn!("Timeout error creating attestation: {:?}", e);
             None
         }
     };
@@ -649,6 +666,7 @@ pub(crate) async fn execute_function(
     rate_limit_db: &State<Arc<RateLimitDB>>,
     cfg: &State<ReloadableLitConfig>,
     allowlist_cache: &State<Arc<models::AllowlistCache>>,
+    ipfs_cache: &State<Cache<String, Arc<String>>>,
     json_execution_request: Json<models::JsonExecutionRequest>,
     tracing: Tracing,
     client_context: ClientContext,
@@ -668,6 +686,7 @@ pub(crate) async fn execute_function(
             "execute, request: {:}",
             format!("{:?}", json_execution_request)
         );
+
 
         let mut timing: BTreeMap<String, Duration> = BTreeMap::new();
 
@@ -733,6 +752,7 @@ pub(crate) async fn execute_function(
         .await;
         timing.insert("rate limit check".to_string(), before.elapsed());
 
+
         let rate_limit_check_return = match rate_limit_res {
             Ok(rate_limit_check_return) => rate_limit_check_return,
             Err(e) => {
@@ -755,7 +775,7 @@ pub(crate) async fn execute_function(
         let before = std::time::Instant::now();
         // determine if the user passed code or an ipfs hash
         let derived_ipfs_id;
-        let code_to_run: String;
+        let code_to_run: Arc<String>;
         if let Some(code) = &json_execution_request.code {
             let decoded_bytes = match data_encoding::BASE64.decode(code.as_bytes()) {
                 Ok(decoded_bytes) => decoded_bytes,
@@ -767,7 +787,7 @@ pub(crate) async fn execute_function(
             };
 
             match String::from_utf8(decoded_bytes) {
-                Ok(string_result) => code_to_run = string_result,
+                Ok(string_result) => code_to_run = Arc::new(string_result),
                 Err(err) => {
                     return conversion_err(err, Some("Error converting bytes to string".into()))
                         .add_msg_to_details()
@@ -781,7 +801,7 @@ pub(crate) async fn execute_function(
             derived_ipfs_id = cid;
         } else if let Some(ipfs_id) = &json_execution_request.ipfs_id {
             // pull down the code from ipfs
-            match get_ipfs_file(&ipfs_id.to_string(), &cfg).await {
+            match get_ipfs_file(&ipfs_id.to_string(), &cfg, moka::future::Cache::clone(ipfs_cache)).await {
                 Ok(ipfs_result) => code_to_run = ipfs_result,
                 Err(err) => {
                     return err.handle();
@@ -914,7 +934,8 @@ pub(crate) async fn execute_function(
         let deno_execution_env = models::DenoExecutionEnv {
             tss_state: Some(tss_state.as_ref().clone()),
             auth_context,
-            cfg
+            cfg,
+            ipfs_cache: Some(moka::future::Cache::clone(ipfs_cache)),
         };
 
         let http_headers = {
@@ -948,11 +969,11 @@ pub(crate) async fn execute_function(
             Ok(client) => client,
             Err(e) => return e.handle(),
         };
-        let execution_result = client.execute_js_blocking(action_client::ExecutionOptions {
+        let execution_result = client.execute_js(action_client::ExecutionOptions {
             code: code_to_run,
             globals: json_execution_request.js_params.clone(),
             action_ipfs_id: Some(derived_ipfs_id),
-        });
+        }).await;
         timing.insert("js execution".to_string(), before.elapsed());
 
         let execution_state = match execution_result {
@@ -1000,6 +1021,7 @@ pub(crate) async fn sign_session_key(
     tss_state: &State<Arc<crate::tss::common::tss_state::TssState>>,
     auth_context_cache: &State<Arc<models::AuthContextCache>>,
     rate_limit_db: &State<Arc<RateLimitDB>>,
+    ipfs_cache: &State<Cache<String, Arc<String>>>,
     cfg: &State<ReloadableLitConfig>,
     json_sign_session_key_request: models::JsonSignSessionKeyRequestV1,
     tracing: Tracing,
@@ -1270,7 +1292,7 @@ pub(crate) async fn sign_session_key(
                     };
 
                     match String::from_utf8(decoded_bytes) {
-                        Ok(string_result) => code_to_run = string_result,
+                        Ok(string_result) => code_to_run = Arc::new(string_result),
                         Err(err) => {
                             return conversion_err(
                                 err,
@@ -1292,7 +1314,7 @@ pub(crate) async fn sign_session_key(
                         .as_ref()
                         .unwrap(); // We check that either the code is provided or the ipfs_cid
                                    // pull down the code from ipfs
-                    match get_ipfs_file(&ipfs_id.to_string(), &cfg).await {
+                    match get_ipfs_file(&ipfs_id.to_string(), &cfg, ipfs_cache.inner().clone()).await {
                         Ok(ipfs_result) => code_to_run = ipfs_result,
                         Err(err) => {
                             return err.handle();
@@ -1305,6 +1327,7 @@ pub(crate) async fn sign_session_key(
                     tss_state: Some(tss_state.as_ref().clone()),
                     auth_context: auth_context.clone(),
                     cfg: cfg.clone(),
+                    ipfs_cache: Some(moka::future::Cache::clone(ipfs_cache)),
                 };
 
                 trace!("spawning js execution task");
@@ -1331,11 +1354,11 @@ pub(crate) async fn sign_session_key(
                     Ok(client) => client,
                     Err(e) => return e.handle(),
                 };
-                let execution_result = client.execute_js_blocking(action_client::ExecutionOptions {
+                let execution_result = client.execute_js(action_client::ExecutionOptions {
                     code: code_to_run,
                     globals: json_sign_session_key_request.js_params.clone(),
                     action_ipfs_id: derived_ipfs_id.clone(),
-                });
+                }).await;
                 let execution_state = match execution_result {
                     Ok(state) => state,
                     Err(err) => {
@@ -1790,6 +1813,7 @@ pub async fn check_multiple_access_control_conditions(
     bls_root_pubkey: &String,
     endpoint_version: &EndpointVersion,
     current_action_ipfs_id: Option<&String>,
+    ipfs_cache: &State<Cache<String, Arc<String>>>,
 ) -> error::Result<models::UnifiedConditionCheckResult> {
     if let Some(access_control_conditions) = &access_control_conditions {
         let auth_sig = access_control::get_ethereum_auth_sig(auth_sig_item)?;
@@ -1804,6 +1828,7 @@ pub async fn check_multiple_access_control_conditions(
             bls_root_pubkey,
             endpoint_version,
             current_action_ipfs_id,
+            moka::future::Cache::clone(ipfs_cache),
         )
         .await?;
         return Ok(models::UnifiedConditionCheckResult {
@@ -1854,6 +1879,7 @@ pub async fn check_multiple_access_control_conditions(
             bls_root_pubkey,
             endpoint_version,
             current_action_ipfs_id,
+            moka::future::Cache::clone(ipfs_cache),
         )
         .await;
     }

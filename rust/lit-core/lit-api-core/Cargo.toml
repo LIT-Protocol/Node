@@ -42,18 +42,13 @@ sd-notify = { version = "0.4.1" }
 semver = { version = "1.0.16" }
 tracing = { version = "0.1.40" }
 tracing-opentelemetry = { version = "0.18" }
+rocket = { version = "0.5.1", features = ["tls", "json"], optional = true }
 
 [dependencies.lit-core]
 path = "../lit-core"
 
 [dependencies.lit-core-derive]
 path = "../lit-core-derive"
-
-[dependencies.rocket]
-git = "https://github.com/LIT-Protocol/Rocket"
-branch = "feature/port-reuse"
-features = ["tls", "json"]
-optional = true
 
 [dependencies.zerossl]
 git = "https://github.com/LIT-Protocol/zerossl"

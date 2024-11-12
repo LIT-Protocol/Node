@@ -33,9 +33,10 @@ use moka::future::Cache;
 use networking::http::client::HttpClientFactory;
 use rate_limiting::models::RateLimitDB;
 use rocket::fairing::AdHoc;
-use rocket::http::{Header, Method, Status};
+use rocket::http::{Header, Status};
 use rocket::response::status;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use std::str::FromStr;
 use std::sync::Arc;
 use std::thread;
 use tokio::sync::broadcast;
@@ -45,7 +46,7 @@ use tokio::sync::{mpsc::channel, Mutex, RwLock};
 use rocket::serde::json::json;
 use rocket::serde::json::Value;
 use rocket::Request;
-use rocket_cors::{AllowedOrigins, CorsOptions};
+use rocket_cors::AllowedOrigins;
 
 mod config;
 mod constants;
@@ -254,6 +255,12 @@ pub fn main() {
         auth_contexts: cache,
     });
 
+    // 1gb max capacity
+    let ipfs_cache: Cache<String, Arc<String>> = Cache::builder()
+        .weigher(|_key, value: &Arc<String>| -> u32 { value.len().try_into().unwrap_or(u32::MAX) })
+        .max_capacity(1024 * 1024 * 1024)
+        .build();
+
     let allowlist_cache = Arc::new(models::AllowlistCache {
         entries: RwLock::new(HashMap::new()),
     });
@@ -337,17 +344,25 @@ pub fn main() {
     )
     .expect("failed to launch tasks");
 
-    let cors = CorsOptions::default()
-        .allowed_origins(AllowedOrigins::all())
-        .allowed_methods(
-            vec![Method::Get, Method::Post, Method::Patch]
-                .into_iter()
-                .map(From::from)
-                .collect(),
-        )
-        .allow_credentials(true)
-        .to_cors()
-        .expect("CORS failed to build");
+    let mut allowed_methods: HashSet<rocket_cors::Method> = HashSet::new();
+    allowed_methods.insert(
+        rocket_cors::Method::from_str("Get").expect("failed to parse 'GET' for CORS method"),
+    );
+    allowed_methods.insert(
+        rocket_cors::Method::from_str("Post").expect("failed to parse 'POST' for CORS method"),
+    );
+    allowed_methods.insert(
+        rocket_cors::Method::from_str("Patch").expect("failed to parse 'PATCH' for CORS method"),
+    );
+
+    let cors = rocket_cors::CorsOptions {
+        allowed_origins: AllowedOrigins::all(),
+        allowed_methods,
+        allow_credentials: true,
+        ..Default::default()
+    }
+    .to_cors()
+    .expect("CORS failed to build");
 
     Engine::new(move || {
         let cfg = cfg.clone();
@@ -365,7 +380,7 @@ pub fn main() {
         let metrics_tx = metrics_tx.clone();
         let fsm_worker_metadata = fsm_worker_metadata.clone();
         let file_tx_clone = file_tx.clone();
-
+        let ipfs_cache = ipfs_cache.clone();
         Box::pin(async move {
             #[allow(unused_mut)]
             let mut l = Launcher::try_new(cfg.clone(), Some(file_tx_clone))
@@ -376,7 +391,7 @@ pub fn main() {
                 .mount("/", endpoints::versions::v1::routes())
                 // internode communication is currently seperate
                 .mount("/", p2p_comms::web::routes())
-                .attach(cors.clone())
+                .attach(cors)
                 .attach(AdHoc::on_response("Version Header", |_, resp| {
                     Box::pin(async move {
                         resp.set_header(Header::new(
@@ -395,6 +410,7 @@ pub fn main() {
                 .manage(allowlist_cache)
                 .manage(fsm_worker_metadata)
                 .manage(metrics_tx)
+                .manage(ipfs_cache)
                 .register(
                     "/",
                     catchers![bad_input_data_catcher, internal_server_error_catcher],

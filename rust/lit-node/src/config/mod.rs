@@ -40,6 +40,7 @@ pub static CFG_KEY_COMS_KEYS_RECEIVER_PRIVKEY: &str = "coms_keys_receiver_privke
 pub static CFG_KEY_ADMIN_ADDRESS: &str = "admin_address";
 pub static CFG_KEY_ENABLE_PROXIED_HTTP_CLIENT: &str = "enable_proxied_http_client";
 pub static CFG_KEY_ENABLE_RATE_LIMITING: &str = "enable_rate_limiting";
+pub static CFG_KEY_ENABLE_RATE_LIMITING_ALLOCATION: &str = "enable_rate_limiting_allocation";
 pub static CFG_KEY_ENABLE_ACTIONS_ALLOWLIST: &str = "enable_actions_allowlist";
 pub static CFG_KEY_ENABLE_EPOCH_TRANSITIONS: &str = "enable_epoch_transitions";
 pub static CFG_KEY_ENABLE_ECDSA_DKG: &str = "enable_ecdsa_dkg";
@@ -83,12 +84,13 @@ static REQUIRED_CFG_KEYS: [&str; 9] = [
     CFG_KEY_DOMAIN,
 ];
 
-static USER_EDITABLE_KEYS: [&str; 22] = [
+static USER_EDITABLE_KEYS: [&str; 23] = [
     CFG_KEY_RPC_URL,
     CFG_KEY_ADMIN_ADDRESS,
     CFG_KEY_STAKER_ADDRESS,
     CFG_KEY_ENABLE_PROXIED_HTTP_CLIENT,
     CFG_KEY_ENABLE_RATE_LIMITING,
+    CFG_KEY_ENABLE_RATE_LIMITING_ALLOCATION,
     CFG_KEY_ENABLE_ACTIONS_ALLOWLIST,
     CFG_KEY_ENABLE_EPOCH_TRANSITIONS,
     CFG_KEY_ENABLE_ECDSA_DKG,
@@ -144,6 +146,7 @@ pub trait LitNodeConfig {
     // Feature flag bool accessors
     fn enable_proxied_http_client(&self) -> Result<bool>;
     fn enable_rate_limiting(&self) -> Result<bool>;
+    fn enable_rate_limiting_allocation(&self) -> Result<bool>;
     fn enable_actions_allowlist(&self) -> Result<bool>;
     fn enable_epoch_transitions(&self) -> Result<bool>;
     fn enable_ecdsa_dkg(&self) -> Result<bool>;
@@ -214,7 +217,8 @@ impl LitNodeConfig for LitConfig {
             .set_section_default(CFG_KEY_ENABLE_SIWE_VALIDATION, "true")
             .set_section_default(CFG_KEY_ACTIONS_SOCKET, CFG_KEY_ACTIONS_SOCKET_DEFAULT)
             .set_section_default(CFG_KEY_ACTIONS_SANDBOX, "true")
-            .set_section_default(CFG_KEY_HEALTH_POLL_INTERVAL_MS, "60000");
+            .set_section_default(CFG_KEY_HEALTH_POLL_INTERVAL_MS, "60000")
+            .set_section_default(CFG_KEY_ENABLE_RATE_LIMITING_ALLOCATION, "false");
 
         // Apply others
         builder = <LitConfig as LitBlockchainConfig>::apply_defaults(builder)?;
@@ -410,6 +414,10 @@ impl LitNodeConfig for LitConfig {
 
     fn enable_rate_limiting(&self) -> Result<bool> {
         self.get_section_bool(CFG_KEY_ENABLE_RATE_LIMITING)
+    }
+
+    fn enable_rate_limiting_allocation(&self) -> Result<bool> {
+        self.get_section_bool(CFG_KEY_ENABLE_RATE_LIMITING_ALLOCATION)
     }
 
     fn enable_actions_allowlist(&self) -> Result<bool> {

@@ -1,4 +1,4 @@
-// Full Command: HARDHAT_NETWORK=<NETWORK> npx ts-node --files scripts/diamondContracts/appendDiamondCutManifest.ts --contract-name <CONTRACT_NAME> --facet-cut-action <FACET_CUT_ACTION> --new-facet-address <NEW_FACET_ADDRESS>
+// Full Command: HARDHAT_NETWORK=<NETWORK> npx ts-node --files scripts/diamondContracts/appendDiamondCutManifest.ts --contract-name <CONTRACT_NAME> --facet-cut-action <FACET_CUT_ACTION> --new-facet-address <NEW_FACET_ADDRESS> --diamond-contract-address <DIAMOND_CONTRACT_ADDRESS>
 
 import hre from 'hardhat';
 import yargs from 'yargs';
@@ -35,7 +35,15 @@ async function run() {
   );
 }
 
-run();
+run()
+  .then(() => {
+    console.log('Diamond cut manifest updated');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 
 async function getInputsFromCliOptions(): Promise<Inputs> {
   const argv = await yargs(process.argv.slice(2)).options({

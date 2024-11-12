@@ -552,6 +552,49 @@ pub mod pkp_permissions {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("getPKPPubKeysByAuthMethod"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "getPKPPubKeysByAuthMethod",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("authMethodType"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
+                                        256usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("uint256"),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("id"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bytes"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Array(
+                                        ::std::boxed::Box::new(
+                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                        ),
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bytes[]"),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("getPermittedActions"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -2280,6 +2323,19 @@ pub mod pkp_permissions {
                 .method_hash([189, 73, 134, 160], token_id)
                 .expect("method not found (this should never happen)")
         }
+        ///Calls the contract's `getPKPPubKeysByAuthMethod` (0x574b89e4) function
+        pub fn get_pkp_pub_keys_by_auth_method(
+            &self,
+            auth_method_type: ::ethers::core::types::U256,
+            id: ::ethers::core::types::Bytes,
+        ) -> ::ethers::contract::builders::ContractCall<
+            M,
+            ::std::vec::Vec<::ethers::core::types::Bytes>,
+        > {
+            self.0
+                .method_hash([87, 75, 137, 228], (auth_method_type, id))
+                .expect("method not found (this should never happen)")
+        }
         ///Calls the contract's `getPermittedActions` (0xbb7a1070) function
         pub fn get_permitted_actions(
             &self,
@@ -3899,6 +3955,27 @@ pub mod pkp_permissions {
     pub struct GetEthAddressCall {
         pub token_id: ::ethers::core::types::U256,
     }
+    ///Container type for all input parameters for the `getPKPPubKeysByAuthMethod` function with signature `getPKPPubKeysByAuthMethod(uint256,bytes)` and selector `0x574b89e4`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(
+        name = "getPKPPubKeysByAuthMethod",
+        abi = "getPKPPubKeysByAuthMethod(uint256,bytes)"
+    )]
+    pub struct GetPKPPubKeysByAuthMethodCall {
+        pub auth_method_type: ::ethers::core::types::U256,
+        pub id: ::ethers::core::types::Bytes,
+    }
     ///Container type for all input parameters for the `getPermittedActions` function with signature `getPermittedActions(uint256)` and selector `0xbb7a1070`
     #[derive(
         Clone,
@@ -4389,6 +4466,7 @@ pub mod pkp_permissions {
         Facets(FacetsCall),
         GetAuthMethodId(GetAuthMethodIdCall),
         GetEthAddress(GetEthAddressCall),
+        GetPKPPubKeysByAuthMethod(GetPKPPubKeysByAuthMethodCall),
         GetPermittedActions(GetPermittedActionsCall),
         GetPermittedAddresses(GetPermittedAddressesCall),
         GetPermittedAuthMethodScopes(GetPermittedAuthMethodScopesCall),
@@ -4478,6 +4556,12 @@ pub mod pkp_permissions {
             if let Ok(decoded)
                 = <GetEthAddressCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::GetEthAddress(decoded));
+            }
+            if let Ok(decoded)
+                = <GetPKPPubKeysByAuthMethodCall as ::ethers::core::abi::AbiDecode>::decode(
+                    data,
+                ) {
+                return Ok(Self::GetPKPPubKeysByAuthMethod(decoded));
             }
             if let Ok(decoded)
                 = <GetPermittedActionsCall as ::ethers::core::abi::AbiDecode>::decode(
@@ -4653,6 +4737,9 @@ pub mod pkp_permissions {
                 Self::GetEthAddress(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
+                Self::GetPKPPubKeysByAuthMethod(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
                 Self::GetPermittedActions(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -4753,6 +4840,9 @@ pub mod pkp_permissions {
                 Self::Facets(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetAuthMethodId(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetEthAddress(element) => ::core::fmt::Display::fmt(element, f),
+                Self::GetPKPPubKeysByAuthMethod(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::GetPermittedActions(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
@@ -4866,6 +4956,11 @@ pub mod pkp_permissions {
     impl ::core::convert::From<GetEthAddressCall> for PKPPermissionsCalls {
         fn from(value: GetEthAddressCall) -> Self {
             Self::GetEthAddress(value)
+        }
+    }
+    impl ::core::convert::From<GetPKPPubKeysByAuthMethodCall> for PKPPermissionsCalls {
+        fn from(value: GetPKPPubKeysByAuthMethodCall) -> Self {
+            Self::GetPKPPubKeysByAuthMethod(value)
         }
     }
     impl ::core::convert::From<GetPermittedActionsCall> for PKPPermissionsCalls {
@@ -5083,6 +5178,22 @@ pub mod pkp_permissions {
         Hash
     )]
     pub struct GetEthAddressReturn(pub ::ethers::core::types::Address);
+    ///Container type for all return fields from the `getPKPPubKeysByAuthMethod` function with signature `getPKPPubKeysByAuthMethod(uint256,bytes)` and selector `0x574b89e4`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct GetPKPPubKeysByAuthMethodReturn(
+        pub ::std::vec::Vec<::ethers::core::types::Bytes>,
+    );
     ///Container type for all return fields from the `getPermittedActions` function with signature `getPermittedActions(uint256)` and selector `0xbb7a1070`
     #[derive(
         Clone,

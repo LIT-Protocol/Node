@@ -1,13 +1,13 @@
 use super::utils::virtual_node_collection::VirtualNodeCollection;
-use crate::common::{
-    self,
-    interpolation::{get_secret_and_shares, interpolate_secret},
-};
 use futures::future::join_all;
 use lit_core::utils::binary::bytes_to_hex;
 use lit_node::peers::peer_state::models::{SimplePeer, SimplePeerExt};
 use lit_node::tss::common::{curve_type::CurveType, dkg_type::DkgType};
 use test_case::test_case;
+use test_common::{
+    self,
+    interpolation::{get_secret_and_shares, interpolate_secret},
+};
 use tokio::task::JoinHandle;
 use tracing::{error, info};
 
@@ -30,7 +30,7 @@ enum DkgMode {
 #[tokio::test]
 #[doc = "Test that a DKG can be run on a set of virtual nodes."]
 pub async fn dkg_only(curve_type: CurveType) {
-    common::init_test_config();
+    test_common::init_test_config();
     initial_dkg(curve_type, 3).await;
 }
 
@@ -44,7 +44,7 @@ pub async fn dkg_only(curve_type: CurveType) {
 #[test_case(CurveType::RedJubjub; "RedJubjub Refresh")]
 #[tokio::test]
 pub async fn dkg_and_refresh(curve_type: CurveType) {
-    common::init_test_config();
+    test_common::init_test_config();
     let num_nodes = 3;
     // initial setup
     let (mut vnc, pubkey, epoch, _current_peers) = initial_dkg(curve_type, num_nodes).await;
@@ -78,7 +78,7 @@ pub async fn dkg_and_refresh(curve_type: CurveType) {
 // #[test_case( CurveType::K256, 5, [1,1,0,-4,0,-3,0,-1,0,4,3,0,1,5,5,0].to_vec() ; "ECDSA reshare batch: 5 a2 r1 r1 r1 a2 a3")]
 #[tokio::test]
 pub async fn dkg_and_reshare(curve_type: CurveType, num_nodes: usize, node_changes: Vec<i8>) {
-    common::init_test_config();
+    test_common::init_test_config();
     struct EpochHistory {
         epoch: u64,
         threshold: u16,
@@ -145,7 +145,7 @@ pub async fn initial_dkg(
     curve_type: CurveType,
     num_nodes: usize,
 ) -> (VirtualNodeCollection, String, u64, Vec<SimplePeer>) {
-    common::init_test_config();
+    test_common::init_test_config();
     info!("Starting dkg test {}", curve_type.to_string());
     let epoch = 1;
 

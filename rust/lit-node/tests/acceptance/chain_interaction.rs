@@ -2,37 +2,14 @@ use std::sync::Arc;
 
 use crate::acceptance::web_user_tests::assert_decrypted;
 use crate::acceptance::web_user_tests::retrieve_decryption_key;
-use crate::common::auth_sig::get_auth_sig_for_session_sig;
-use crate::common::auth_sig::get_session_sigs_for_pkp;
-use crate::common::lit_actions::assert_signed_action;
-use crate::common::lit_actions::execute_lit_action_session_sigs;
-use crate::common::lit_actions::sign_lit_action;
-use crate::common::lit_actions::HELLO_WORLD_LIT_ACTION_CODE;
-use crate::common::node_collection::get_network_pubkey;
-use crate::common::node_collection::hit_endpoints_with_json_body;
-use crate::common::node_collection::hit_endpoints_with_json_body_per_port;
-use crate::common::pkp::add_permitted_address_to_pkp_with_wallet;
-use crate::common::pkp::mint_next_pkp_with_wallet;
-use crate::common::testnet::actions::Actions;
-use crate::common::testnet::contracts::StakingContractConfig;
-use crate::common::testnet::node_config::CustomNodeRuntimeConfig;
-use crate::common::testnet::rate_limit_nfts::create_payment_delegation_entry;
-use crate::common::testnet::rate_limit_nfts::fund_wallet;
-use crate::common::testnet::rate_limit_nfts::mint_rate_limit_nft;
-use crate::common::testnet::Testnet;
-use crate::common::validator::ValidatorCollection;
-// use ethers::{prelude::*, solc::Solc};
-use std::path::Path;
+
+use test_common::node_collection::get_network_pubkey;
+use test_common::testnet::rate_limit_nfts::fund_wallet;
+use test_common::testnet::Testnet;
+use test_common::validator::ValidatorCollection;
 
 #[allow(dead_code)]
-use super::super::common;
-use base64_light::base64_decode;
 use blsful::Bls12381G2Impl;
-use common::auth_sig::{
-    generate_authsig, get_auth_sig_with_rli_nft_resources, get_session_sigs_for_auth,
-};
-use common::new_node_collection;
-use ethers::abi::Abi;
 use ethers::contract::abigen;
 use ethers::contract::Contract;
 use ethers::contract::ContractFactory;
@@ -49,6 +26,7 @@ use lit_core::utils::binary::hex_to_bytes;
 use lit_node::tss::common::curve_type::CurveType;
 use rand_core::OsRng;
 use sha2::{Digest, Sha256};
+use test_common::new_node_collection;
 
 use lit_node::auth::auth_material::AuthSigItem;
 use lit_node::auth::auth_material::JsonAuthSig;
@@ -221,7 +199,7 @@ async fn test_encryption_decryption_eip1271(
 
 #[tokio::test]
 async fn test_chain_interaction() {
-    common::init_test_config();
+    test_common::init_test_config();
     // use initial_node_setup if you don't have a DKG result saved.
     let num_nodes = 6;
 

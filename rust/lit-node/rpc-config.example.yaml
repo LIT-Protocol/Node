@@ -1,12 +1,14 @@
 chains:
-  alfajores:
-    - url: https://alfajores-forno.celo-testnet.org
   amoy:
     - url: https://rpc-amoy.polygon.technology
+  alfajores:
+    - url: https://alfajores-forno.celo-testnet.org
   anvil:
     - url: http://127.0.0.1:8545
   arbitrum:
     - url: https://arb1.arbitrum.io/rpc
+  arbitrumSepolia:
+    - url: https://arbitrum-sepolia.blockpi.network/v1/rpc/public
   aurora:
     - url: https://mainnet.aurora.dev
   avalanche:
@@ -17,6 +19,10 @@ chains:
     - url: https://goerli.base.org
   baseSepolia:
     - url: https://sepolia.base.org
+  blast:
+    - url: https://rpc.blast.io
+  blastSepolia:
+    - url: https://sepolia.blast.io
   bsc:
     - url: https://bsc-dataseed.binance.org
   celo:
@@ -25,6 +31,8 @@ chains:
     - url: https://api.cheqd.net
   cheqdTestnet:
     - url: https://api.cheqd.network
+  chiado:
+    - url: https://rpc.chiadochain.net
   chronicleTestnet:
     - url: https://chain-rpc.litprotocol.com/http
   cosmos:
@@ -34,7 +42,8 @@ chains:
   eluvio:
     - url: https://host-76-74-28-226.contentfabric.io/eth
   ethereum:
-    - url: https://mainnet.infura.io/v3/cf01b9202dde482e8ce2aaa92289ea24
+    - url: https://mainnet.infura.io/v3/96dffb3d8c084dec952c61bd6230af34
+    - url: https://eth-mainnet.g.alchemy.com/v2/csvV3bBtx2v8uX3APunm8z-HD3Twqa8Q
   evmos:
     - url: https://eth.bd.evmos.org:8545
   evmosTestnet:
@@ -43,30 +52,32 @@ chains:
     - url: https://rpcapi.fantom.network
   filecoin:
     - url: https://api.node.glif.io/rpc/v1
+  hyperspace:
+    - url: https://api.hyperspace.node.glif.io/rpc/v1
   fuji:
     - url: https://api.avax-test.network/ext/bc/C/rpc
   goerli:
-    - url: https://goerli.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8
-  hyperspace:
-    - url: https://api.hyperspace.node.glif.io/rpc/v1
+    - url: https://goerli.infura.io/v3/96dffb3d8c084dec952c61bd6230af34
   hardhat:
     - url: http://127.0.0.1:8545
   harmony:
     - url: https://rpc.s0.t.hmny.io
   juno:
     - url: https://rest.cosmos.directory/juno
+  kovan:
+    - url: https://kovan.infura.io/v3/96dffb3d8c084dec952c61bd6230af34
   kyve:
     - url: https://api.korellia.kyve.network
   lineaGoerli:
     - url: https://rpc.goerli.linea.build
+  lineaSepolia:
+    - url: https://rpc.sepolia.linea.build
   lit:
-    - url: 'https://lit-protocol.calderachain.xyz/http'
+    - url: https://lit-protocol.calderachain.xyz/replica-http
   litTestnet:
-    - url: 'https://lit.calderachain.xyz/http'
+    - url: https://lit.calderachain.xyz/http
   localchain:
     - url: http://127.0.0.1:8545
-  localchainArbitrum:
-    - url: http://127.0.0.1:8547
   lukso:
     - url: https://rpc.lukso.gateway.fm
   luksoTestnet:
@@ -78,23 +89,34 @@ chains:
   moonriver:
     - url: https://rpc.api.moonriver.moonbeam.network
   mumbai:
-    - url: https://matic-mumbai.chainstacklabs.com/
+    - url: https://polygon-mumbai.g.alchemy.com/v2/jGDSCo9ynp9AEIA9jdmpp834M1NjwWX-
   optimism:
-    - url: https://mainnet.optimism.io/
+    - url: https://optimism-mainnet.infura.io/v3/96dffb3d8c084dec952c61bd6230af34
   optimismGoerli:
     - url: https://optimism-goerli.publicnode.com/
   polygon:
+    - url: https://polygon-mainnet.g.alchemy.com/v2/D1b4fE8b1DB2YJkkm_lM4_qjqyMdx9Tr
     - url: https://polygon-rpc.com
+  rinkeby:
+    - url: https://rinkeby.infura.io/v3/96dffb3d8c084dec952c61bd6230af34
+  ropsten:
+    - url: https://ropsten.infura.io/v3/96dffb3d8c084dec952c61bd6230af34
   sepolia:
-    - url: https://sepolia.infura.io/v3/cf01b9202dde482e8ce2aaa92289ea24
+    - url: https://sepolia.infura.io/v3/96dffb3d8c084dec952c61bd6230af34
   scrollAlphaTestnet:
     - url: https://alpha-rpc.scroll.io/l2
+  scroll:
+    - url: https://rpc.scroll.io
+  solana:
+    - url: https://long-wild-fog.solana-mainnet.quiknode.pro/01f8f003ac20c02576f7a205a158a45120102a6d
+  solanaDevnet:
+    - url: https://solana-devnet.g.alchemy.com/v2/q4EAtK0PRYHz4PavhP8jxaVxwVpSV9de
   solanaTestnet:
     - url: https://api.testnet.solana.com
+  verifyTestnet:
+    - url: https://rpc.verify-testnet.gelato.digital
   xdai:
-    - url: https://rpc.gnosischain.com/
-  chiado:
-    - url: https://rpc.chiadochain.net
+    - url: https://small-ultra-dawn.xdai.quiknode.pro/5769e900e2fe616d47184f089d98459d6ab2318f
   xdc:
     - url: https://rpc.xinfin.network
   zkSync:
@@ -104,7 +126,7 @@ chains:
   zkEvm:
     - url: https://zkevm-rpc.com
   zora:
-    - url: https://rpc.zora.energy/
+    - url: https://rpc.zora.energy
   zoraGoerli:
     - url: https://testnet.rpc.zora.energy
   mantleTestnet:
@@ -116,12 +138,36 @@ chains:
   publicGoodsNetwork:
     - url: https://rpc.publicgoods.network
   waevEclipseTestnet:
-    - url: https://api.evm.waev.eclipsenetwork.xyz
-  waevEclipseDevnet:
-    - url: https://api.evm.waev.dev.eclipsenetwork.xyz
-  verifyTestnet:
-    - url: https://rpc.verify-testnet.gelato.digital
-  vesuvius:
-    - url: https://vesuvius-rpc.litprotocol.com
+    - url: https://api.evm.waev.eclipsenetwork.xyz/solana
   yellowstone:
     - url: https://yellowstone-rpc.litprotocol.com
+  fuse:
+    - url: https://rpc.fuse.io/
+  campNetwork:
+    - url: https://rpc.camp-network-testnet.gelato.digital
+  vanar:
+    - url: https://rpc-vanguard.vanarchain.com
+  lisk:
+    - url: https://lisk.drpc.org
+  chilizMainnet:
+    - url: https://rpc.ankr.com/chiliz
+  chilizTestnet:
+    - url: https://spicy-rpc.chiliz.com/
+  skaleTestnet:
+    - url: https://testnet.skalenodes.com/v1/lanky-ill-funny-testnet
+  skale:
+    - url: https://mainnet.skalenodes.com/v1/green-giddy-denebola
+  skaleCalypso:
+    - url: https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague
+  fhenixHelium:
+    - url: https://api.helium.fhenix.zone
+  hederaTestnet:
+    - url: https://testnet.hashio.io/api
+  bitTorrentTestnet:
+    - url: https://test-rpc.bittorrentchain.io
+  storyIlaid:
+    - url: https://testnet.storyrpc.io
+  campTestnet:
+    - url: https://rpc.camp-network-testnet.gelato.digital
+  hushedNorthstar:
+    - url: https://rpc.buildbear.io/yielddev

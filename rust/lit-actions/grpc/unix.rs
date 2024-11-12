@@ -65,6 +65,7 @@ where
         .build()?;
 
     let router = Server::builder()
+        .max_frame_size(16_777_215)
         .add_service(reflection)
         .add_service(service);
 

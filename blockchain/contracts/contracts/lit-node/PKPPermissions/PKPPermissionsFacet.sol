@@ -264,6 +264,23 @@ contract PKPPermissionsFacet {
         return allPermittedAddresses;
     }
 
+    function getPKPPubKeysByAuthMethod(
+        uint256 authMethodType,
+        bytes memory id
+    ) external view returns (bytes[] memory) {
+        uint256 authMethodId = getAuthMethodId(authMethodType, id);
+
+        uint256 pkpIdsLength = s().authMethodToPkpIds[authMethodId].length();
+        bytes[] memory allPkpPubkeys = new bytes[](pkpIdsLength);
+
+        for (uint256 i = 0; i < pkpIdsLength; i++) {
+            allPkpPubkeys[i] = getPubkey(
+                s().authMethodToPkpIds[authMethodId].at(i)
+            );
+        }
+
+        return allPkpPubkeys;
+    }
     /// get if a user is permitted to use a given pubkey.  returns true if it is permitted to use the pubkey in the permittedAuthMethods[tokenId] struct.
     function isPermittedAuthMethod(
         uint256 tokenId,

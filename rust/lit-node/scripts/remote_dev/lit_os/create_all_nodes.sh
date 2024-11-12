@@ -20,7 +20,7 @@ for i in "${HOSTS[@]}"; do
     file="$toml_path/lit_config$counter.toml"
     if [ -f "$file" ]; then
         echo "Creating node $counter with file $file"
-        export host_ip="$i"
+        export host_ip="${i%/*}"
         export ip_address=${GUESTS_WITH_SM[$counter]}
         export gw=${GUEST_GATEWAYS[$counter]}
         export subnet_id=`stoml "$file" subnet.id`

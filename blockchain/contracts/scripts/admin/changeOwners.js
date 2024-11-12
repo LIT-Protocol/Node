@@ -10,12 +10,12 @@ const fs = require('fs');
  */
 
 // put your new owner here.  YOU MUST HAVE THE ABILITY TO SEND TXNS FROM HERE OR ELSE YOU COULD END UP SETTING AN OWNER THAT YOU CAN'T EVER CHANGE
-const NEW_OWNER = '0x6D3f1E51D550a343714c12a9E4ecc4a441CD0484';
+const NEW_OWNER = '0xdDD9B576f0ec66Aa5F0573Ab223807b69A5b666A';
 
 const LIT_CORE_ADDRESSES_PATH =
-  '../../../networks/habanero/deployed-lit-core-contracts-temp.json';
+  '../../../networks/datil-prod/deployed-lit-core-contracts-temp.json';
 const LIT_NODE_ADDRESSES_PATH =
-  '../../../networks/habanero/deployed-lit-node-contracts-temp.json';
+  '../../../networks/datil-prod/deployed-lit-node-contracts-temp.json';
 
 // const LIT_CORE_ADDRESSES_PATH = "./deployed-lit-core-contracts-temp.json";
 // const LIT_NODE_ADDRESSES_PATH = "./deployed-lit-node-contracts-temp.json";

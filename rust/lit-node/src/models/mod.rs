@@ -7,6 +7,7 @@ use lit_attestation::Attestation;
 use lit_blockchain::resolver::rpc::config::RpcConfig;
 #[cfg(feature = "lit-actions")]
 use lit_core::config::LitConfig;
+use moka::future::Cache;
 use rocket::form;
 use rocket::form::{FromFormField, ValueField};
 use rocket::serde::{Deserialize, Serialize};
@@ -182,6 +183,7 @@ pub struct DenoExecutionEnv {
     pub tss_state: Option<crate::tss::common::tss_state::TssState>,
     pub auth_context: AuthContext,
     pub cfg: Arc<LitConfig>,
+    pub ipfs_cache: Option<Cache<String, Arc<String>>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

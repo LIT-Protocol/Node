@@ -1,17 +1,5 @@
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
-use crate::common::{
-    assertions::NetworkIntegrityChecker,
-    init_test_config,
-    node_collection::choose_random_indices,
-    testnet::{
-        contracts::{ComplaintConfig, Contracts, StakingContractConfig},
-        contracts_repo::default_staker_ip_addresses,
-        node_config::CustomNodeRuntimeConfig,
-        NodeAccount, Testnet,
-    },
-    validator::ValidatorCollection,
-};
 use ethers::core::k256::ecdsa::SigningKey;
 use ethers::middleware::SignerMiddleware;
 use ethers::prelude::*;
@@ -24,6 +12,18 @@ use lit_blockchain::{
 };
 use lit_node::peers::peer_reviewer::Issue;
 use test_case::test_case;
+use test_common::{
+    assertions::NetworkIntegrityChecker,
+    init_test_config,
+    node_collection::choose_random_indices,
+    testnet::{
+        contracts::{ComplaintConfig, Contracts, StakingContractConfig},
+        contracts_repo::default_staker_ip_addresses,
+        node_config::CustomNodeRuntimeConfig,
+        NodeAccount, Testnet,
+    },
+    validator::ValidatorCollection,
+};
 use tracing::info;
 
 fn setup() {

@@ -262,28 +262,17 @@ impl Signable for CsEcdsaState {
             }))
             .await;
 
-        let signature_share = self
-            .sign_with_pubkey_internal(
-                message_bytes,
-                public_key,
-                root_pubkeys,
-                tweak_preimage,
-                request_id,
-                epoch,
-            )
-            .await;
+        self.sign_with_pubkey_internal(
+            message_bytes,
+            public_key,
+            root_pubkeys,
+            tweak_preimage,
+            request_id,
+            epoch,
+        )
+        .await
 
-        #[cfg(feature = "rtmetrics")]
-        let _ = tx_metrics
-            .send_async(NewAction(MetricAction {
-                type_id: MetricActionType::SignEcdsa,
-                txn_id,
-                is_start: false,
-                is_success: signature_share.is_ok(),
-            }))
-            .await;
-
-        signature_share
+        // removed the final rt_metric call as clippy was complaining when it's compiled out, and it's deprecated in another PR.
     }
 }
 

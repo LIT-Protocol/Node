@@ -245,6 +245,24 @@ contract RateLimitNFTFacet is
         s().maxExpirationSeconds = newMaxExpirationSeconds;
     }
 
+    function pruneExpired(address owner) public {
+        uint256 balance = balanceOf(owner);
+        uint256[] memory tokenIds = new uint256[](balance);
+        for (uint256 i = 0; i < balance; i++) {
+            uint256 tokenId = tokenOfOwnerByIndex(owner, i);
+            if (s().capacity[tokenId].expiresAt < block.timestamp) {
+                tokenIds[i] = tokenId;
+            }
+        }
+
+        // burn the expired ones
+        for (uint256 i = 0; i < balance; i++) {
+            if (tokenIds[i] != 0) {
+                _burn(tokenIds[i]);
+            }
+        }
+    }
+
     /* ========== EVENTS ========== */
 
     event AdditionalRequestsPerKilosecondCostSet(

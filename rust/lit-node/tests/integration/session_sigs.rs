@@ -2,26 +2,6 @@ use crate::acceptance::web_user_tests::{
     assert_decrypted, prepare_test_encryption_parameters_with_wallet_address,
     retrieve_decryption_key, retrieve_decryption_key_session_sigs,
 };
-use crate::common::auth_sig::get_auth_sig_for_session_sig_from_nodes;
-use crate::common::auth_sig::get_session_sigs_for_auth;
-use crate::common::auth_sig::get_session_sigs_for_pkp;
-use crate::common::lit_actions::HELLO_WORLD_LIT_ACTION_CODE;
-use crate::common::lit_actions::{
-    assert_signed_action, execute_lit_action, execute_lit_action_session_sigs, sign_lit_action,
-};
-use crate::common::node_collection::get_network_pubkey;
-use crate::common::pkp::add_permitted_action_to_pkp;
-use crate::common::pkp::{add_permitted_address_auth_method_to_pkp, add_permitted_address_to_pkp};
-use crate::common::{
-    auth_sig::{generate_authsig, generate_authsig_item},
-    session_sigs::{
-        get_pkp_sign, init_test, mint_pkp, CUSTOM_AUTH_RESOURCE_VALID_PKP_SIGNING_LIT_ACTION_CODE,
-        CUSTOM_AUTH_RESOURCE_VALID_SESSION_SIG_LIT_ACTION_CODE,
-        INVALID_SESSION_SIG_LIT_ACTION_CODE, NO_AUTH_METHOD_PKP_SIGNING_LIT_ACTION_CODE,
-        NO_AUTH_METHOD_SESSION_SIG_LIT_ACTION_CODE, VALID_PKP_SIGNING_LIT_ACTION_CODE,
-        VALID_SESSION_SIG_LIT_ACTION_CODE,
-    },
-};
 use anyhow::Result;
 use blsful::Bls12381G2Impl;
 use ethers::signers::LocalWallet;
@@ -46,6 +26,26 @@ use lit_node::utils::web::hash_access_control_conditions;
 use lit_node::utils::web::EndpointVersion;
 use rand_core::OsRng;
 use serde::Deserialize;
+use test_common::auth_sig::get_auth_sig_for_session_sig_from_nodes;
+use test_common::auth_sig::get_session_sigs_for_auth;
+use test_common::auth_sig::get_session_sigs_for_pkp;
+use test_common::lit_actions::HELLO_WORLD_LIT_ACTION_CODE;
+use test_common::lit_actions::{
+    assert_signed_action, execute_lit_action, execute_lit_action_session_sigs, sign_lit_action,
+};
+use test_common::node_collection::get_network_pubkey;
+use test_common::pkp::add_permitted_action_to_pkp;
+use test_common::pkp::{add_permitted_address_auth_method_to_pkp, add_permitted_address_to_pkp};
+use test_common::{
+    auth_sig::{generate_authsig, generate_authsig_item},
+    session_sigs::{
+        get_pkp_sign, init_test, mint_pkp, CUSTOM_AUTH_RESOURCE_VALID_PKP_SIGNING_LIT_ACTION_CODE,
+        CUSTOM_AUTH_RESOURCE_VALID_SESSION_SIG_LIT_ACTION_CODE,
+        INVALID_SESSION_SIG_LIT_ACTION_CODE, NO_AUTH_METHOD_PKP_SIGNING_LIT_ACTION_CODE,
+        NO_AUTH_METHOD_SESSION_SIG_LIT_ACTION_CODE, VALID_PKP_SIGNING_LIT_ACTION_CODE,
+        VALID_SESSION_SIG_LIT_ACTION_CODE,
+    },
+};
 use tracing::info;
 
 #[derive(Deserialize)]

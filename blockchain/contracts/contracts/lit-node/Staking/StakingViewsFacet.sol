@@ -304,4 +304,58 @@ contract StakingViewsFacet {
         }
         return values;
     }
+
+    function getActiveUnkickedValidators()
+        public
+        view
+        returns (address[] memory)
+    {
+        uint256 currentCount = stakingStorage()
+            .validatorsInCurrentEpoch
+            .length();
+        uint256 kickedCountInNextEpoch = stakingStorage()
+            .validatorsKickedFromNextEpoch
+            .length();
+        uint256 activeCount = currentCount - kickedCountInNextEpoch;
+        address[] memory values = new address[](activeCount);
+        uint256 index = 0;
+        for (uint256 i = 0; i < currentCount; i++) {
+            address validator = stakingStorage().validatorsInCurrentEpoch.at(i);
+            if (
+                stakingStorage().validatorsKickedFromNextEpoch.contains(
+                    validator
+                )
+            ) {
+                continue;
+            }
+            values[index] = validator;
+            index++;
+        }
+        return values;
+    }
+
+    function getActiveUnkickedValidatorStructs()
+        public
+        view
+        returns (LibStakingStorage.Validator[] memory)
+    {
+        address[] memory activeValidators = getActiveUnkickedValidators();
+        return getValidatorsStructs(activeValidators);
+    }
+
+    function getActiveUnkickedValidatorStructsAndCounts()
+        public
+        view
+        returns (
+            LibStakingStorage.Epoch memory,
+            uint256,
+            LibStakingStorage.Validator[] memory
+        )
+    {
+        return (
+            epoch(),
+            currentValidatorCountForConsensus(),
+            getActiveUnkickedValidatorStructs()
+        );
+    }
 }

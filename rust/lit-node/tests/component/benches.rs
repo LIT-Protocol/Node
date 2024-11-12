@@ -1,6 +1,4 @@
 use super::utils::virtual_node_collection::VirtualNodeCollection;
-use crate::common;
-
 use lit_node::tss::common::curve_type::CurveType;
 
 use std::time::Instant;
@@ -15,7 +13,7 @@ pub struct TestRun {
 #[ignore]
 #[doc = "Run a series of benchmarks to compare the time taken to run DKG with BLS and ECDSA curves - the DKG currently uses the Gennaro DKG implementation for both curves"]
 async fn dkg_benchmarks() {
-    common::init_test_config();
+    test_common::init_test_config();
 
     let test_sizes: Vec<usize> = vec![3, 5, 7, 10];
     let mut test_runs: Vec<TestRun> = Vec::new();

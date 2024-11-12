@@ -300,7 +300,7 @@ pub async fn node_fsm_worker(
                         // The node should request to leave if it is running a soon-to-be / already incompatible node version.
                         let is_node_running_compatible_version =
                             check_version_compatibility(peer_state.clone());
-                        match is_node_running_compatible_version {
+                        match is_node_running_compatible_version.await {
                             Ok(false) => {
                                 info!("Node is running an incompatible version. Requesting to leave the network.");
                                 if let Err(e) = peer_state.request_to_leave().await {
@@ -956,14 +956,16 @@ where
     Ok(U256::from(epoch_number_u128))
 }
 
-fn check_version_compatibility(peer_state: Arc<PeerState>) -> Result<bool> {
+async fn check_version_compatibility(peer_state: Arc<PeerState>) -> Result<bool> {
     let min_valid_version = peer_state
         .chain_data_config_manager
         .get_min_version_requirement()
+        .await
         .map_err(|e| unexpected_err(e, Some("Could not get min version requirement".into())))?;
     let max_valid_version = peer_state
         .chain_data_config_manager
         .get_max_version_requirement()
+        .await
         .map_err(|e| unexpected_err(e, Some("Could not get max version requirement".into())))?;
     is_compatible_version(
         &get_version().to_string(),

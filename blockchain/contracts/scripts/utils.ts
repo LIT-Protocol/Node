@@ -367,11 +367,17 @@ export async function hardhatDeployAndVerifySingleContract(
   const contractAddress = await contract.getAddress();
   console.info(`${contractName} deployed to ${contractAddress}`);
 
-  if (verifyContracts)
+  if (verifyContracts) {
     // @ts-ignore
-    globalThis.queue.add(() =>
-      verifyContractInBg(networkName, contractAddress, deploymentArgs)
-    );
+    if (globalThis.queue) {
+      // @ts-ignore
+      globalThis.queue.add(() =>
+        verifyContractInBg(networkName, contractAddress, deploymentArgs)
+      );
+    } else {
+      await verifyContractInBg(networkName, contractAddress, deploymentArgs);
+    }
+  }
 
   return contract;
 }

@@ -1,11 +1,11 @@
 <div align="center">
-<h1>Lit Protocol Node and Contracts Snapshot Repo</h1>
+<h1>Lit Protocol Node and Contracts</h1>
 <img src="https://i.ibb.co/p2xfzK1/Screenshot-2022-11-15-at-09-56-57.png">
 <br/>
 <a href="https://twitter.com/LitProtocol"><img src="https://img.shields.io/twitter/follow/litprotocol?label=Follow&style=social"/></a>
 <br/>
 <br/>
-This is a snapshot repo of the Lit Protocol Node and Contracts. It contains the code that is currently running on the "Datil" network.  You can find previous network releases in the Archive folder.
+The Lit Protocol Node is the core software that runs the Lit Protocol. It is a Rust application that node operators run to provide service to Lit Protocol.
 <br/>
 <br/>
 
@@ -16,7 +16,7 @@ https://developer.litprotocol.com/v3/sdk/installation
 </a>
 
 <br/><br/>
-This is a snapshot of the monorepo that holds everything needed to run a Lit Node on the "Datil" network. Check out the readme in each folder for more information.
+This is a monorepo that holds everything needed to run a Lit Node. Check out the readme in each folder for more information.
 
 </div>
 

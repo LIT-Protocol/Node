@@ -442,4 +442,106 @@ describe('RateLimitNFT', function () {
       });
     });
   });
+
+  describe('Test pruning expired NFTs', async () => {
+    let minter;
+    let admin;
+
+    beforeEach(async () => ([minter, admin, ...signers] = signers));
+
+    it('mints a rate limit increase nft, advances the clock to tomorrow, and prunes the expired NFT', async () => {
+      // we would like 10 requests per kilosecond, which is 10 request per 1000 seconds.
+      const requestsPerKilosecond = BigInt(10);
+      // this should be set to 1,000,000 wei
+      const additionalRequestsPerKilosecondCost =
+        await rateLimitNFTViewsContract.additionalRequestsPerKilosecondCost();
+      expect(additionalRequestsPerKilosecondCost).to.equal(1000000);
+
+      // get block timestamp
+      let block = await ethers.provider.getBlock('latest');
+      let timestamp = block.timestamp;
+      // this calculates the next midnight time
+      const expiresAt = Math.ceil(timestamp / 86400 + 1) * 86400;
+      // calculate the cost manually
+      // const manualCost =
+      //     (additionalRequestsPerKilosecondCost *
+      //         requestsPerKilosecond *
+      //         expirationTimeInSecondsFromNow) /
+      //     1000n;
+
+      const cost = await rateLimitNFTViewsContract.calculateCost(
+        requestsPerKilosecond,
+        expiresAt
+      );
+
+      const secondsBought = expiresAt - timestamp;
+
+      // console.log("cost: ", cost.toString());
+      // each additional kilosecond costs 1,000,000 wei, aka 1000 for each additional second
+      // we're asking for 10 request per kilosecond, aka 0.01 requests per second
+      // for secondsBought seconds, so we need to pay secondsBought seconds * 1000 * 10 for each second
+      expect(cost).to.equal(
+        BigInt(secondsBought) * 1000n * requestsPerKilosecond
+      );
+
+      // let's sanity check the opposite calculation
+      const requestsPerKilosecondFromContract =
+        await rateLimitNFTViewsContract.calculateRequestsPerKilosecond(
+          cost,
+          expiresAt
+        );
+
+      expect(requestsPerKilosecondFromContract).to.equal(requestsPerKilosecond);
+
+      block = await ethers.provider.getBlock('latest');
+      timestamp = BigInt(block.timestamp);
+      // send eth with the txn
+      let rateLimitNFTContractAsMinter = rateLimitNFTContract.connect(minter);
+      let res = await rateLimitNFTContractAsMinter.mint(expiresAt, {
+        value: cost,
+      });
+      let receipt = await res.wait();
+
+      // get the tokenId from the event
+      let tokenId = receipt.logs[0].topics[3];
+      // console.log("tokenId", tokenId.toString());
+
+      // check the params
+      let capacity = await rateLimitNFTViewsContract.capacity(tokenId);
+      expect(capacity[0]).to.equal(requestsPerKilosecond);
+      expect(capacity[1]).to.equal(expiresAt);
+
+      let tokenBalance = await rateLimitNFTContract.balanceOf(minter.address);
+      expect(tokenBalance).to.equal(1);
+
+      // mint 1 more, but set the expiration to 3 days from now.  this will show that the
+      // pruning process only removes NFTs that have expired.
+      const expiresAtThreeDaysFromNow =
+        Math.ceil(expiresAt / 86400 + 3) * 86400; // 1 second past midnight in 3 days
+      const costThreeDaysFromNow =
+        await rateLimitNFTViewsContract.calculateCost(
+          requestsPerKilosecond,
+          expiresAtThreeDaysFromNow
+        );
+      res = await rateLimitNFTContractAsMinter.mint(expiresAtThreeDaysFromNow, {
+        value: costThreeDaysFromNow,
+      });
+      receipt = await res.wait();
+
+      tokenBalance = await rateLimitNFTContract.balanceOf(minter.address);
+      expect(tokenBalance).to.equal(2);
+
+      // advance the clock to tomorrow and try minting again.  it should succeed.
+      // console.log('expiresAt', expiresAt);
+      const tomorrow = Math.ceil(expiresAt / 86400 + 1) * 86400; // 1 second past midnight tonight
+      // console.log('tomorrow', tomorrow);
+      await ethers.provider.send('evm_setNextBlockTimestamp', [tomorrow]);
+      await ethers.provider.send('evm_mine', []);
+
+      // prune the expired NFT
+      await rateLimitNFTContract.pruneExpired(minter.address);
+      tokenBalance = await rateLimitNFTContract.balanceOf(minter.address);
+      expect(tokenBalance).to.equal(1);
+    });
+  });
 });

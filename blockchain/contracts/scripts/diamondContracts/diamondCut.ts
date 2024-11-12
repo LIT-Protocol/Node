@@ -1,4 +1,4 @@
-// Full command: HARDHAT_NETWORK=<NETWORK> npx ts-node --files scripts/diamond/diamondCut.ts
+// Full command: HARDHAT_NETWORK=<NETWORK> npx ts-node --files scripts/diamondContracts/diamondCut.ts --diamond-owner-signer-private-key <DIAMOND_OWNER_SIGNER_PRIVATE_KEY>
 
 import yargs from 'yargs';
 import { executeDiamondCutOperations } from './lib/diamondCutManifest';
@@ -39,7 +39,15 @@ async function getInputsFromCliOptions(): Promise<Inputs> {
   return argv;
 }
 
-run();
+run()
+  .then(() => {
+    console.log('Diamond cuts completed');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 
 interface Inputs {
   diamondOwnerSignerPrivateKey: string;

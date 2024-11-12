@@ -7,12 +7,15 @@ use std::borrow::BorrowMut;
 use std::collections::{BTreeMap, HashMap};
 use std::error::Error as _;
 use std::path::PathBuf;
+use std::sync::Arc;
+use std::time::Duration;
 
 use anyhow::{bail, Context as _, Result};
 use base64_light::base64_decode;
 use blsful::{Bls12381G2Impl, SignatureShare};
 use derive_builder::Builder;
 use ethers::utils::keccak256;
+use futures::FutureExt as _;
 use lit_actions_grpc::tokio_stream::StreamExt as _;
 use lit_actions_grpc::tonic::{
     metadata::MetadataMap, transport::Error as TransportError, Code, Extensions, Request, Status,
@@ -22,6 +25,7 @@ use lit_blockchain::resolver::rpc::{RpcHealthcheckPoller, ENDPOINT_MANAGER};
 use lit_core::config::LitConfig;
 use lit_core::error::Unexpected;
 use lit_core::utils::binary::bytes_to_hex;
+use moka::future::Cache;
 use tracing::{debug, instrument};
 
 use crate::access_control::rpc_url;
@@ -43,6 +47,7 @@ use crate::utils::web::{get_bls_root_pubkey, hash_access_control_conditions, End
 const DEFAULT_TIMEOUT_MS: u64 = 30000; // 30s
 const DEFAULT_MEMORY_LIMIT_MB: u32 = 256; // 256MB
 
+const DEFAULT_MAX_CODE_LENGTH: usize = 16 * 1024 * 1024; // 16MB
 const DEFAULT_MAX_CONSOLE_LOG_LENGTH: usize = 1024 * 100; // 100KB
 const DEFAULT_MAX_CONTRACT_CALL_COUNT: u32 = 30;
 const DEFAULT_MAX_FETCH_COUNT: u32 = 50;
@@ -50,6 +55,7 @@ const DEFAULT_MAX_RESPONSE_LENGTH: usize = 1024 * 100; // 100KB
 const DEFAULT_MAX_SIGN_COUNT: u32 = 10; // 10 signature requests per action execution
 const DEFAULT_MAX_BROADCAST_AND_COLLECT_COUNT: u32 = 30;
 const DEFAULT_MAX_CALL_DEPTH: u32 = 5;
+const DEFAULT_CLIENT_TIMEOUT_MS_BUFFER: u64 = 5000;
 
 #[derive(Debug, Default, Builder)]
 pub struct Client {
@@ -109,7 +115,7 @@ pub struct ExecutionState {
 
 #[derive(Debug, Default, Clone)]
 pub struct ExecutionOptions {
-    pub code: String,
+    pub code: Arc<String>,
     pub globals: Option<serde_json::Value>,
     pub action_ipfs_id: Option<String>,
 }
@@ -117,7 +123,7 @@ pub struct ExecutionOptions {
 impl From<&str> for ExecutionOptions {
     fn from(code: &str) -> Self {
         Self {
-            code: code.to_string(),
+            code: Arc::new(code.to_string()),
             ..Default::default()
         }
     }
@@ -126,7 +132,7 @@ impl From<&str> for ExecutionOptions {
 impl From<String> for ExecutionOptions {
     fn from(code: String) -> Self {
         Self {
-            code,
+            code: Arc::new(code),
             ..Default::default()
         }
     }
@@ -172,6 +178,14 @@ impl Client {
         Ok((tss_state, txn_prefix))
     }
 
+    fn ipfs_cache(&self) -> Result<Cache<String, Arc<String>>> {
+        if let Some(ipfs_cache) = self.js_env.ipfs_cache.clone() {
+            return Ok(ipfs_cache);
+        }
+
+        bail!("No IPFS cache found");
+    }
+
     fn metadata(&self) -> Result<MetadataMap> {
         let mut md = MetadataMap::new();
         md.insert(
@@ -189,21 +203,6 @@ impl Client {
         std::mem::take(&mut self.state);
     }
 
-    // Use this blocking version of execute_js when running into this error:
-    // "implementation of `std::marker::Send` is not general enough"
-    // Calling block_in_place should be fine if the code is already running in
-    // a multi-threaded Tokio runtime, e.g. with Rocket.
-    // See https://docs.rs/tokio/latest/tokio/task/fn.block_in_place.html
-    #[instrument(skip_all, ret)]
-    pub fn execute_js_blocking(
-        &mut self,
-        opts: impl Into<ExecutionOptions>,
-    ) -> Result<ExecutionState, crate::error::Error> {
-        tokio::task::block_in_place(move || {
-            tokio::runtime::Handle::current().block_on(async { self.execute_js(opts).await })
-        })
-    }
-
     #[instrument(skip_all, ret)]
     pub async fn execute_js(
         &mut self,
@@ -211,7 +210,7 @@ impl Client {
     ) -> Result<ExecutionState, crate::error::Error> {
         self.reset_state();
         let opts = opts.into();
-        self.execute_js_inner(opts.code, opts.globals, opts.action_ipfs_id, 0)
+        Box::pin(self.execute_js_inner(opts.code, opts.globals, opts.action_ipfs_id, 0))
             .await
             .map_err(|e| {
                 if let Some(status) = e.downcast_ref::<Status>() {
@@ -222,6 +221,8 @@ impl Client {
                     }
                 } else if let Some(te) = e.downcast_ref::<TransportError>() {
                     connect_err(te.source().unwrap_or(te).to_string(), None)
+                } else if let Some(se) = e.downcast_ref::<flume::SendError<ExecuteJsRequest>>() {
+                    connect_err(se.source().unwrap_or(se).to_string(), None)
                 } else {
                     unexpected_err(e, None)
                 }
@@ -231,21 +232,62 @@ impl Client {
     #[instrument(skip(self), err)]
     async fn execute_js_inner(
         &mut self,
-        code: String,
+        code: Arc<String>,
         globals: Option<serde_json::Value>,
         action_ipfs_id: Option<String>,
         call_depth: u32,
     ) -> Result<ExecutionState> {
+        if code.len() > DEFAULT_MAX_CODE_LENGTH {
+            bail!(
+                "Code payload is too large ({} bytes). Max length is {} bytes.",
+                code.len(),
+                DEFAULT_MAX_CODE_LENGTH,
+            );
+        }
+
         let (outbound_tx, outbound_rx) = flume::bounded(0);
         let channel = unix::connect_to_socket(self.socket_path()).await?;
-        let mut stream = ActionClient::new(channel)
-            .execute_js(Request::from_parts(
-                self.metadata()?,
-                Extensions::default(),
-                outbound_rx.into_stream(),
-            ))
-            .await?
-            .into_inner();
+
+        let mut stream = match tokio::time::timeout(
+            Duration::from_millis(self.timeout_ms + DEFAULT_CLIENT_TIMEOUT_MS_BUFFER),
+            ActionClient::new(channel)
+                .execute_js(Request::from_parts(
+                    self.metadata()?,
+                    Extensions::default(),
+                    outbound_rx.into_stream(),
+                ))
+                // Fix "implementation of `std::marker::Send` is not general enough"
+                // Workaround for compiler bug https://github.com/rust-lang/rust/issues/96865
+                // See https://github.com/rust-lang/rust/issues/100013#issuecomment-2052045872
+                .boxed(),
+        )
+        .await
+        {
+            Ok(stream) => stream?.into_inner(),
+            Err(e) => {
+                return Err(timeout_err(
+                    format!(
+                        "execution timeout of {}ms on lit-node side was hit",
+                        self.timeout_ms + DEFAULT_CLIENT_TIMEOUT_MS_BUFFER
+                    ),
+                    None,
+                )
+                .into())
+            }
+        };
+
+        // let mut stream = ActionClient::new(channel)
+        // .execute_js(Request::from_parts(
+        //     self.metadata()?,
+        //     Extensions::default(),
+        //     outbound_rx.into_stream(),
+        // ))
+        // // Fix "implementation of `std::marker::Send` is not general enough"
+        // // Workaround for compiler bug https://github.com/rust-lang/rust/issues/96865
+        // // See https://github.com/rust-lang/rust/issues/100013#issuecomment-2052045872
+        // .boxed()
+        // .await?
+        // .into_inner();
 
         let auth_context = {
             // Add current ipfs id to the end of the action_ipfs_ids vec
@@ -260,7 +302,7 @@ impl Client {
         outbound_tx
             .send_async(
                 ExecutionRequest {
-                    code,
+                    code: code.to_string(),
                     js_params: globals.and_then(|v| serde_json::to_vec(&v).ok()),
                     auth_context: serde_json::to_vec(&auth_context).ok(),
                     http_headers: self.http_headers.clone(),
@@ -596,7 +638,12 @@ impl Client {
                 }
 
                 // Pull down the lit action code from IPFS
-                let code = crate::utils::web::get_ipfs_file(&ipfs_id, self.lit_config()).await?;
+                let code = crate::utils::web::get_ipfs_file(
+                    &ipfs_id,
+                    self.lit_config(),
+                    self.ipfs_cache()?,
+                )
+                .await?;
 
                 let globals = params
                     .map(|params| serde_json::from_slice::<serde_json::Value>(&params))
@@ -644,6 +691,8 @@ impl Client {
                 let (tss_state, txn_prefix) = self.tss_state_and_txn_prefix()?;
                 let json_auth_sig = self.parse_json_authsig_helper(auth_sig)?;
                 let txn_prefix = format!("{}_{}", txn_prefix, generate_hash(ciphertext.clone()));
+                let peers = tss_state.peer_state.peers().await?;
+                let self_addr = format!("{}:{}", tss_state.addr, tss_state.port);
 
                 let conditions: Vec<models::UnifiedAccessControlConditionItem> =
                     serde_json::from_slice(&access_control_conditions)?;
@@ -686,15 +735,19 @@ impl Client {
                 };
 
                 let cm = CommsManager::new(&tss_state, 0, &txn_prefix, "0").await?;
+                let expected_peers = peers.all_peers_except(&self_addr); // we're gonna push our own share in
+
+                let threshold =
+                    (crate::utils::consensus::get_threshold_count(peers.len()) as u16) - 1;
+                cm.broadcast(signature_share).await?;
                 let mut shares = cm
-                    .broadcast_and_collect::<SignatureShare<Bls12381G2Impl>, SignatureShare<Bls12381G2Impl>>(
-                        signature_share
+                    .collect_from_earliest::<SignatureShare<Bls12381G2Impl>>(
+                        &expected_peers,
+                        threshold,
                     )
                     .await?;
 
                 shares.push((0, signature_share)); // lazy - it's not zero, but we don't seem to care!
-
-                let network_pubkey = &get_bls_root_pubkey(&tss_state).await?;
 
                 let serialized_decryption_shares: Vec<String> = shares
                     .iter()
@@ -702,7 +755,7 @@ impl Client {
                     .collect();
 
                 let decrypted = lit_bls_wasm::verify_and_decrypt::<Bls12381G2Impl>(
-                    network_pubkey,
+                    &bls_root_pubkey,
                     &identity_parameter,
                     &base64_decode(&ciphertext),
                     &serialized_decryption_shares,
@@ -1193,6 +1246,7 @@ impl Client {
             &bls_root_pubkey,
             &self.endpoint_version,
             action_ipfs_id.as_ref(),
+            self.ipfs_cache()?,
         )
         .await
         .map_err(|e| anyhow::anyhow!(format!("Error checking access control conditions: {:?}", e)))

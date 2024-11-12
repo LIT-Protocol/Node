@@ -20,8 +20,12 @@ pub async fn create_attestation(cfg: Arc<LitConfig>, noonce: &str) -> Result<Att
         ));
     };
 
-    let noonce = <[u8; 32]>::from_hex(noonce)
-        .map_err(|e| unexpected_err(e, Some("cannot parse noonce".into())))?;
+    let noonce = <[u8; 32]>::from_hex(noonce).map_err(|e| {
+        unexpected_err(
+            e,
+            Some(format!("cannot parse noonce as 32-byte hex: {}", noonce)),
+        )
+    })?;
     let mut data = BTreeMap::new();
     data.insert(
         DATA_KEY_EXTERNAL_ADDR.to_string(),

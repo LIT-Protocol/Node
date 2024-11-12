@@ -235,7 +235,7 @@ impl<'r> FromRequest<'r> for TracingRequired {
 
             Outcome::Success(tracing)
         } else {
-            Outcome::Failure((
+            Outcome::Error((
                 rocket::http::Status::ImATeapot,
                 push_err_to_req(
                     req,
@@ -295,7 +295,7 @@ impl<'r> FromRequest<'r> for SdkVersion {
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         match extract_and_verify_or_default_sdk_version(req) {
             Ok(v) => Outcome::Success(Self::new(v)),
-            Err(e) => Outcome::Failure((rocket::http::Status::ImATeapot, push_err_to_req(req, e))),
+            Err(e) => Outcome::Error((rocket::http::Status::ImATeapot, push_err_to_req(req, e))),
         }
     }
 }

@@ -1,5 +1,4 @@
 use super::utils::virtual_node_collection::VirtualNodeCollection;
-use crate::common;
 use futures::future::join_all;
 use lit_node::{
     tasks::{
@@ -21,7 +20,7 @@ async fn test_generate_triple_pairs() {
 
 #[tokio::test]
 async fn test_generate_triple() {
-    common::init_test_config();
+    test_common::init_test_config();
     let num_nodes = 3;
     let vnc = VirtualNodeCollection::new(num_nodes).await;
     let txn_prefix = "test".to_string();
@@ -29,7 +28,7 @@ async fn test_generate_triple() {
 }
 
 pub async fn generate_triple_pairs(num_nodes: usize, num_pairs: usize, safe_triple: bool) {
-    common::init_test_config();
+    test_common::init_test_config();
     tracing::trace!("starting test: generate_triple_pairs");
     let mut vnc = VirtualNodeCollection::new(num_nodes).await;
     match safe_triple {

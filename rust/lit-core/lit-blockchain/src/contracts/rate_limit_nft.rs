@@ -1011,6 +1011,26 @@ pub mod rate_limit_nft {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("pruneExpired"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("pruneExpired"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("owner"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("redeemedFreeMints"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -2627,6 +2647,15 @@ pub mod rate_limit_nft {
         ) -> ::ethers::contract::builders::ContractCall<M, [u8; 32]> {
             self.0
                 .method_hash([31, 39, 87, 19], hash)
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `pruneExpired` (0xc3485de6) function
+        pub fn prune_expired(
+            &self,
+            owner: ::ethers::core::types::Address,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([195, 72, 93, 230], owner)
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `redeemedFreeMints` (0x3b1a72cc) function
@@ -4628,6 +4657,23 @@ pub mod rate_limit_nft {
     pub struct PrefixedCall {
         pub hash: [u8; 32],
     }
+    ///Container type for all input parameters for the `pruneExpired` function with signature `pruneExpired(address)` and selector `0xc3485de6`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "pruneExpired", abi = "pruneExpired(address)")]
+    pub struct PruneExpiredCall {
+        pub owner: ::ethers::core::types::Address,
+    }
     ///Container type for all input parameters for the `redeemedFreeMints` function with signature `redeemedFreeMints(bytes32)` and selector `0x3b1a72cc`
     #[derive(
         Clone,
@@ -5093,6 +5139,7 @@ pub mod rate_limit_nft {
         Owner(OwnerCall),
         OwnerOf(OwnerOfCall),
         Prefixed(PrefixedCall),
+        PruneExpired(PruneExpiredCall),
         RedeemedFreeMints(RedeemedFreeMintsCall),
         SafeTransferFrom(SafeTransferFromCall),
         SafeTransferFromWithFromAndToAndData(SafeTransferFromWithFromAndToAndDataCall),
@@ -5271,6 +5318,10 @@ pub mod rate_limit_nft {
             if let Ok(decoded)
                 = <PrefixedCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Prefixed(decoded));
+            }
+            if let Ok(decoded)
+                = <PruneExpiredCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+                return Ok(Self::PruneExpired(decoded));
             }
             if let Ok(decoded)
                 = <RedeemedFreeMintsCall as ::ethers::core::abi::AbiDecode>::decode(
@@ -5479,6 +5530,9 @@ pub mod rate_limit_nft {
                 Self::Prefixed(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
+                Self::PruneExpired(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
                 Self::RedeemedFreeMints(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -5603,6 +5657,7 @@ pub mod rate_limit_nft {
                 Self::Owner(element) => ::core::fmt::Display::fmt(element, f),
                 Self::OwnerOf(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Prefixed(element) => ::core::fmt::Display::fmt(element, f),
+                Self::PruneExpired(element) => ::core::fmt::Display::fmt(element, f),
                 Self::RedeemedFreeMints(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SafeTransferFrom(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SafeTransferFromWithFromAndToAndData(element) => {
@@ -5806,6 +5861,11 @@ pub mod rate_limit_nft {
     impl ::core::convert::From<PrefixedCall> for RateLimitNFTCalls {
         fn from(value: PrefixedCall) -> Self {
             Self::Prefixed(value)
+        }
+    }
+    impl ::core::convert::From<PruneExpiredCall> for RateLimitNFTCalls {
+        fn from(value: PruneExpiredCall) -> Self {
+            Self::PruneExpired(value)
         }
     }
     impl ::core::convert::From<RedeemedFreeMintsCall> for RateLimitNFTCalls {

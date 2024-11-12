@@ -40,8 +40,5 @@ if (require.main === module) {
   // deployContract('BackupRecovery', args, ['BackupRecoveryFacet']);
 
   // regular contract
-  deployRegularContract('PKPHelperV2', [
-    '0xe5a7C5d908EE8996332F488cE5f636d4EBff8522',
-    2n,
-  ]);
+  deployRegularContract('ReleaseRegister', [2n]);
 }

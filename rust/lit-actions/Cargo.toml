@@ -2,6 +2,7 @@
 members = ["cli", "ext", "grpc", "server", "snapshot", "tests"]
 resolver = "2"
 
+
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
@@ -36,6 +37,12 @@ lit-logging = { path = "../lit-core/lit-logging" }
 # happens when lit-node disconnects (e.g. op_sign_ecdsa: receiving on a closed channel)
 # Upstream PR: https://github.com/denoland/deno_core/pull/730
 deno_core = { git = "https://github.com/Lit-Protocol/deno_core", branch = "fix/deno-1444-op-panic" }
+# Hotfix for yanked wgpu crate versions, see https://github.com/gfx-rs/wgpu/issues/5837
+wgpu-core = { git = "https://github.com/gfx-rs/wgpu", tag = "v0.20.0" }
+wgpu-types = { git = "https://github.com/gfx-rs/wgpu", tag = "v0.20.0" }
+
+
+
 
 [workspace.metadata.cargo-machete]
 ignored = ["log", "prost"]

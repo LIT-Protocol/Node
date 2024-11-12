@@ -91,6 +91,14 @@ pub(crate) async fn check_rate_limit(
     );
 
     if !all_authorized_rate_limit_nfts.is_empty() {
+        if matches!(cfg.enable_rate_limiting_allocation(), Ok(false)) {
+            // if there are any authorized NFTs, we're good
+            debug!("Rate limiting allocation disabled, just checking if any NFTs have capacity");
+            return Ok(RateLimitCheckReturn {
+                rate_limit_exceeded: false,
+                try_again_after: None,
+            });
+        }
         // Free tier has been reached - check against RLI NFT quota.
         let permitted_reqs_per_second_from_tokens = calculate_requests_permitted_from_tokens(
             &all_authorized_rate_limit_nfts,

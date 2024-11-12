@@ -134,7 +134,7 @@ mod tests {
         assert_eq!(attestation_intent_resp.attestation.signatures().len(), 0);
         assert!(attestation_intent_resp.attestation.report_raw().is_err());
 
-        assert!(CACHE.get(&cache_key_session(&attestation_intent_resp.session_id)).is_some());
+        assert!(CACHE.get(&cache_key_session(&attestation_intent_resp.session_id)).await.is_some());
     }
 
     // Util

@@ -13,7 +13,7 @@ use vsss_rs::Share;
 
 use lit_node::utils::consensus::get_threshold_count;
 
-use crate::common::new_node_collection;
+use test_common::new_node_collection;
 
 #[tokio::test]
 async fn end_to_end_backup_test() {
@@ -21,7 +21,7 @@ async fn end_to_end_backup_test() {
     const ROOT_KEY_COUNT: usize = 10;
 
     // step 0: init and load the test configuration file
-    crate::common::init_test_config();
+    test_common::init_test_config();
     let (_testnet, validator_collection) = new_node_collection(NODE_COUNT, false).await;
 
     // Step 1: Get registered wallet addresses and

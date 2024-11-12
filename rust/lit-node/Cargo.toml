@@ -1,6 +1,6 @@
 [package]
 name = "lit_node"
-version = "0.2.16"
+version = "1.0.5"
 edition = "2021"
 default-run = "lit_node"
 rust-version = "1.77" # for recursion in async fn
@@ -14,8 +14,7 @@ lit-actions = ["dep:lit-actions-grpc", "dep:lit-actions-server", "dep:libaes"]
 lit-actions-server = ["lit-actions"] # start internal lit_actions server for testing
 
 testing = ["lit-actions-server"] # enables testing features
-rtmetrics = [] # enables runtime metrics
-proxy_http = []
+proxy_http = ["test-common/proxy_http", "test-common/testing", "test-common/lit-actions"] # enables proxy http for testing
 
 [build-dependencies]
 tonic-build = "0.10"
@@ -64,6 +63,7 @@ glob = "0.3.1"
 hex-literal = "0.4.1"
 ipfs-hasher = "0.13.0"
 gennaro-dkg = "0.9.0-rc1"
+hd-keys-curves = { git = "https://github.com/LIT-Protocol/hd-keys-curves-wasm" , package = "hd-keys-curves-wasm", features=["k256"] }
 iri-string = "0.6"
 json = "0.12.4"
 jsonpath-plus = "0.1.9"
@@ -74,17 +74,16 @@ p384 = { version = "0.13", features = ["arithmetic", "serde"], optional = false 
 libaes = { version = "0.6.4", optional = true }
 libsecp256k1 = { git = "https://github.com/LIT-Protocol/libsecp256k1", branch = "master", version = "0.7.1" }
 log = { version = "0.4.17", features = ["kv_unstable", "kv_unstable_serde"] }
-moka = { version = "0.11.0", features = ["future"] }
+moka = { version = "0.12.7", features = ["future"] }
 mpl-token-metadata = "1.2.10"
 num_cpus = { version = "1.15.0" }
-once_cell = { version = "1", optional = true }
 openssl = { version = "0.10.55" }
 rand = { version = "~0.8.5", features = ["std_rng"]}
 rand_core = "~0.6.4"
 regex = "1.7.1"
-reqwest = { version = "0.11.14", features = ["json"] }
-rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse", features = ["json"] }
-rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", rev = "985098dd8f3b052716111eaa872d184cc21a1a68"  }
+reqwest = { version = "0.11.14", default-features = false, features = ["json", "rustls-tls"] }
+rocket = { version = "0.5.1", features = ["json"] }
+rocket_cors = { version = "0.6.0"  }
 # used to verify JWTs.  must match the version in the crate overrides at the bottom of this file
 rsa = { git = "https://github.com/RustCrypto/RSA", tag = "v0.7.0-pre" }
 rusqlite = { version = "0.29.0", features = ["backup"] }
@@ -109,8 +108,8 @@ tracing = "0.1.40"
 ucan-capabilities-object = "0.1"
 url = { version = "2", features = ["serde"] }
 uuid = { version = "1.4", features = ["v4"] }
-verifiable-share-encryption = { git = "https://github.com/LIT-Protocol/verifiable-share-encryption" }
-vsss-rs = { version = "4.0", features = ["std"] }
+verifiable-share-encryption = { version = "0.2.3", git = "https://github.com/LIT-Protocol/verifiable-share-encryption" }
+vsss-rs = { version = "4.0.1", features = ["std"] }
 webauthn-rs-core = { git = "https://github.com/LIT-Protocol/webauthn-rs" }
 webauthn-rs-proto = { git = "https://github.com/LIT-Protocol/webauthn-rs" }
 webauthn-rs = { git = "https://github.com/LIT-Protocol/webauthn-rs" }
@@ -186,6 +185,11 @@ ctor = "0.2"
 [dev-dependencies.utils]
 path = "common/utils"
 
+[dev-dependencies.test-common]
+path = "common/test-common" 
+features = ["lit-actions", "testing", "proxy_http"]
+
+
 [[bench]]
 name = "bench_main"
 harness = false
@@ -194,11 +198,14 @@ required-features = ["lit-actions"]
 [patch.crates-io]
 # needed to force deno_crypto to use v0.7.0-pre and not v0.7.0-rc.0 which for some reason is missing a bunch of stuff from the -pre version
 rsa = { git = "https://github.com/RustCrypto/RSA", tag = "v0.7.0-pre" }
-rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse" }
+# rocket = { git = "https://github.com/LIT-Protocol/Rocket", branch = "feature/port-reuse" }
 # Prevent panic "Custom error class must have a builder registered: Uncaught null" that
 # happens when lit-node disconnects (e.g. op_sign_ecdsa: receiving on a closed channel)
 # Upstream PR: https://github.com/denoland/deno_core/pull/730
 deno_core = { git = "https://github.com/Lit-Protocol/deno_core", branch = "fix/deno-1444-op-panic" }
+# Hotfix for yanked wgpu crate versions, see https://github.com/gfx-rs/wgpu/issues/5837
+wgpu-core = { git = "https://github.com/gfx-rs/wgpu", tag = "v0.20.0" }
+wgpu-types = { git = "https://github.com/gfx-rs/wgpu", tag = "v0.20.0" }
 
 # Please keep all profiles in sync with lit-actions
 [profile.release]

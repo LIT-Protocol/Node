@@ -73,16 +73,19 @@ impl<G: Group + GroupEncoding + Default> FrostState<G> {
         let mut rng = rand::rngs::OsRng;
         let self_peer = peers.peer_at_address(&self.state.addr)?;
         let peer_id = self_peer.get_protocol_index()?;
-        let scheme = signature_scheme.into();
+        let scheme = signature_scheme.try_into().map_err(|e| {
+            unexpected_err_code(
+                e,
+                EC::NodeUnknownError,
+                Some("SigningScheme::try_into".to_string()),
+            )
+        })?;
         let group_key = self.get_verifying_key(scheme, pubkey)?;
         let secret_share = lit_frost::SigningShare {
             scheme,
             value: secret_share,
         };
-        let identifier = Identifier {
-            scheme,
-            id: peer_id as u8,
-        };
+        let identifier = Identifier::from((scheme, peer_id));
 
         let verifying_share = scheme.verifying_share(&secret_share).map_err(|e| {
             unexpected_err_code(
@@ -110,16 +113,13 @@ impl<G: Group + GroupEncoding + Default> FrostState<G> {
             .await?;
 
         // store commitments & starting with ours!
-        let mut signing_commitments = vec![(identifier, commitments.clone())];
+        let mut signing_commitments = vec![(identifier.clone(), commitments.clone())];
 
         for (share_index, peer_commitments) in r_commitments {
             let remote_peer_id = peers
                 .peer_at_share_index(share_index)?
                 .get_protocol_index()?;
-            let remote_identifier = Identifier {
-                scheme,
-                id: remote_peer_id as u8,
-            };
+            let remote_identifier = Identifier::from((scheme, remote_peer_id));
             // signing_package.insert(peer_id, (nonces, secret_share));
             signing_commitments.push((remote_identifier, peer_commitments));
         }
@@ -136,10 +136,10 @@ impl<G: Group + GroupEncoding + Default> FrostState<G> {
         };
         // round 2
         let key_package = KeyPackage {
-            identifier,
+            identifier: identifier.clone(),
             secret_share: secret_share.clone(),
             verifying_key: group_key.clone(),
-            threshold,
+            threshold: threshold.into(),
         };
 
         let signature_share = scheme
@@ -208,14 +208,6 @@ impl<G: Group + GroupEncoding + Default> FrostState<G> {
                 let kh = KeyHelper::<k256::ProjectivePoint>::default();
                 let p = kh.pk_from_bytes(&pubkey)?;
                 VerifyingKey::try_from((scheme, p))
-            }
-
-            _ => {
-                return Err(unexpected_err_code(
-                    "Unsupported curve type",
-                    EC::NodeUnknownError,
-                    Some("Signing Round 1".to_string()),
-                ))
             }
         };
 

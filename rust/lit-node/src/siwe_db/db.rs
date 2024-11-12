@@ -11,8 +11,18 @@ use crate::siwe_db::rpc::fetch_block_from_hash;
 const INDEXER_URL: &str = "http://block-indexer.litgateway.com/get_all_valid_blocks";
 
 fn db_conn(port: u16) -> Result<Connection> {
-    Connection::open(format!("node_{}.db", port))
-        .map_err(|e| unexpected_err_code(e, EC::NodeSystemFault, None))
+    let in_container = std::env::var("IN_CONTAINER").unwrap_or("0".to_string()) == "1";
+    // if running in a container with a volume mount used where this file will be created.
+    // the nodes will not be able to access their respective database files due to a lock being held
+    // which will not be released. By initalizing the database in a directory within the container
+    // allows the nodes to read and write to the database over this connection
+    if in_container {
+        Connection::open(format!("/var/tmp/node_{}.db", port))
+            .map_err(|e| unexpected_err_code(e, EC::NodeSystemFault, None))
+    } else {
+        Connection::open(format!("node_{}.db", port))
+            .map_err(|e| unexpected_err_code(e, EC::NodeSystemFault, None))
+    }
 }
 
 pub fn db_initial_setup(port: u16) -> Result<()> {

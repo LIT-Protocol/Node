@@ -3,8 +3,6 @@
 
 // these tests emulate calls from a web browser, using our SDK.
 pub mod acceptance;
-// common functions re-usable across tests
-pub mod common;
 // individual component testing - test a single component in isolation, like the DKG
 pub mod component;
 // integration tests - test the nodes in full compilation in a local network configuration
@@ -13,3 +11,10 @@ pub mod integration;
 pub mod sdk;
 // upgrade tests - test the upgrade process
 pub mod upgrades;
+// fault tests - test the fault tolerance of the network
+pub mod toxiproxy;
+
+// external tests - external tests that require a network to be running
+#[macro_use]
+extern crate rocket;
+pub mod external;

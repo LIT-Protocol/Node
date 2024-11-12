@@ -1,4 +1,7 @@
+use lit_blockchain::resolver::rpc;
+use lit_blockchain::resolver::rpc::RpcHealthcheckPoller;
 use lit_core::{config::LitConfig, error::Unexpected};
+use moka::future::Cache;
 use siwe::Message;
 use std::env;
 use std::sync::Arc;
@@ -6,9 +9,6 @@ use web3::{
     contract::{Contract, Options},
     types::{Address, Bytes, CallRequest, U256},
 };
-
-use lit_blockchain::resolver::rpc;
-use lit_blockchain::resolver::rpc::RpcHealthcheckPoller;
 
 use crate::functions::action_client;
 use crate::{auth::auth_material::JsonAuthSig, utils::encoding};
@@ -123,6 +123,7 @@ pub(crate) async fn check_access_control_conditions(
     bls_root_pubkey: &String,
     endpoint_version: &EndpointVersion,
     current_action_ipfs_id: Option<&String>,
+    ipfs_cache: Cache<String, Arc<String>>,
 ) -> Result<bool> {
     let validate_res = auth_sig
         .validate_and_get_wallet_sig(
@@ -147,6 +148,7 @@ pub(crate) async fn check_access_control_conditions(
                 bls_root_pubkey,
                 endpoint_version,
                 current_action_ipfs_id,
+                ipfs_cache,
             )
             .await?;
             Ok(conditions_met)
@@ -220,6 +222,7 @@ pub fn validate_boolean_expression<T>(conditions: &Vec<ControlConditionItem<T>>)
     current_state == State::Condition
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn check_condition_group(
     conditions: &Vec<AccessControlConditionItem>,
     auth_sig: &JsonAuthSig,
@@ -228,6 +231,7 @@ async fn check_condition_group(
     bls_root_pubkey: &String,
     endpoint_version: &EndpointVersion,
     current_action_ipfs_id: Option<&String>,
+    ipfs_cache: Cache<String, Arc<String>>,
 ) -> Result<bool> {
     if !validate_boolean_expression(conditions) {
         return Err(validation_err_code(
@@ -251,6 +255,7 @@ async fn check_condition_group(
                         bls_root_pubkey,
                         endpoint_version,
                         current_action_ipfs_id,
+                        ipfs_cache.clone(),
                     )
                     .await?,
                 );
@@ -268,6 +273,7 @@ async fn check_condition_group(
                         bls_root_pubkey,
                         endpoint_version,
                         current_action_ipfs_id,
+                        ipfs_cache.clone(),
                     ))
                     .await?,
                 );
@@ -340,6 +346,7 @@ where
     Ok(url)
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn check_condition(
     condition: &JsonAccessControlCondition,
     auth_sig: &JsonAuthSig,
@@ -348,6 +355,7 @@ async fn check_condition(
     bls_root_pubkey: &String,
     endpoint_version: &EndpointVersion,
     current_action_ipfs_id: Option<&String>,
+    ipfs_cache: Cache<String, Arc<String>>,
 ) -> Result<bool> {
     let web3 = get_web3(condition.chain.as_str()).map_err(|e| {
         blockchain_err_code(e, EC::NodeRpcError, Some("Web3 Error".into())).add_msg_to_details()
@@ -370,6 +378,7 @@ async fn check_condition(
                 bls_root_pubkey,
                 endpoint_version,
                 current_action_ipfs_id,
+                ipfs_cache,
             )
             .await;
             #[cfg(not(feature = "lit-actions"))]
@@ -487,6 +496,7 @@ async fn get_poaps_for_user(
         &auth_sig.address
     );
     let client = reqwest::Client::builder()
+        .use_rustls_tls()
         .build()
         .map_err(|e| unexpected_err(e, None))?;
     let result = client
@@ -607,6 +617,7 @@ async fn check_condition_via_siwe(
 }
 
 #[cfg(feature = "lit-actions")]
+#[allow(clippy::too_many_arguments)]
 async fn check_condition_via_lit_action(
     condition: &JsonAccessControlCondition,
     auth_sig: &JsonAuthSig,
@@ -615,6 +626,7 @@ async fn check_condition_via_lit_action(
     bls_root_pubkey: &String,
     endpoint_version: &EndpointVersion,
     current_action_ipfs_id: Option<&String>,
+    ipfs_cache: Cache<String, Arc<String>>,
 ) -> Result<bool> {
     use crate::error::{memory_limit_err_code, timeout_err_code};
     use crate::models::DenoExecutionEnv;
@@ -625,7 +637,7 @@ async fn check_condition_via_lit_action(
     let ipfs_id = condition.contract_address.replace("ipfs://", "");
 
     // pull down the code from ipfs
-    let code_from_ipfs = get_ipfs_file(&ipfs_id.to_string(), &cfg)
+    let code_from_ipfs = get_ipfs_file(&ipfs_id.to_string(), &cfg, ipfs_cache.clone())
         .await
         .map_err(|e| unexpected_err(e, Some("Error getting ipfs file".into())))?;
 
@@ -666,9 +678,10 @@ async fn check_condition_via_lit_action(
         tss_state: None,
         auth_context,
         cfg,
+        ipfs_cache: Some(ipfs_cache.clone()),
     };
 
-    let execution_result = action_client::ClientBuilder::default()
+    let mut client = action_client::ClientBuilder::default()
         .js_env(deno_execution_env)
         .auth_sig(Some(auth_sig.clone()))
         .request_id(request_id.to_string())
@@ -680,14 +693,15 @@ async fn check_condition_via_lit_action(
                 EC::NodeJsExecutionError,
                 Some("Error building action client".into()),
             )
+        })?;
+
+    let execution_result = client
+        .execute_js(action_client::ExecutionOptions {
+            code: Arc::new(code_to_run),
+            action_ipfs_id: Some(ipfs_id),
+            ..Default::default()
         })
-        .and_then(|mut client| {
-            client.execute_js_blocking(action_client::ExecutionOptions {
-                code: code_to_run,
-                action_ipfs_id: Some(ipfs_id),
-                ..Default::default()
-            })
-        });
+        .await;
 
     let execution_state = match execution_result {
         Ok(state) => state,

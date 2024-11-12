@@ -9,6 +9,7 @@ use crate::models::{
 use crate::utils::web::EndpointVersion;
 use lit_core::config::LitConfig;
 use lit_core::error::Unexpected;
+use moka::future::Cache;
 use std::borrow::BorrowMut;
 use std::sync::Arc;
 
@@ -23,6 +24,7 @@ pub(crate) async fn check_access_control_conditions(
     bls_root_pubkey: &String,
     endpoint_version: &EndpointVersion,
     current_action_ipfs_id: Option<&String>,
+    ipfs_cache: Cache<String, Arc<String>>,
 ) -> Result<UnifiedConditionCheckResult> {
     // massage auth_sig into the MultipleAuthSigs struct before doing the check
     let auth_sigs = {
@@ -64,11 +66,13 @@ pub(crate) async fn check_access_control_conditions(
         bls_root_pubkey,
         endpoint_version,
         current_action_ipfs_id,
+        ipfs_cache,
     )
     .await?;
     Ok(res)
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn check_condition_group(
     conditions: &Vec<UnifiedAccessControlConditionItem>,
     auth_sigs: &MultipleAuthSigs,
@@ -77,6 +81,7 @@ async fn check_condition_group(
     bls_root_pubkey: &String,
     endpoint_version: &EndpointVersion,
     current_action_ipfs_id: Option<&String>,
+    ipfs_cache: Cache<String, Arc<String>>,
 ) -> Result<UnifiedConditionCheckResult> {
     if !validate_boolean_expression(conditions) {
         return Err(validation_err_code(
@@ -100,6 +105,7 @@ async fn check_condition_group(
                         bls_root_pubkey,
                         endpoint_version,
                         current_action_ipfs_id,
+                        ipfs_cache.clone(),
                     )
                     .await?,
                 );
@@ -117,6 +123,7 @@ async fn check_condition_group(
                         bls_root_pubkey,
                         endpoint_version,
                         current_action_ipfs_id,
+                        ipfs_cache.clone(),
                     ))
                     .await?,
                 );
@@ -155,6 +162,7 @@ async fn check_condition_group(
         .to_owned())
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn check_condition(
     condition: &UnifiedAccessControlCondition,
     auth_sigs: &MultipleAuthSigs,
@@ -163,6 +171,7 @@ async fn check_condition(
     bls_root_pubkey: &String,
     endpoint_version: &EndpointVersion,
     current_action_ipfs_id: Option<&String>,
+    ipfs_cache: Cache<String, Arc<String>>,
 ) -> Result<UnifiedConditionCheckResult> {
     // do the check depending on the condition type
     let auth_sig;
@@ -183,6 +192,7 @@ async fn check_condition(
                 bls_root_pubkey,
                 endpoint_version,
                 current_action_ipfs_id,
+                ipfs_cache,
             )
             .await?
         }

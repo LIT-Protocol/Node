@@ -17,7 +17,7 @@ pub struct Server;
 
 impl Server {
     fn into_service(self) -> ActionServer<Self> {
-        ActionServer::new(self)
+        ActionServer::new(self).max_decoding_message_size(16_777_215)
     }
 }
 

@@ -12,6 +12,7 @@ use crate::utils::web::EndpointVersion;
 use lit_api_core::context::{SdkVersion, Tracing, TracingRequired};
 use lit_api_core::http::rocket::helper::stream::ChildStream;
 use lit_core::config::ReloadableLitConfig;
+use moka::future::Cache;
 use rocket::response::status;
 use rocket::serde::json::{Json, Value};
 use rocket::{Data, Route, State};
@@ -170,6 +171,7 @@ pub(crate) async fn encryption_sign(
     session: &State<Arc<TssState>>,
     remote_addr: SocketAddr,
     rate_limit_db: &State<Arc<RateLimitDB>>,
+    ipfs_cache: &State<Cache<String, Arc<String>>>,
     cfg: &State<ReloadableLitConfig>,
     encryption_sign_request: Json<models::EncryptionSignRequest>,
     tracing: Tracing,
@@ -179,6 +181,7 @@ pub(crate) async fn encryption_sign(
         session,
         remote_addr,
         rate_limit_db,
+        ipfs_cache,
         cfg,
         encryption_sign_request,
         tracing,
@@ -199,6 +202,7 @@ pub(crate) async fn signing_access_control_condition(
     session: &State<Arc<TssState>>,
     remote_addr: SocketAddr,
     rate_limit_db: &State<Arc<RateLimitDB>>,
+    ipfs_cache: &State<Cache<String, Arc<String>>>,
     cfg: &State<ReloadableLitConfig>,
     signing_access_control_condition_request: Json<models::SigningAccessControlConditionRequest>,
     tracing: Tracing,
@@ -209,6 +213,7 @@ pub(crate) async fn signing_access_control_condition(
         session,
         remote_addr,
         rate_limit_db,
+        ipfs_cache,
         cfg,
         signing_access_control_condition_request,
         tracing,
@@ -231,6 +236,7 @@ pub(crate) async fn sign_session_key(
     tss_state: &State<Arc<crate::tss::common::tss_state::TssState>>,
     auth_context_cache: &State<Arc<models::AuthContextCache>>,
     rate_limit_db: &State<Arc<RateLimitDB>>,
+    ipfs_cache: &State<Cache<String, Arc<String>>>,
     cfg: &State<ReloadableLitConfig>,
     json_sign_session_key_request: Json<models::JsonSignSessionKeyRequest>,
     tracing: Tracing,
@@ -254,6 +260,7 @@ pub(crate) async fn sign_session_key(
         tss_state,
         auth_context_cache,
         rate_limit_db,
+        ipfs_cache,
         cfg,
         json_sign_session_key_request_v1,
         tracing,
@@ -342,6 +349,7 @@ pub(crate) async fn execute_function(
     rate_limit_db: &State<Arc<RateLimitDB>>,
     cfg: &State<ReloadableLitConfig>,
     allowlist_cache: &State<Arc<models::AllowlistCache>>,
+    ipfs_cache: &State<Cache<String, Arc<String>>>,
     json_execution_request: Json<models::JsonExecutionRequest>,
     tracing: Tracing,
     client_context: ClientContext,
@@ -355,6 +363,7 @@ pub(crate) async fn execute_function(
         rate_limit_db,
         cfg,
         allowlist_cache,
+        ipfs_cache,
         json_execution_request,
         tracing,
         client_context,

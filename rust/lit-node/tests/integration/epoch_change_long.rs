@@ -1,4 +1,4 @@
-use crate::common::{
+use test_common::{
     assertions::NetworkIntegrityChecker,
     init_test_config,
     testnet::{contracts::StakingContractConfig, NodeAccount, Testnet, WhichTestnet},
@@ -149,8 +149,6 @@ mod network_state {
     use rand::Rng;
     use std::fmt;
 
-    use crate::common;
-
     #[derive(Debug, Clone)]
     pub struct NetworkState {
         epoch_number: usize,
@@ -217,7 +215,7 @@ mod network_state {
         prev_validator_count: usize,
         epoch_number: usize,
     ) -> NetworkState {
-        let rng = &mut common::rand::thread_rng();
+        let rng = &mut test_common::rand::thread_rng();
 
         let mut valid_dealt_in_and_out;
         loop {

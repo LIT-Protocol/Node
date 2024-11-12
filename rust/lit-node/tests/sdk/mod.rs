@@ -1,5 +1,4 @@
-use crate::common;
-use common::new_node_collection;
+use test_common::new_node_collection;
 use tokio::fs;
 use tokio::process::Command;
 use tracing::info;
@@ -32,7 +31,7 @@ pub async fn test_sdk() {
         .await
         .expect("Failed to install package with yarn");
 
-    common::init_test_config();
+    test_common::init_test_config();
 
     let num_nodes = 3;
     let (_testnet, _validator_collection) = new_node_collection(num_nodes, false).await;

@@ -553,6 +553,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "setDefaultRestriction",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "components": [

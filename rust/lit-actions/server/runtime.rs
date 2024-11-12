@@ -44,6 +44,7 @@ fn deno_isolate_init() -> Option<&'static [u8]> {
 
 fn get_error_class_name(e: &anyhow::Error) -> &'static str {
     deno_runtime::errors::get_error_class_name(e).unwrap_or_else(|| {
+        #[allow(unexpected_cfgs)]
         if cfg!(debug) {
             warn!(
                 "Error '{}' contains boxed error of unknown type:{}",

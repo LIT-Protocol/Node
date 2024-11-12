@@ -214,6 +214,32 @@ describe('Staking', function () {
         expect(validator.port).equal(stakingAccount1Port + i + 1);
         expect(balance).equal(minStake);
       }
+      const nodeConnectionInfo =
+        await stakingViewsFacet.getActiveUnkickedValidatorStructsAndCounts();
+      console.log(
+        `nodeConnectionInfo: ${JSON.stringify(
+          nodeConnectionInfo,
+          (key, value) => (typeof value === 'bigint' ? value.toString() : value)
+        )}`
+      );
+      const epoch = nodeConnectionInfo[0];
+      const currentValidatorCountForConsensus = nodeConnectionInfo[1];
+      const validators = nodeConnectionInfo[2];
+      expect(epoch.number).equal(2);
+      expect(currentValidatorCountForConsensus).equal(6);
+      expect(validators.length).equal(10);
+      for (let i = 0; i < validators.length; i++) {
+        const validator = validators[i];
+        const balance = await stakingBalances.balanceOf(
+          validatorStakingAddresses[i]
+        );
+        expect(validator.nodeAddress).equal(
+          await stakingAccounts[i].nodeAddress.address
+        );
+        expect(validator.ip).equal(ipAddress);
+        expect(validator.port).equal(stakingAccount1Port + i + 1);
+        expect(balance).equal(minStake);
+      }
     });
   });
 
@@ -438,6 +464,30 @@ describe('Staking', function () {
       expect(postNodeAddressToStakerAddress).to.equal(
         await stakingAccount1.address
       );
+    });
+
+    it('works in all scenarios with kicked nodes', async function () {
+      const validatorsInNextEpochBeforeTest =
+        await stakingViewsFacet.getValidatorsInNextEpoch();
+      expect(validatorsInNextEpochBeforeTest.length).equal(10);
+
+      let [epoch, currentValidatorCountForConsensus, allStructs] =
+        await stakingViewsFacet.getActiveUnkickedValidatorStructsAndCounts();
+      expect(allStructs.length).equal(10);
+
+      const stakingAsAdmin = stakingContract.connect(deployer);
+
+      // kick the first 3 nodes
+      for (let i = 0; i < 3; i++) {
+        const stakingAddress = stakingViewsFacet.nodeAddressToStakerAddress(
+          allStructs[i].nodeAddress
+        );
+        await stakingAsAdmin.adminKickValidatorInNextEpoch(stakingAddress);
+      }
+
+      [epoch, currentValidatorCountForConsensus, allStructs] =
+        await stakingViewsFacet.getActiveUnkickedValidatorStructsAndCounts();
+      expect(allStructs.length).equal(7);
     });
 
     it('can join as a validator and can leave', async function () {
@@ -1223,7 +1273,19 @@ describe('Staking', function () {
       );
 
       expect(
-        stakingContract.setConfig(25, 1, 10, [1, 2, 3], 6)
+        stakingContract.setConfig([
+          25,
+          1,
+          10,
+          [1, 2, 3],
+          6,
+          1000,
+          10,
+          25,
+          10,
+          10,
+          true,
+        ])
       ).revertedWithCustomError(stakingContract, 'CallerNotOwner()');
 
       expect(

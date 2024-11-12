@@ -36,12 +36,12 @@ cp wallets/"$newest_wallet_file" "$secrets_path/"
 cd ../../rust/lit-node
 
 # destroy
-./scripts/remote_dev/lit_os/expect/destroy_prov.exp "$prov_ip" "$old_staking_contract_address"
+./scripts/remote_dev/lit_os/expect/destroy_prov.exp "$PROV_HOST_IP" "$old_staking_contract_address"
 
 # create template
-./scripts/remote_dev/lit_os/expect/create_prov_template.exp "$prov_ip"
+./scripts/remote_dev/lit_os/expect/create_prov_template.exp "$PROV_HOST_IP"
 
 # create prov instance
-./scripts/remote_dev/lit_os/expect/create_prov.exp "$prov_ip" "$new_staking_contract_address" "$LIT_DEV_PROV_WALLET_PRIVATE_KEY" "$LIT_DEV_PROV_ADMIN_PRIVATE_KEY"
+./scripts/remote_dev/lit_os/expect/create_prov.exp "$PROV_HOST_IP" "$new_staking_contract_address" "$LIT_DEV_PROV_WALLET_PRIVATE_KEY" "$LIT_DEV_PROV_ADMIN_PRIVATE_KEY"
 
 echo "Please commit changes in the networks directory"
