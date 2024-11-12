@@ -154,7 +154,6 @@ function startQueue() {
   // @ts-ignore
   globalThis.queue.on('idle', () => {
     console.log(`Queue is idle and all verification tasks have been completed`);
-    process.exit(0);
   });
 }
 
