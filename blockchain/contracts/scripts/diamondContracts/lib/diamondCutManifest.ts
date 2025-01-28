@@ -4,6 +4,7 @@ import {
   DiamondCutManifest,
   DiamondCutOperation,
   FacetCutAction,
+  FunctionSelector,
 } from './types';
 import { getSelectors } from './utils';
 import { checkIfPathExists, ensureDirExists } from '../../utils';
@@ -23,7 +24,8 @@ export async function appendDiamondCutOperationToManifest(
   diamondAddress: string,
   facetContract: Contract,
   facetCutAction: FacetCutAction,
-  facetName: string
+  facetName: string,
+  oldFacetAddress?: string
 ): Promise<DiamondCutManifest> {
   // Ensure the manifests directory exists.
   await ensureDirExists(path.join(__dirname, `../${MANIFESTS_DIR}`));
@@ -39,8 +41,29 @@ export async function appendDiamondCutOperationToManifest(
   // Parse the number of existing operations written to this file. This is used to generate the next operation ID
   const operationId = manifest.operations.length;
 
-  // Get the selectors for the new facet
-  const functionSelectors = getSelectors(facetContract);
+  let functionSelectors: FunctionSelector[] = [];
+  if (facetCutAction === FacetCutAction.Remove) {
+    // go find the methods from the live facet and remove them.
+    // don't use the local contracts - this gets really confusing because you have to load
+    // old contracts in to the repo in order to remove them.
+
+    const liveDiamondContract = await ethers.getContractAt(
+      'DiamondLoupeFacetNoERC165',
+      diamondAddress
+    );
+    if (!oldFacetAddress) {
+      throw new Error('Old facet address is required for removal');
+    }
+    const selectors: string[] =
+      await liveDiamondContract.facetFunctionSelectors(oldFacetAddress);
+    functionSelectors = selectors.map((s) => ({
+      selector: s,
+      signature: 'unknown',
+    }));
+  } else {
+    // Get the selectors for the new facet
+    functionSelectors = getSelectors(facetContract);
+  }
 
   // Write the new operation to the manifest
   manifest.operations.push({

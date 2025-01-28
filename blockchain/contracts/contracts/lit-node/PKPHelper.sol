@@ -85,6 +85,14 @@ contract PKPHelper is Ownable, IERC721Receiver, AccessControl {
             );
     }
 
+    function getStakingAddress() public view returns (address) {
+        return
+            contractResolver.getContract(
+                contractResolver.STAKING_CONTRACT(),
+                env
+            );
+    }
+
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     function mintNextAndAddAuthMethods(
@@ -379,6 +387,26 @@ contract PKPHelper is Ownable, IERC721Receiver, AccessControl {
         LibPKPNFTStorage.ClaimMaterial memory claimMaterial,
         AuthMethodData memory authMethodData
     ) public payable returns (uint256) {
+        // Convert the claim material to the v2 struct
+        LibPKPNFTStorage.ClaimMaterialV2
+            memory claimMaterialV2 = LibPKPNFTStorage.ClaimMaterialV2(
+                claimMaterial.keyType,
+                claimMaterial.derivedKeyId,
+                claimMaterial.signatures,
+                getStakingAddress()
+            );
+
+        return
+            claimAndMintNextAndAddAuthMethodsWithTypesV2(
+                claimMaterialV2,
+                authMethodData
+            );
+    }
+
+    function claimAndMintNextAndAddAuthMethodsWithTypesV2(
+        LibPKPNFTStorage.ClaimMaterialV2 memory claimMaterial,
+        AuthMethodData memory authMethodData
+    ) public payable returns (uint256) {
         require(
             claimMaterial.keyType == authMethodData.keyType,
             "PKPHelper: Claim key type must match Auth Method data key type"
@@ -389,7 +417,8 @@ contract PKPHelper is Ownable, IERC721Receiver, AccessControl {
         }(
             claimMaterial.keyType,
             claimMaterial.derivedKeyId,
-            claimMaterial.signatures
+            claimMaterial.signatures,
+            claimMaterial.stakingContractAddress
         );
 
         require(

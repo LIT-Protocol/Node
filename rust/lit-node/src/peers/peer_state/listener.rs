@@ -1,11 +1,11 @@
 use super::super::PeerState;
+use super::models::NetworkState;
+use crate::error::{unexpected_err_code, Result, EC};
+use crate::tasks::beaver_manager::models::BeaverMessage;
+use ethers::providers::StreamExt;
 use lit_blockchain::contracts::staking::StakingEvents;
 use rocket::serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
-
-use super::models::NetworkState;
-use crate::error::{unexpected_err_code, Result, EC};
-use ethers::providers::StreamExt;
 
 #[allow(dead_code)]
 impl PeerState {
@@ -98,6 +98,14 @@ impl PeerState {
                                                 error!("Failed to update version requirements: {:?}", e);
                                             }
                                         }
+                                    }
+                                    StakingEvents::CountOfflinePhaseDataFilter(data_type) => {
+                                        debug!("CountOfflinePhaseData event: {:?}", data_type);
+                                        let _r = self.bm_tx.send_async(BeaverMessage::Count).await;
+                                    }
+                                    StakingEvents::ClearOfflinePhaseDataFilter(data_type) => {
+                                        debug!("ClearOfflinePhaseData event: {:?}", data_type);
+                                        let _r = self.bm_tx.send_async(BeaverMessage::Clear).await;
                                     }
                                     _ => {}
                                 }

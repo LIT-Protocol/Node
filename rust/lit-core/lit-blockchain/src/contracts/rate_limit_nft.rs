@@ -3348,98 +3348,88 @@ pub mod rate_limit_nft {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RevertString(decoded));
             }
-            if let Ok(decoded)
-                = <CallerNotOwner as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CallerNotOwner as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CallerNotOwner(decoded));
             }
-            if let Ok(decoded)
-                = <CannotAddFunctionToDiamondThatAlreadyExists as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotAddFunctionToDiamondThatAlreadyExists as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotAddFunctionToDiamondThatAlreadyExists(decoded));
             }
-            if let Ok(decoded)
-                = <CannotAddSelectorsToZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotAddSelectorsToZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotAddSelectorsToZeroAddress(decoded));
             }
-            if let Ok(decoded)
-                = <CannotRemoveFunctionThatDoesNotExist as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotRemoveFunctionThatDoesNotExist as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotRemoveFunctionThatDoesNotExist(decoded));
             }
-            if let Ok(decoded)
-                = <CannotRemoveImmutableFunction as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotRemoveImmutableFunction as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotRemoveImmutableFunction(decoded));
             }
-            if let Ok(decoded)
-                = <CannotReplaceFunctionThatDoesNotExists as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotReplaceFunctionThatDoesNotExists as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotReplaceFunctionThatDoesNotExists(decoded));
             }
-            if let Ok(decoded)
-                = <CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(
                     Self::CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet(
                         decoded,
                     ),
                 );
             }
-            if let Ok(decoded)
-                = <CannotReplaceFunctionsFromFacetWithZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotReplaceFunctionsFromFacetWithZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotReplaceFunctionsFromFacetWithZeroAddress(decoded));
             }
-            if let Ok(decoded)
-                = <CannotReplaceImmutableFunction as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotReplaceImmutableFunction as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotReplaceImmutableFunction(decoded));
             }
-            if let Ok(decoded)
-                = <IncorrectFacetCutAction as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <IncorrectFacetCutAction as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::IncorrectFacetCutAction(decoded));
             }
-            if let Ok(decoded)
-                = <InitializationFunctionReverted as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <InitializationFunctionReverted as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::InitializationFunctionReverted(decoded));
             }
-            if let Ok(decoded)
-                = <NoBytecodeAtAddress as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <NoBytecodeAtAddress as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NoBytecodeAtAddress(decoded));
             }
-            if let Ok(decoded)
-                = <NoSelectorsProvidedForFacetForCut as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <NoSelectorsProvidedForFacetForCut as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NoSelectorsProvidedForFacetForCut(decoded));
             }
-            if let Ok(decoded)
-                = <NotContractOwner as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <NotContractOwner as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NotContractOwner(decoded));
             }
-            if let Ok(decoded)
-                = <RemoveFacetAddressMustBeZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <RemoveFacetAddressMustBeZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RemoveFacetAddressMustBeZeroAddress(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -3965,8 +3955,9 @@ pub mod rate_limit_nft {
         fn decode_log(
             log: &::ethers::core::abi::RawLog,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::Error> {
-            if let Ok(decoded)
-                = AdditionalRequestsPerKilosecondCostSetFilter::decode_log(log) {
+            if let Ok(decoded) = AdditionalRequestsPerKilosecondCostSetFilter::decode_log(
+                log,
+            ) {
                 return Ok(
                     RateLimitNFTEvents::AdditionalRequestsPerKilosecondCostSetFilter(
                         decoded,
@@ -3985,8 +3976,9 @@ pub mod rate_limit_nft {
             if let Ok(decoded) = FreeMintSignerSetFilter::decode_log(log) {
                 return Ok(RateLimitNFTEvents::FreeMintSignerSetFilter(decoded));
             }
-            if let Ok(decoded)
-                = FreeRequestsPerRateLimitWindowSetFilter::decode_log(log) {
+            if let Ok(decoded) = FreeRequestsPerRateLimitWindowSetFilter::decode_log(
+                log,
+            ) {
                 return Ok(
                     RateLimitNFTEvents::FreeRequestsPerRateLimitWindowSetFilter(decoded),
                 );
@@ -3997,8 +3989,9 @@ pub mod rate_limit_nft {
             if let Ok(decoded) = OwnershipTransferredFilter::decode_log(log) {
                 return Ok(RateLimitNFTEvents::OwnershipTransferredFilter(decoded));
             }
-            if let Ok(decoded)
-                = RliholderRateLimitWindowSecondsSetFilter::decode_log(log) {
+            if let Ok(decoded) = RliholderRateLimitWindowSecondsSetFilter::decode_log(
+                log,
+            ) {
                 return Ok(
                     RateLimitNFTEvents::RliholderRateLimitWindowSecondsSetFilter(decoded),
                 );
@@ -5173,276 +5166,279 @@ pub mod rate_limit_nft {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <RliholderRateLimitWindowSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <RliholderRateLimitWindowSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RliholderRateLimitWindowSeconds(decoded));
             }
-            if let Ok(decoded)
-                = <AdditionalRequestsPerKilosecondCostCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <AdditionalRequestsPerKilosecondCostCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AdditionalRequestsPerKilosecondCost(decoded));
             }
-            if let Ok(decoded)
-                = <ApproveCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ApproveCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Approve(decoded));
             }
-            if let Ok(decoded)
-                = <BalanceOfCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <BalanceOfCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::BalanceOf(decoded));
             }
-            if let Ok(decoded)
-                = <BurnCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <BurnCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Burn(decoded));
             }
-            if let Ok(decoded)
-                = <CalculateCostCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CalculateCostCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CalculateCost(decoded));
             }
-            if let Ok(decoded)
-                = <CalculateRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CalculateRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CalculateRequestsPerKilosecond(decoded));
             }
-            if let Ok(decoded)
-                = <CapacityCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CapacityCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Capacity(decoded));
             }
-            if let Ok(decoded)
-                = <CheckBelowMaxRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CheckBelowMaxRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CheckBelowMaxRequestsPerKilosecond(decoded));
             }
-            if let Ok(decoded)
-                = <CurrentSoldRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CurrentSoldRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CurrentSoldRequestsPerKilosecond(decoded));
             }
-            if let Ok(decoded)
-                = <DefaultRateLimitWindowSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <DefaultRateLimitWindowSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::DefaultRateLimitWindowSeconds(decoded));
             }
-            if let Ok(decoded)
-                = <DiamondCutCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <DiamondCutCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::DiamondCut(decoded));
             }
-            if let Ok(decoded)
-                = <FacetAddressCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FacetAddressCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FacetAddress(decoded));
             }
-            if let Ok(decoded)
-                = <FacetAddressesCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FacetAddressesCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FacetAddresses(decoded));
             }
-            if let Ok(decoded)
-                = <FacetFunctionSelectorsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <FacetFunctionSelectorsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FacetFunctionSelectors(decoded));
             }
-            if let Ok(decoded)
-                = <FacetsCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FacetsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Facets(decoded));
             }
-            if let Ok(decoded)
-                = <FreeMintCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FreeMintCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FreeMint(decoded));
             }
-            if let Ok(decoded)
-                = <FreeMintSigTestCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FreeMintSigTestCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FreeMintSigTest(decoded));
             }
-            if let Ok(decoded)
-                = <FreeMintSignerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FreeMintSignerCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FreeMintSigner(decoded));
             }
-            if let Ok(decoded)
-                = <FreeRequestsPerRateLimitWindowCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <FreeRequestsPerRateLimitWindowCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FreeRequestsPerRateLimitWindow(decoded));
             }
-            if let Ok(decoded)
-                = <GetApprovedCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetApprovedCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetApproved(decoded));
             }
-            if let Ok(decoded)
-                = <InitializeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <InitializeCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Initialize(decoded));
             }
-            if let Ok(decoded)
-                = <IsApprovedForAllCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <IsApprovedForAllCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::IsApprovedForAll(decoded));
             }
-            if let Ok(decoded)
-                = <IsExpiredCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <IsExpiredCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::IsExpired(decoded));
             }
-            if let Ok(decoded)
-                = <MaxExpirationSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <MaxExpirationSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::MaxExpirationSeconds(decoded));
             }
-            if let Ok(decoded)
-                = <MaxRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <MaxRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::MaxRequestsPerKilosecond(decoded));
             }
-            if let Ok(decoded)
-                = <MintCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <MintCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Mint(decoded));
             }
-            if let Ok(decoded)
-                = <NameCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <NameCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Name(decoded));
             }
-            if let Ok(decoded)
-                = <OwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <OwnerCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Owner(decoded));
             }
-            if let Ok(decoded)
-                = <OwnerOfCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <OwnerOfCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::OwnerOf(decoded));
             }
-            if let Ok(decoded)
-                = <PrefixedCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <PrefixedCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Prefixed(decoded));
             }
-            if let Ok(decoded)
-                = <PruneExpiredCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <PruneExpiredCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::PruneExpired(decoded));
             }
-            if let Ok(decoded)
-                = <RedeemedFreeMintsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <RedeemedFreeMintsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RedeemedFreeMints(decoded));
             }
-            if let Ok(decoded)
-                = <SafeTransferFromCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SafeTransferFromCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SafeTransferFrom(decoded));
             }
-            if let Ok(decoded)
-                = <SafeTransferFromWithFromAndToAndDataCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SafeTransferFromWithFromAndToAndDataCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SafeTransferFromWithFromAndToAndData(decoded));
             }
-            if let Ok(decoded)
-                = <SetAdditionalRequestsPerKilosecondCostCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetAdditionalRequestsPerKilosecondCostCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetAdditionalRequestsPerKilosecondCost(decoded));
             }
-            if let Ok(decoded)
-                = <SetApprovalForAllCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetApprovalForAllCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetApprovalForAll(decoded));
             }
-            if let Ok(decoded)
-                = <SetFreeMintSignerCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetFreeMintSignerCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetFreeMintSigner(decoded));
             }
-            if let Ok(decoded)
-                = <SetFreeRequestsPerRateLimitWindowCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetFreeRequestsPerRateLimitWindowCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetFreeRequestsPerRateLimitWindow(decoded));
             }
-            if let Ok(decoded)
-                = <SetMaxExpirationSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetMaxExpirationSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetMaxExpirationSeconds(decoded));
             }
-            if let Ok(decoded)
-                = <SetMaxRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetMaxRequestsPerKilosecondCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetMaxRequestsPerKilosecond(decoded));
             }
-            if let Ok(decoded)
-                = <SetRLIHolderRateLimitWindowSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetRLIHolderRateLimitWindowSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetRLIHolderRateLimitWindowSeconds(decoded));
             }
-            if let Ok(decoded)
-                = <SetRateLimitWindowSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetRateLimitWindowSecondsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetRateLimitWindowSeconds(decoded));
             }
-            if let Ok(decoded)
-                = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SupportsInterface(decoded));
             }
-            if let Ok(decoded)
-                = <SymbolCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SymbolCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Symbol(decoded));
             }
-            if let Ok(decoded)
-                = <TokenByIndexCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <TokenByIndexCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TokenByIndex(decoded));
             }
-            if let Ok(decoded)
-                = <TokenIdCounterCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <TokenIdCounterCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TokenIdCounter(decoded));
             }
-            if let Ok(decoded)
-                = <TokenOfOwnerByIndexCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <TokenOfOwnerByIndexCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TokenOfOwnerByIndex(decoded));
             }
-            if let Ok(decoded)
-                = <TokenSVGCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <TokenSVGCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TokenSVG(decoded));
             }
-            if let Ok(decoded)
-                = <TokenURICall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <TokenURICall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TokenURI(decoded));
             }
-            if let Ok(decoded)
-                = <TotalSoldRequestsPerKilosecondByExpirationTimeCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <TotalSoldRequestsPerKilosecondByExpirationTimeCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TotalSoldRequestsPerKilosecondByExpirationTime(decoded));
             }
-            if let Ok(decoded)
-                = <TotalSupplyCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <TotalSupplyCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TotalSupply(decoded));
             }
-            if let Ok(decoded)
-                = <TransferFromCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <TransferFromCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TransferFrom(decoded));
             }
-            if let Ok(decoded)
-                = <TransferOwnershipCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <TransferOwnershipCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TransferOwnership(decoded));
             }
-            if let Ok(decoded)
-                = <WithdrawCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <WithdrawCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Withdraw(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())

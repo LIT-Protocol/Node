@@ -17,7 +17,6 @@ impl PeerState {
         let func = self
             .staking_contract
             .signal_ready_for_next_epoch(epoch_number);
-        // .gas(100000);
 
         let gas_estimate = match func.estimate_gas().await {
             Ok(gas_estimate) => gas_estimate,
@@ -33,7 +32,6 @@ impl PeerState {
 
         let func_with_gas = func.gas(gas_estimate * U256::from(5));
         let tx = func_with_gas
-            // let tx = func
             .send()
             .await
             .map_err(|e| blockchain_err(e, None))?
@@ -152,10 +150,8 @@ impl PeerState {
 
     pub async fn rpc_lock_validators_for_next_epoch(&self) {
         // when testing, do estimate gas.  this is fine because anvil returns the current time in block.timestamp, even in view methods
-        #[cfg(feature = "testing")]
         {
             let func = self.staking_contract.lock_validators_for_next_epoch();
-            // .gas_price(1000000000);
             // println!("Sending txn to lock validators: {:?}", func);
             let gas_estimate = func.estimate_gas().await;
             match gas_estimate {
@@ -174,45 +170,6 @@ impl PeerState {
                 }
                 Err(e) => {
                     trace!("failed to estimate gas to lock validators for next epoch (only one caller need succeed though) w/ err {:?}", e);
-                    trace!("{}", decode_revert(&e, self.staking_contract.abi()));
-                }
-            }
-        }
-
-        // in real life, on chronicle, we don't estimate gas, because
-        // the optimism node puts the time of the last txn in block.timestamp,
-        // which is only correct if the chain has a lot of activity.
-        #[cfg(not(feature = "testing"))]
-        {
-            let epoch = match self.staking_contract.epoch().await {
-                Ok(epoch) => epoch,
-                Err(e) => {
-                    error!(
-                        "in rpc_lock_validators_for_next_epoch and failed to get epoch w/ err {:?}",
-                        e
-                    );
-                    return;
-                }
-            };
-            let now = SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)
-                .expect("Time went backwards")
-                .as_secs();
-            if now < epoch.end_time.as_u64() {
-                trace!("not locking validators because we are not in the next epoch yet.  Current time according to system clock is {} and epoch is {}", now, epoch.end_time.as_u64());
-                return;
-            }
-
-            let func = self
-                .staking_contract
-                .lock_validators_for_next_epoch()
-                .gas(60000); // this transaction typically uses 42k gas
-            let result = func.send().await;
-
-            match result {
-                Ok(_) => info!("locked the validators"),
-                Err(e) => {
-                    error!("failed to send txn to lock validators for next epoch (only one caller need succeed though) w/ err {:?}", e);
                     trace!("{}", decode_revert(&e, self.staking_contract.abi()));
                 }
             }

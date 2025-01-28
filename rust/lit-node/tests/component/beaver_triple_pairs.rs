@@ -1,10 +1,8 @@
 use super::utils::virtual_node_collection::VirtualNodeCollection;
 use futures::future::join_all;
 use lit_node::{
-    tasks::{
-        beaver_manager::{models::BeaverManager, models::BeaverTriplePair},
-        utils::generate_hash,
-    },
+    peers::peer_state::models::{SimplePeer, SimplePeerExt},
+    tasks::beaver_manager::models::{BeaverManager, BeaverTriplePair},
     tss::common::storage::write_beaver_triple_to_disk,
 };
 use tokio::task::JoinHandle;
@@ -64,7 +62,7 @@ async fn generate_unsafe_triple_pairs(vnc: &VirtualNodeCollection, num_pairs: us
     let mut triple_key = BeaverManager::triple_key_from_triple_pair(&triple_pairs[0]);
     let staker_address = "0x0"; // this function is about to be deprecated
     for _count in 0..num_pairs {
-        triple_key = generate_hash(triple_key);
+        triple_key = Vec::<SimplePeer>::generate_hash(triple_key);
         let pubkey = format!("{}", triple_key);
         for (share_index, triple_pair) in triple_pairs.iter().enumerate() {
             let result = write_beaver_triple_to_disk(

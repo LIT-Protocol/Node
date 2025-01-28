@@ -84,6 +84,7 @@ pub struct RequestMapResponse {
 pub enum BeaverMessage {
     Generate(u64),
     Clear,
+    Count,
     Store(Box<BeaverTriplePair>, u64),
     RequestTriple(
         TripleRequest,

@@ -2219,46 +2219,49 @@ pub mod release_register {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RevertString(decoded));
             }
-            if let Ok(decoded)
-                = <ActivatorRoleRequired as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <ActivatorRoleRequired as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ActivatorRoleRequired(decoded));
             }
-            if let Ok(decoded)
-                = <AdminRoleRequired as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <AdminRoleRequired as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AdminRoleRequired(decoded));
             }
-            if let Ok(decoded)
-                = <BurnerRoleRequired as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <BurnerRoleRequired as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::BurnerRoleRequired(decoded));
             }
-            if let Ok(decoded)
-                = <CreatorRoleRequired as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CreatorRoleRequired as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CreatorRoleRequired(decoded));
             }
-            if let Ok(decoded)
-                = <DeactivatorRoleRequired as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <DeactivatorRoleRequired as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::DeactivatorRoleRequired(decoded));
             }
-            if let Ok(decoded)
-                = <InvalidEnv as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <InvalidEnv as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::InvalidEnv(decoded));
             }
-            if let Ok(decoded)
-                = <InvalidStatus as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <InvalidStatus as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::InvalidStatus(decoded));
             }
-            if let Ok(decoded)
-                = <ReleaseNotFound as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ReleaseNotFound as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ReleaseNotFound(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -2720,16 +2723,18 @@ pub mod release_register {
         fn decode_log(
             log: &::ethers::core::abi::RawLog,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::Error> {
-            if let Ok(decoded)
-                = AllowedAdminSigningPublicKeyAddedFilter::decode_log(log) {
+            if let Ok(decoded) = AllowedAdminSigningPublicKeyAddedFilter::decode_log(
+                log,
+            ) {
                 return Ok(
                     ReleaseRegisterEvents::AllowedAdminSigningPublicKeyAddedFilter(
                         decoded,
                     ),
                 );
             }
-            if let Ok(decoded)
-                = AllowedAdminSigningPublicKeyRemovedFilter::decode_log(log) {
+            if let Ok(decoded) = AllowedAdminSigningPublicKeyRemovedFilter::decode_log(
+                log,
+            ) {
                 return Ok(
                     ReleaseRegisterEvents::AllowedAdminSigningPublicKeyRemovedFilter(
                         decoded,
@@ -3551,172 +3556,174 @@ pub mod release_register {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <ActivatorRoleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ActivatorRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ActivatorRole(decoded));
             }
-            if let Ok(decoded)
-                = <AdminRoleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <AdminRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AdminRole(decoded));
             }
-            if let Ok(decoded)
-                = <BurnerRoleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <BurnerRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::BurnerRole(decoded));
             }
-            if let Ok(decoded)
-                = <CreatorRoleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CreatorRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CreatorRole(decoded));
             }
-            if let Ok(decoded)
-                = <DeactivatorRoleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <DeactivatorRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::DeactivatorRole(decoded));
             }
-            if let Ok(decoded)
-                = <DefaultAdminRoleCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <DefaultAdminRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::DefaultAdminRole(decoded));
             }
-            if let Ok(decoded)
-                = <ReleaseOptionRoCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ReleaseOptionRoCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ReleaseOptionRo(decoded));
             }
-            if let Ok(decoded)
-                = <ReleaseOptionSshCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <ReleaseOptionSshCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ReleaseOptionSsh(decoded));
             }
-            if let Ok(decoded)
-                = <ReleaseOptionUsersCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <ReleaseOptionUsersCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ReleaseOptionUsers(decoded));
             }
-            if let Ok(decoded)
-                = <AddAllowedAdminSigningPublicKeyCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <AddAllowedAdminSigningPublicKeyCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AddAllowedAdminSigningPublicKey(decoded));
             }
-            if let Ok(decoded)
-                = <AddAllowedEnvCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <AddAllowedEnvCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AddAllowedEnv(decoded));
             }
-            if let Ok(decoded)
-                = <AddAllowedSubnetCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <AddAllowedSubnetCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AddAllowedSubnet(decoded));
             }
-            if let Ok(decoded)
-                = <BurnReleaseCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <BurnReleaseCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::BurnRelease(decoded));
             }
-            if let Ok(decoded)
-                = <CreateReleaseCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CreateReleaseCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CreateRelease(decoded));
             }
-            if let Ok(decoded)
-                = <GetActiveReleaseCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetActiveReleaseCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetActiveRelease(decoded));
             }
-            if let Ok(decoded)
-                = <GetActiveReleasesCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetActiveReleasesCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetActiveReleases(decoded));
             }
-            if let Ok(decoded)
-                = <GetCreatorDomainCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetCreatorDomainCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetCreatorDomain(decoded));
             }
-            if let Ok(decoded)
-                = <GetReleaseCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetReleaseCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetRelease(decoded));
             }
-            if let Ok(decoded)
-                = <GetRoleAdminCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetRoleAdminCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetRoleAdmin(decoded));
             }
-            if let Ok(decoded)
-                = <GrantRoleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GrantRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GrantRole(decoded));
             }
-            if let Ok(decoded)
-                = <HasAllowedAdminSigningPublicKeyCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <HasAllowedAdminSigningPublicKeyCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::HasAllowedAdminSigningPublicKey(decoded));
             }
-            if let Ok(decoded)
-                = <HasAllowedAuthorKeyDigestCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <HasAllowedAuthorKeyDigestCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::HasAllowedAuthorKeyDigest(decoded));
             }
-            if let Ok(decoded)
-                = <HasAllowedEnvCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <HasAllowedEnvCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::HasAllowedEnv(decoded));
             }
-            if let Ok(decoded)
-                = <HasAllowedSubnetCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <HasAllowedSubnetCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::HasAllowedSubnet(decoded));
             }
-            if let Ok(decoded)
-                = <HasCreatorInitCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <HasCreatorInitCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::HasCreatorInit(decoded));
             }
-            if let Ok(decoded)
-                = <HasRoleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <HasRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::HasRole(decoded));
             }
-            if let Ok(decoded)
-                = <InitCreatorCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <InitCreatorCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::InitCreator(decoded));
             }
-            if let Ok(decoded)
-                = <RemoveAllowedAdminSigningPublicKeyCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <RemoveAllowedAdminSigningPublicKeyCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RemoveAllowedAdminSigningPublicKey(decoded));
             }
-            if let Ok(decoded)
-                = <RemoveAllowedEnvCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <RemoveAllowedEnvCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RemoveAllowedEnv(decoded));
             }
-            if let Ok(decoded)
-                = <RemoveAllowedSubnetCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <RemoveAllowedSubnetCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RemoveAllowedSubnet(decoded));
             }
-            if let Ok(decoded)
-                = <RenounceRoleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <RenounceRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RenounceRole(decoded));
             }
-            if let Ok(decoded)
-                = <RevokeRoleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <RevokeRoleCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RevokeRole(decoded));
             }
-            if let Ok(decoded)
-                = <SetReleaseStatusCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetReleaseStatusCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetReleaseStatus(decoded));
             }
-            if let Ok(decoded)
-                = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SupportsInterface(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())

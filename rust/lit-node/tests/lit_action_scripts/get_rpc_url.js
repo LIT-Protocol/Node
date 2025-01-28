@@ -1,6 +1,8 @@
 (async () => {
   const resp = await Lit.Actions.getRpcUrl({
-    chain: 'ethereum',
+    chain: 'filecoin',
   });
   Lit.Actions.setResponse({ response: JSON.stringify(resp) });
 })();
+
+

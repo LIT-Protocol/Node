@@ -346,9 +346,8 @@ impl PeerState {
     }
 
     pub async fn next_epoch_validators_communicating(&self) -> Result<bool> {
-        let next_validators = self.validators_in_next_epoch().await.map_err(|e| {
+        let next_validators = self.validators_in_next_epoch().await.inspect_err(|e| {
             error!("[lock validators] Failed to get validators for next epoch from chain.");
-            e
         })?;
 
         match self.find_peers(next_validators).await {

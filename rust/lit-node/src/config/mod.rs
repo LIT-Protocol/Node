@@ -3,16 +3,11 @@ use std::collections::HashMap;
 use std::path::Path;
 use url::Url;
 
-use ethers::{prelude::k256::ecdsa::SigningKey, types::H160, utils::secret_key_to_address};
-use generic_array::GenericArray;
-
+use ethers::types::H160;
+use lit_api_core::config::{http_section_key, https_section_key, LitApiConfig, CFG_KEY_IDENT};
 use lit_api_core::config::{
     CFG_KEY_DOMAIN, CFG_KEY_ENABLED, CFG_KEY_PORT, CFG_KEY_REDIRECT_TO_HTTPS,
     CFG_KEY_TLS_AUTO_ENABLED,
-};
-use lit_api_core::{
-    config::{http_section_key, https_section_key, LitApiConfig, CFG_KEY_IDENT},
-    error::Unexpected,
 };
 use lit_blockchain::config::{
     LitBlockchainConfig, CFG_KEY_BLOCKCHAIN_CHAIN_ID, CFG_KEY_BLOCKCHAIN_CHAIN_NAME,
@@ -22,10 +17,7 @@ use lit_blockchain::resolver::rpc::{RpcHealthcheckPoller, ENDPOINT_MANAGER};
 use lit_core::config::{LitConfig, LitConfigBuilder, ReloadableLitConfig};
 use lit_logging::config::LitLoggingConfig;
 
-use crate::{
-    error::{parser_err, validation_err, Result},
-    utils::encoding,
-};
+use crate::error::{parser_err, validation_err, Result};
 
 pub mod chain;
 
@@ -43,27 +35,16 @@ pub static CFG_KEY_ENABLE_RATE_LIMITING: &str = "enable_rate_limiting";
 pub static CFG_KEY_ENABLE_RATE_LIMITING_ALLOCATION: &str = "enable_rate_limiting_allocation";
 pub static CFG_KEY_ENABLE_ACTIONS_ALLOWLIST: &str = "enable_actions_allowlist";
 pub static CFG_KEY_ENABLE_EPOCH_TRANSITIONS: &str = "enable_epoch_transitions";
-pub static CFG_KEY_ENABLE_ECDSA_DKG: &str = "enable_ecdsa_dkg";
-pub static CFG_KEY_ENABLE_ECDSA_BATCH_SENDING: &str = "enable_ecdsa_batch_sending";
-pub static CFG_KEY_ENABLE_ECDSA_DKG_BATCH_SENDING: &str = "enable_ecdsa_dkg_batch_sending";
 pub static CFG_KEY_ECDSA_ROUND_TIMEOUT: &str = "ecdsa_round_timeout";
-pub static CFG_KEY_ECDSA_BATCH_SEND_INTERVAL: &str = "ecdsa_batch_send_interval";
 pub static CFG_KEY_WEBAUTHN_ALLOWED_ORIGINS: &str = "webauthn_allowed_origins";
-pub static CFG_KEY_MESSAGE_QUEUE_PROCESS_LENGTH: &str = "message_queue_process_length";
 pub static CFG_KEY_CHAIN_POLLING_INTERVAL_MS: &str = "chain_polling_interval";
-pub static CFG_KEY_PEER_REVIEWER_LIMIT: &str = "peer_reviewer_limit";
-pub static CFG_KEY_PEER_REVIEWER_INTERVAL: &str = "peer_reviewer_interval";
 pub static CFG_KEY_HTTP_CLIENT_TIMEOUT: &str = "http_client_timeout";
-pub static CFG_KEY_HTTP_CLIENT_PATIENCE: &str = "http_client_patience";
-pub static CFG_KEY_ENABLE_HTTP_HEADER_DESCRIPTORS: &str = "enable_http_header_descriptors";
-pub static CFG_KEY_ECDSA_ROOT_PUBKEY_COUNT: &str = "ecdsa_root_pubkey_count";
 pub static CFG_KEY_ENTER_RESTORE_STATE: &str = "enter_restore_state";
 pub static CFG_KEY_BLS_KEY_BLINDER: &str = "bls_key_blinder";
 pub static CFG_KEY_ECDSA_KEY_BLINDER: &str = "ecdsa_key_blinder";
 pub static CFG_KEY_ENABLE_SIWE_VALIDATION: &str = "enable_siwe_validation";
 pub static CFG_KEY_RESTORE_LOG_INTERVAL_MS: &str = "restore_log_interval";
 pub static CFG_KEY_ACTIONS_SOCKET: &str = "actions_socket";
-pub static CFG_KEY_ACTIONS_SANDBOX: &str = "enable_actions_sandbox";
 pub static CFG_KEY_HEALTH_POLL_INTERVAL_MS: &str = "health_poll_interval";
 
 // Defaults
@@ -72,7 +53,7 @@ pub static CFG_KEY_ECDSA_ROUND_TIMEOUT_MS_DEFAULT: i64 = 30000;
 pub static CFG_KEY_RESTORE_LOG_INTERVAL_MS_DEFAULT: i64 = 1000 * 60 * 10;
 pub static CFG_KEY_ACTIONS_SOCKET_DEFAULT: &str = "/tmp/lit_actions.sock";
 
-static REQUIRED_CFG_KEYS: [&str; 9] = [
+static REQUIRED_CFG_KEYS: [&str; 8] = [
     CFG_KEY_STAKER_ADDRESS,
     CFG_KEY_COMS_KEYS_SENDER_PRIVKEY,
     CFG_KEY_COMS_KEYS_RECEIVER_PRIVKEY,
@@ -80,11 +61,10 @@ static REQUIRED_CFG_KEYS: [&str; 9] = [
     CFG_KEY_ENABLE_RATE_LIMITING,
     CFG_KEY_ENABLE_ACTIONS_ALLOWLIST,
     CFG_KEY_ENABLE_EPOCH_TRANSITIONS,
-    CFG_KEY_ENABLE_ECDSA_DKG,
     CFG_KEY_DOMAIN,
 ];
 
-static USER_EDITABLE_KEYS: [&str; 23] = [
+static USER_EDITABLE_KEYS: [&str; 16] = [
     CFG_KEY_RPC_URL,
     CFG_KEY_ADMIN_ADDRESS,
     CFG_KEY_STAKER_ADDRESS,
@@ -93,20 +73,13 @@ static USER_EDITABLE_KEYS: [&str; 23] = [
     CFG_KEY_ENABLE_RATE_LIMITING_ALLOCATION,
     CFG_KEY_ENABLE_ACTIONS_ALLOWLIST,
     CFG_KEY_ENABLE_EPOCH_TRANSITIONS,
-    CFG_KEY_ENABLE_ECDSA_DKG,
-    CFG_KEY_ENABLE_ECDSA_BATCH_SENDING,
-    CFG_KEY_ENABLE_ECDSA_DKG_BATCH_SENDING,
-    CFG_KEY_MESSAGE_QUEUE_PROCESS_LENGTH,
     CFG_KEY_ECDSA_ROUND_TIMEOUT,
-    CFG_KEY_ECDSA_BATCH_SEND_INTERVAL,
     CFG_KEY_WEBAUTHN_ALLOWED_ORIGINS,
     CFG_KEY_CHAIN_POLLING_INTERVAL_MS,
-    CFG_KEY_ECDSA_ROOT_PUBKEY_COUNT,
     CFG_KEY_ENTER_RESTORE_STATE,
     CFG_KEY_BLS_KEY_BLINDER,
     CFG_KEY_ECDSA_KEY_BLINDER,
     CFG_KEY_ENABLE_SIWE_VALIDATION,
-    CFG_KEY_ACTIONS_SANDBOX,
     CFG_KEY_HEALTH_POLL_INTERVAL_MS,
 ];
 
@@ -128,19 +101,13 @@ pub trait LitNodeConfig {
     fn external_addr(&self) -> Result<String>;
     fn http_prefix_when_talking_to_other_nodes(&self) -> String;
     fn internal_port(&self) -> Result<u16>;
-    fn node_address(&self) -> Result<H160>;
     fn rpc_url(&self) -> Result<String>;
     fn staker_address(&self) -> Result<String>;
     fn coms_keys_sender_privkey(&self) -> Result<String>;
     fn coms_keys_receiver_privkey(&self) -> Result<String>;
     fn admin_address(&self) -> Result<H160>;
-    fn key_path(&self, staker_address: &str) -> PathBuf;
-    fn typed_key_path(&self, keytype: &str, staker_address: &str) -> PathBuf;
     fn webauthn_allowed_origins(&self) -> Result<Vec<Url>>;
-    fn peer_reviewer_limit(&self) -> Result<u8>;
-    fn peer_reviewer_interval(&self) -> Result<u64>;
     fn http_client_timeout(&self) -> Result<u64>;
-    fn http_client_patience(&self) -> Result<u64>;
     fn actions_socket(&self) -> Result<std::path::PathBuf>;
 
     // Feature flag bool accessors
@@ -149,19 +116,11 @@ pub trait LitNodeConfig {
     fn enable_rate_limiting_allocation(&self) -> Result<bool>;
     fn enable_actions_allowlist(&self) -> Result<bool>;
     fn enable_epoch_transitions(&self) -> Result<bool>;
-    fn enable_ecdsa_dkg(&self) -> Result<bool>;
-    fn enable_ecdsa_batch_sending(&self) -> Result<bool>;
-    fn enable_ecdsa_dkg_batch_sending(&self) -> Result<bool>;
-    fn enable_http_header_descriptors(&self) -> Result<bool>;
     fn enable_siwe_validation(&self) -> Result<bool>;
-    fn enable_actions_sandbox(&self) -> Result<bool>;
 
     // communications parameters for ECDSA rounds
     fn ecdsa_round_timeout(&self) -> Result<i64>;
-    fn ecdsa_batch_send_interval(&self) -> Result<i64>;
-    fn message_queue_process_length(&self) -> Result<i64>;
     fn chain_polling_interval_ms(&self) -> Result<i64>;
-    fn ecdsa_root_pubkey_count(&self) -> Result<i64>;
 
     // restore state parameters
     fn enter_restore_state(&self) -> Result<bool>;
@@ -190,17 +149,11 @@ impl LitNodeConfig for LitConfig {
             .set_section_default(https_section_key(CFG_KEY_PORT), "8443")
             .set_section_default(https_section_key(CFG_KEY_ENABLED), "false")
             .set_section_default(CFG_KEY_TLS_AUTO_ENABLED, "false")
-            .set_section_default(CFG_KEY_ENABLE_ECDSA_BATCH_SENDING, "false")
-            .set_section_default(CFG_KEY_ENABLE_ECDSA_DKG_BATCH_SENDING, "false")
             .set_section_default(
                 CFG_KEY_ECDSA_ROUND_TIMEOUT,
                 CFG_KEY_ECDSA_ROUND_TIMEOUT_MS_DEFAULT.to_string(),
             )
-            .set_section_default(CFG_KEY_MESSAGE_QUEUE_PROCESS_LENGTH, "1000")
-            .set_section_default(CFG_KEY_PEER_REVIEWER_LIMIT, "10")
-            .set_section_default(CFG_KEY_PEER_REVIEWER_INTERVAL, "900")
             .set_section_default(CFG_KEY_HTTP_CLIENT_TIMEOUT, "30")
-            .set_section_default(CFG_KEY_HTTP_CLIENT_PATIENCE, "30")
             .set_section_default(CFG_KEY_ENABLE_PROXIED_HTTP_CLIENT, "false")
             .set_section_default(CFG_KEY_WEBAUTHN_ALLOWED_ORIGINS, "http://*/,https://*/")
             .set_section_default(
@@ -211,12 +164,9 @@ impl LitNodeConfig for LitConfig {
                 CFG_KEY_RESTORE_LOG_INTERVAL_MS,
                 CFG_KEY_RESTORE_LOG_INTERVAL_MS_DEFAULT.to_string(),
             )
-            .set_section_default(CFG_KEY_ECDSA_ROOT_PUBKEY_COUNT, "10")
-            .set_section_default(CFG_KEY_ENABLE_HTTP_HEADER_DESCRIPTORS, "false")
             .set_section_default(CFG_KEY_ENTER_RESTORE_STATE, "false")
             .set_section_default(CFG_KEY_ENABLE_SIWE_VALIDATION, "true")
             .set_section_default(CFG_KEY_ACTIONS_SOCKET, CFG_KEY_ACTIONS_SOCKET_DEFAULT)
-            .set_section_default(CFG_KEY_ACTIONS_SANDBOX, "true")
             .set_section_default(CFG_KEY_HEALTH_POLL_INTERVAL_MS, "60000")
             .set_section_default(CFG_KEY_ENABLE_RATE_LIMITING_ALLOCATION, "false");
 
@@ -316,15 +266,6 @@ impl LitNodeConfig for LitConfig {
         Ok(self.api_port(self.https_enabled())? as u16)
     }
 
-    fn node_address(&self) -> Result<H160> {
-        let secret_key = SigningKey::from_bytes(GenericArray::from_slice(
-            &encoding::hex_to_bytes(self.blockchain_wallet_private_key(None)?)
-                .expect_or_err("Failed to hex encode node.private_key config var")?,
-        ))
-        .expect_or_err("Could not convert node.private_key config var to SigningKey")?;
-        Ok(secret_key_to_address(&secret_key))
-    }
-
     fn rpc_url(&self) -> Result<String> {
         if let Ok(url) = self.get_section_string(CFG_KEY_RPC_URL) {
             return Ok(url);
@@ -356,14 +297,6 @@ impl LitNodeConfig for LitConfig {
             })
     }
 
-    fn key_path(&self, staker_address: &str) -> PathBuf {
-        key_path(staker_address)
-    }
-
-    fn typed_key_path(&self, keytype: &str, staker_address: &str) -> PathBuf {
-        typed_key_path(keytype, staker_address)
-    }
-
     fn webauthn_allowed_origins(&self) -> Result<Vec<Url>> {
         let origins: Vec<String> = self
             .get_section_string(CFG_KEY_WEBAUTHN_ALLOWED_ORIGINS)
@@ -387,23 +320,8 @@ impl LitNodeConfig for LitConfig {
         Ok(origins)
     }
 
-    fn peer_reviewer_limit(&self) -> Result<u8> {
-        self.get_section_int(CFG_KEY_PEER_REVIEWER_LIMIT)
-            .map(|i| i as u8)
-    }
-
-    fn peer_reviewer_interval(&self) -> Result<u64> {
-        self.get_section_int(CFG_KEY_PEER_REVIEWER_INTERVAL)
-            .map(|i| i as u64)
-    }
-
     fn http_client_timeout(&self) -> Result<u64> {
         self.get_section_int(CFG_KEY_HTTP_CLIENT_TIMEOUT)
-            .map(|i| i as u64)
-    }
-
-    fn http_client_patience(&self) -> Result<u64> {
-        self.get_section_int(CFG_KEY_HTTP_CLIENT_PATIENCE)
             .map(|i| i as u64)
     }
 
@@ -428,48 +346,16 @@ impl LitNodeConfig for LitConfig {
         self.get_section_bool(CFG_KEY_ENABLE_EPOCH_TRANSITIONS)
     }
 
-    fn enable_ecdsa_dkg(&self) -> Result<bool> {
-        self.get_section_bool(CFG_KEY_ENABLE_ECDSA_DKG)
-    }
-
-    fn enable_ecdsa_batch_sending(&self) -> Result<bool> {
-        self.get_section_bool(CFG_KEY_ENABLE_ECDSA_BATCH_SENDING)
-    }
-
-    fn enable_ecdsa_dkg_batch_sending(&self) -> Result<bool> {
-        self.get_section_bool(CFG_KEY_ENABLE_ECDSA_DKG_BATCH_SENDING)
-    }
-
-    fn enable_http_header_descriptors(&self) -> Result<bool> {
-        self.get_section_bool(CFG_KEY_ENABLE_HTTP_HEADER_DESCRIPTORS)
-    }
-
     fn enable_siwe_validation(&self) -> Result<bool> {
         self.get_section_bool(CFG_KEY_ENABLE_SIWE_VALIDATION)
-    }
-
-    fn enable_actions_sandbox(&self) -> Result<bool> {
-        self.get_section_bool(CFG_KEY_ACTIONS_SANDBOX)
     }
 
     fn ecdsa_round_timeout(&self) -> Result<i64> {
         self.get_section_int(CFG_KEY_ECDSA_ROUND_TIMEOUT)
     }
 
-    fn ecdsa_batch_send_interval(&self) -> Result<i64> {
-        self.get_section_int(CFG_KEY_ECDSA_BATCH_SEND_INTERVAL)
-    }
-
-    fn message_queue_process_length(&self) -> Result<i64> {
-        self.get_section_int(CFG_KEY_MESSAGE_QUEUE_PROCESS_LENGTH)
-    }
-
     fn chain_polling_interval_ms(&self) -> Result<i64> {
         self.get_section_int(CFG_KEY_CHAIN_POLLING_INTERVAL_MS)
-    }
-
-    fn ecdsa_root_pubkey_count(&self) -> Result<i64> {
-        self.get_section_int(CFG_KEY_ECDSA_ROOT_PUBKEY_COUNT)
     }
 
     fn enter_restore_state(&self) -> Result<bool> {

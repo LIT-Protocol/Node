@@ -1,4 +1,5 @@
-const { ethers } = require('ethers-v5');
+import hre from 'hardhat';
+const { ethers } = hre;
 
 function newWallet() {
   const wallet = ethers.Wallet.createRandom();

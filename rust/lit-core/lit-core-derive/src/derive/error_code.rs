@@ -91,7 +91,6 @@ pub(crate) fn derive_error_code(input: &DeriveInput) -> TokenStream {
 
 #[derive(Clone)]
 pub struct CodeAttr {
-    pub name: Ident,
     valid: bool,
     pub magic: Option<MagicAttrName>,
     pub value: Option<AttrValue>,
@@ -159,7 +158,6 @@ impl Parse for CodeAttr {
         };
 
         Ok(Self {
-            name,
             valid: false, // Updated later.
             magic,
             value,

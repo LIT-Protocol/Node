@@ -101,7 +101,6 @@ pub struct AllowlistCache {
 
 pub struct AllowlistEntry {
     pub allowed: bool,
-    pub last_retrieved_at: SystemTime,
 }
 
 pub struct AuthContextCache {

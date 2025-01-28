@@ -56,6 +56,7 @@ pub async fn node_share_push_direct(
     Ok(true)
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct ParsedTxnPrefix {
     pub epoch_number: u128,
@@ -104,6 +105,7 @@ where
     operation_type_and_id.starts_with("EPOCH_DKG")
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct ParsedNodeShareKey {
     pub operation_type_and_id: String,

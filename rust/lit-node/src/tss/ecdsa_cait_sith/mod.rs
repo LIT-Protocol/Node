@@ -8,11 +8,10 @@ use super::common::traits::epoch_manager::EpochManager;
 use super::common::traits::signable::Signable;
 use crate::error::{unexpected_err, unexpected_err_code, Result, EC};
 use crate::p2p_comms::web::models::SignedMessageShare;
-use crate::peers::peer_state::models::SimplePeerExt;
+use crate::peers::peer_state::models::{SimplePeer, SimplePeerExt};
 use crate::peers::utils::derministic_subset::DeterministicSubset;
 #[cfg(feature = "rtmetrics")]
 use crate::tasks::realtime_metrics::{MetricAction, MetricActionType, MetricsMessage::NewAction};
-use crate::tasks::utils::generate_hash;
 use crate::tss::common::tss_state::TssState;
 use crate::tss::common::{curve_type::CurveType, dkg_type::DkgType};
 use elliptic_curve::sec1::ToEncodedPoint;
@@ -251,7 +250,7 @@ impl Signable for CsEcdsaState {
         epoch: Option<u64>,
     ) -> Result<SignedMessageShare> {
         let tx_metrics = self.state.tx_metrics_manager.clone();
-        let txn_id = generate_hash(request_id.clone());
+        let txn_id = Vec::<SimplePeer>::generate_hash(request_id.clone());
         #[cfg(feature = "rtmetrics")]
         let _ = tx_metrics
             .send_async(NewAction(MetricAction {

@@ -247,19 +247,11 @@ pub async fn node_fsm_worker(
                         info!("Node is online, but not part of the current validators.  Waiting for next epoch to join.  Preloading Peer State Data.");
                         let _ = get_current_and_new_peer_addresses(peer_state.clone()).await;
                     }
-
-                    State::Active | State::PendingActive => {
-                        _node_state.next(Transition::ActiveLeaveSlash);
-                    }
-                    State::Locked => {
-                        let validators_in_active_state =
-                            peer_state.validators_in_active_state().await;
-
-                        if let Err(e) = validators_in_active_state {
+                    State::Active | State::PendingActive | State::Locked => {
+                        if let Err(e) = peer_state.validators_in_active_state().await {
                             error!("Error in handle_if_validators_in_active_state: {}", e);
                         }
-                        // looks like we should be checking to see if this node is in the active set before slashing.
-                        _node_state.next(Transition::LockedSlash);
+                        _node_state.next(Transition::Leave)
                     }
                     State::Suspended => {
                         if epoch_number > previous_included_epoch_number + 1 {

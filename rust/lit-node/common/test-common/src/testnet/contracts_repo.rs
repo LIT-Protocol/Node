@@ -1,6 +1,7 @@
 use std::borrow::BorrowMut;
+use std::env;
 use std::io::BufReader;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::sync::Arc;
 use std::time::SystemTime;
@@ -108,7 +109,8 @@ impl WalletManifestItem {
     pub fn assert_against_node_config(&self) {
         let config_file = &format!(
             "{}/node_configs/lit_config{}.toml",
-            LITCONTRACTPATH, self.idx
+            contracts_dir().display(),
+            self.idx
         );
         let config_path = Path::new(config_file);
         let config = SimpleToml::try_from(config_path).expect("Couldn't read config file");
@@ -179,19 +181,20 @@ pub struct WalletManifestStakerWallet {
 }
 
 pub fn node_configs_path() -> String {
-    format!("{}/node_configs", LITCONTRACTPATH)
+    format!("{}/node_configs", contracts_dir().display())
 }
 
 pub fn alias_node_configs_path() -> String {
-    format!("{}/alias_node_configs", LITCONTRACTPATH)
+    format!("{}/alias_node_configs", contracts_dir().display())
 }
 
 pub fn request_to_leave(staker_wallet_private_key: &str, staking_contract_address: &str) {
     // Full command: HARDHAT_NETWORK=<NETWORK> npx ts-node --files scripts/requestToLeave.ts --staker-wallet-private-key <PRIVATE_KEY> --staking-address <STAKING_CONTRACT_ADDRESS>
+    let script_path = contracts_dir().join("scripts").join("requestToLeave.ts");
     let args = [
         "ts-node",
         "--files",
-        "scripts/requestToLeave.ts",
+        script_path.to_str().unwrap(),
         "--staker-wallet-private-key",
         staker_wallet_private_key,
         "--staking-address",
@@ -199,13 +202,13 @@ pub fn request_to_leave(staker_wallet_private_key: &str, staking_contract_addres
     ];
     info!(
         "Running full command in {}: HARDHAT_NETWORK=localchain npx {}",
-        LITCONTRACTPATH,
+        contracts_dir().display(),
         args.join(" ")
     );
     let mut rv = Command::new("npx")
         .args(args)
         .env("HARDHAT_NETWORK", "localchain")
-        .current_dir(fs::canonicalize(LITCONTRACTPATH).unwrap())
+        .current_dir(contracts_dir())
         // .stderr(Stdio::null()) // comment this out to see what's going on
         // .stdout(Stdio::null()) // comment this out to see what's going on
         .group_spawn()
@@ -257,14 +260,14 @@ pub fn request_to_join<T>(
     ];
     info!(
         "Running full command in {}: HARDHAT_NETWORK=localchain npx {}",
-        LITCONTRACTPATH,
+        contracts_dir().display(),
         args.join(" ")
     );
 
     let mut rv = Command::new("npx")
         .args(args)
         .env("HARDHAT_NETWORK", "localchain")
-        .current_dir(fs::canonicalize(LITCONTRACTPATH).unwrap())
+        .current_dir(contracts_dir())
         // .stderr(Stdio::null()) // comment this out to see what's going on
         // .stdout(Stdio::null()) // comment this out to see what's going on
         .group_spawn()
@@ -283,9 +286,7 @@ pub fn request_to_join<T>(
 /// and setup.
 pub fn latest_wallet_manifest(is_alias_wallet_manifest: bool) -> Vec<WalletManifestItem> {
     // Fetch the latest manifest of the deployed wallets.
-    let path = fs::canonicalize(LITCONTRACTPATH)
-        .expect("Failed to get canonical path")
-        .join("wallets");
+    let path = contracts_dir().join("wallets");
 
     // Wallet manifests are named similar to this example: `wallets-1698822800413-localchain-3.json`
     let re = if is_alias_wallet_manifest {
@@ -336,8 +337,7 @@ pub fn latest_wallet_manifest(is_alias_wallet_manifest: bool) -> Vec<WalletManif
 /// An alias manifest is a JSON file that declares the details of how to (generate and) add a new wallet
 /// as an alias of an existing wallet / node.
 pub fn get_alias_manifest_template() -> AddAliasManifest {
-    let alias_manifest_template_path = fs::canonicalize(LITCONTRACTPATH)
-        .expect("Failed to get canonical path")
+    let alias_manifest_template_path = contracts_dir()
         .join("scripts")
         .join("generate_wallet_and_add_as_alias_manifest.template.json");
     let alias_manifest_template =
@@ -347,8 +347,7 @@ pub fn get_alias_manifest_template() -> AddAliasManifest {
 }
 
 pub fn save_alias_manifest(alias_manifest: &AddAliasManifest) {
-    let alias_manifest_path = fs::canonicalize(LITCONTRACTPATH)
-        .expect("Failed to get canonical path")
+    let alias_manifest_path = contracts_dir()
         .join("scripts")
         .join("generate_wallet_and_add_as_alias_manifest.json");
     let alias_manifest =
@@ -367,12 +366,12 @@ pub fn generate_wallet_and_add_as_alias() {
     ];
     info!(
         "Running full command in {}: npx {}",
-        LITCONTRACTPATH,
+        contracts_dir().display(),
         args.join(" ")
     );
     let mut rv = populate_required_environment_variables(Command::new("npx").borrow_mut())
         .args(args)
-        .current_dir(fs::canonicalize(LITCONTRACTPATH).unwrap())
+        .current_dir(contracts_dir())
         // .stderr(Stdio::null()) // comment this out to see what's going on
         // .stdout(Stdio::null()) // comment this out to see what's going on
         .group_spawn()
@@ -390,7 +389,7 @@ pub fn generate_wallet_and_add_as_alias() {
 
 pub fn start_hardhat_chain() -> GroupChild {
     Command::new("npx")
-        .current_dir(fs::canonicalize(LITCONTRACTPATH).unwrap())
+        .current_dir(contracts_dir())
         // .env("ETHERNAL_EMAIL", "user@litprotocol.com") // localhost
         // .env("ETHERNAL_PASSWORD", "somepassword")
         .arg("hardhat")
@@ -411,8 +410,32 @@ pub fn compile_contracts() {
     }
 }
 
+fn contracts_dir() -> PathBuf {
+    let dir = fs::canonicalize(LITCONTRACTPATH);
+    match dir {
+        Ok(path) => path,
+        Err(_) => {
+            // let's try and find the contracts dir by moving up the directory tree until we find blockchain/contracts
+            let mut current_dir = env::current_dir().unwrap();
+            while !current_dir.join("blockchain").join("contracts").exists() {
+                current_dir = current_dir.parent().unwrap().to_path_buf();
+            }
+            fs::canonicalize(current_dir.join("blockchain").join("contracts")).unwrap()
+        }
+    }
+}
+
+fn lit_node_dir() -> PathBuf {
+    // let's try and find the lit-node dir by moving up the directory tree until we find lit-node/config
+    let mut current_dir = env::current_dir().unwrap();
+    while !current_dir.join("lit-node").join("config").exists() {
+        current_dir = current_dir.parent().unwrap().to_path_buf();
+    }
+    fs::canonicalize(current_dir.join("lit-node")).unwrap()
+}
+
 fn artifacts_exist() -> bool {
-    let path = fs::canonicalize(LITCONTRACTPATH).unwrap();
+    let path = contracts_dir();
     path.join("artifacts/contracts/lit-node/Staking.sol/Staking.json")
         .exists()
         && path
@@ -425,7 +448,7 @@ fn artifacts_exist() -> bool {
 
 fn _compile_contracts() {
     info!("{:?}", fs::canonicalize("./").unwrap());
-    let path = fs::canonicalize(LITCONTRACTPATH).unwrap();
+    let path = contracts_dir();
     info!("Compiling in {:?}", path);
     let res = Command::new("npx")
         .current_dir(path)
@@ -451,7 +474,10 @@ pub async fn remote_deployment_and_config_creation(
     generated_custom_node_runtime_config: bool,
 ) -> bool {
     // read and modify the config template
-    let config_template_path = "./config/test/deploy-config-template.json";
+    let config_template_path = lit_node_dir()
+        .join("config")
+        .join("test")
+        .join("deploy-config-template.json");
     let file = fs::File::open(config_template_path).expect("File should open read only");
     let reader = BufReader::new(file);
     let mut config: serde_json::Map<String, Value> =
@@ -486,7 +512,10 @@ pub async fn remote_deployment_and_config_creation(
     }
 
     // write the config
-    let config_path = "./config/test/deploy-config.json";
+    let config_path = lit_node_dir()
+        .join("config")
+        .join("test")
+        .join("deploy-config.json");
     let output = serde_json::to_string_pretty(&config).expect("Failed to serialize config to JSON");
     fs::write(config_path, output).expect("Unable to write config to file");
 
@@ -502,13 +531,13 @@ pub async fn remote_deployment_and_config_creation(
 
     info!(
         "Running full command in {}: npx {}",
-        LITCONTRACTPATH,
+        contracts_dir().display(),
         args.join(" ")
     );
 
     let mut rv = populate_required_environment_variables(Command::new("npx").borrow_mut())
         .args(args)
-        .current_dir(fs::canonicalize(LITCONTRACTPATH).unwrap())
+        .current_dir(contracts_dir())
         // .stderr(Stdio::null()) // comment this out to see what's going on with hardhat deploy
         // .stdout(Stdio::null()) // comment this out to see what's going on with hardhat deploy
         .group_spawn()
@@ -543,10 +572,14 @@ fn populate_required_environment_variables(command: &mut Command) -> &mut Comman
 
 pub async fn contract_addresses_from_deployment() -> ContractAddresses {
     // extract the addresses from the deployment script output
-    let deployed_core_contracts_path =
-        &format!("{}/deployed-lit-core-contracts-temp.json", LITCONTRACTPATH);
-    let deployed_node_contracts_path =
-        &format!("{}/deployed-lit-node-contracts-temp.json", LITCONTRACTPATH);
+    let deployed_core_contracts_path = &format!(
+        "{}/deployed-lit-core-contracts-temp.json",
+        contracts_dir().display()
+    );
+    let deployed_node_contracts_path = &format!(
+        "{}/deployed-lit-node-contracts-temp.json",
+        contracts_dir().display()
+    );
 
     // Read and parse JSON from deployed_core_contracts_path
     let file = fs::File::open(deployed_core_contracts_path).expect("File should open read only");
@@ -664,7 +697,7 @@ pub async fn check_and_load_chain_state_cache(
         .duration_since(SystemTime::UNIX_EPOCH)
         .unwrap()
         .as_millis();
-    let dest_path = Path::new(LITCONTRACTPATH).join(format!(
+    let dest_path = Path::new(&contracts_dir()).join(format!(
         "wallets/wallets-{}-localchain-{}.json",
         timestamp, num_nodes
     ));

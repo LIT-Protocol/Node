@@ -92,6 +92,7 @@ describe('PubkeyRouter', function () {
           'StakingFacet',
           'StakingViewsFacet',
           'StakingVersionFacet',
+          'StakingAdminFacet',
         ],
         verifyContracts: false,
         waitForDeployment: false,
@@ -100,6 +101,10 @@ describe('PubkeyRouter', function () {
     stakingDiamond = deployResult.diamond;
     staking = await ethers.getContractAt(
       'StakingFacet',
+      await stakingDiamond.getAddress()
+    );
+    const stakingAdminFacet = await ethers.getContractAt(
+      'StakingAdminFacet',
       await stakingDiamond.getAddress()
     );
     const { diamond: stakingBalancesDiamond } = await deployDiamond(
@@ -134,6 +139,7 @@ describe('PubkeyRouter', function () {
     stakingAccounts = await setupStakingWithValidatorsAndAdvance(
       ethers,
       staking,
+      stakingAdminFacet,
       stakingBalances,
       tokenContract,
       deployer,

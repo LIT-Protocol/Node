@@ -8,7 +8,7 @@ pub trait LitCliConfig {
     fn default() -> Result<LitConfig>;
     fn must_default() -> LitConfig;
     fn from_builder(builder: LitConfigBuilder) -> Result<LitConfig>;
-    fn default_ascii_table(&self) -> Table<'static>;
+    fn default_ascii_table(&self) -> Table;
 }
 
 impl LitCliConfig for LitConfig {
@@ -30,7 +30,7 @@ impl LitCliConfig for LitConfig {
 
     // Util
 
-    fn default_ascii_table(&self) -> Table<'static> {
+    fn default_ascii_table(&self) -> Table {
         let mut table = Table::new();
         table.style = TableStyle::simple();
 

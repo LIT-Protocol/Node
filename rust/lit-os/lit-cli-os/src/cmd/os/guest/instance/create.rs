@@ -541,7 +541,7 @@ pub(crate) async fn do_os_guest_instance_create(
             custom_args.as_ref().map(|a| a.kind.clone()).as_deref(),
         ) {
             // Get the first (latest) matching template.
-            template = Some(items.get(0).expect("expected to have template items").clone());
+            template = Some(items.first().expect("expected to have template items").clone());
         } else {
             eprintln!(
                 "No template id's found matching; type: {:?}, env: {:?}, id: {:?}",
@@ -682,7 +682,7 @@ pub(crate) async fn do_os_guest_instance_create(
     cmd.arg("-subnet-id")
         .arg(&subnet_id)
         .arg("-vcpus")
-        .arg(&guest_vcpus.to_string())
+        .arg(guest_vcpus.to_string())
         .arg("-mem")
         .arg(&guest_mem)
         .stdout(Stdio::piped())

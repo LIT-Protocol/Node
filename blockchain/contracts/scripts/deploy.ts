@@ -72,7 +72,9 @@ async function run() {
   );
 
   // only exit once the child process has exited.
+  console.log('Waiting for deployWithHardhat to exit');
   const exitCode = await waitForProcessToExit(deployWithHardhat);
+  console.log('deployWithHardhat exited with code', exitCode);
   process.exit(exitCode);
 }
 

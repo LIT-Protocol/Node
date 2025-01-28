@@ -94,6 +94,8 @@ describe('PKPNFT', function () {
       [ethers.parseUnits('1000000000', 18)] // 1b tokens
     );
 
+    console.log('deploying staking');
+
     const { diamond: stakingDiamond } = await deployDiamond(
       'Staking',
       await contractResolver.getAddress(),
@@ -103,6 +105,7 @@ describe('PKPNFT', function () {
           'StakingFacet',
           'StakingViewsFacet',
           'StakingVersionFacet',
+          'StakingAdminFacet',
         ],
         verifyContracts: false,
         waitForDeployment: false,
@@ -110,6 +113,10 @@ describe('PKPNFT', function () {
     );
     stakingContract = await ethers.getContractAt(
       'StakingFacet',
+      await stakingDiamond.getAddress()
+    );
+    const stakingAdminFacet = await ethers.getContractAt(
+      'StakingAdminFacet',
       await stakingDiamond.getAddress()
     );
     const { diamond: stakingBalancesDiamond } = await deployDiamond(
@@ -127,6 +134,8 @@ describe('PKPNFT', function () {
       await stakingBalancesDiamond.getAddress()
     );
 
+    console.log('deploying keyderiver');
+
     if (hre.network.name === 'localchainArbitrum') {
       keyDeriver = await ethers.deployContract('ArbitrumKeyDeriver', [
         await contractResolver.getAddress(),
@@ -135,6 +144,8 @@ describe('PKPNFT', function () {
     } else {
       keyDeriver = await ethers.deployContract('KeyDeriver');
     }
+
+    console.log('setting contract resolver');
 
     await setContractResolver(contractResolver, Environment.DEV, {
       tokenContract,
@@ -155,18 +166,23 @@ describe('PKPNFT', function () {
 
     // Mint enough tokens for the deployer
     await tokenContract.mint(deployer.address, totalTokens);
+
+    console.log('setting up staking');
+
     stakingAccounts = await setupStakingWithValidatorsAndAdvance(
       ethers,
       stakingContract,
+      stakingAdminFacet,
       stakingBalances,
       tokenContract,
       deployer,
       {
-        numValidators: 2,
+        numValidators: 3,
         startingPort: 7777,
         ipAddress: '192.168.1.1',
       }
     );
+    console.log('voting for root keys');
     await allNodesVoteForRootKeys(
       ethers,
       router,
@@ -195,6 +211,12 @@ describe('PKPNFT', function () {
       const transaction = {
         value: mintCost,
       };
+
+      // // debug - uncomment tocheck the root keys
+      // const rootKeys = await router.getRootKeys(
+      //   await stakingContract.getAddress()
+      // );
+      // console.log('root keys', rootKeys);
 
       const tx = await pkpContract.mintNext(2, transaction);
       expect(tx).to.emit(pkpContract, 'PKPMinted');
@@ -249,6 +271,7 @@ describe('PKPNFT', function () {
         2,
         derivedKeyId,
         sigs,
+        await stakingContract.getAddress(),
         transaction
       );
       expect(tx).to.emit(pkpContract, 'PKPMinted');

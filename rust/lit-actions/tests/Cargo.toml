@@ -10,13 +10,20 @@ autotests = false
 name = "integration"
 path = "it.rs"
 
+[[bench]]
+name = "execute_js"
+path = "bench.rs"
+harness = false
+
 [dependencies]
 anyhow = { workspace = true }
+criterion = { version = "0.5", features = ["async_tokio", "html_reports"] }
 ctor = "0.2"
 flume = { workspace = true }
 gotham_store = "1"
 indoc = { workspace = true }
 lit-actions-server = { workspace = true }
+lit-core = { workspace = true }
 pretty_assertions = "1"
 pretty_env_logger = "0.5"
 rstest = "0.19"

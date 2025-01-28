@@ -26,7 +26,7 @@ pub async fn test_sdk() {
         .arg("add")
         .arg("@lit-protocol/lit-node-client-nodejs@3.0.32")
         .arg("ethers")
-        .arg("siwe")
+        .arg("siwe@2.3.2")
         .status()
         .await
         .expect("Failed to install package with yarn");

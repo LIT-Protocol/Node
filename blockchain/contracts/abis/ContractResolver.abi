@@ -182,6 +182,19 @@
   },
   {
     "inputs": [],
+    "name": "CLONE_NET_CONTRACT",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "DEFAULT_ADMIN_ROLE",
     "outputs": [
       {
@@ -209,6 +222,19 @@
   {
     "inputs": [],
     "name": "HD_KEY_DERIVER_CONTRACT",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "HOST_COMMANDS_CONTRACT",
     "outputs": [
       {
         "internalType": "bytes32",

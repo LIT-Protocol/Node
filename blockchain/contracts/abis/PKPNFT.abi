@@ -618,6 +618,11 @@
         "internalType": "struct IPubkeyRouter.Signature[]",
         "name": "signatures",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "stakingContractAddress",
+        "type": "address"
       }
     ],
     "name": "claimAndMint",

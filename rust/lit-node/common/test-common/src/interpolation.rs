@@ -72,12 +72,15 @@ pub async fn interpolate_secret(
             .await
             .to_be_bytes()
             .to_vec(),
-            CurveType::RedJubjub => interpolate_secret_for_key::<jubjub::SubgroupPoint>(
-                peers, pubkey, epoch, curve_type,
-            )
-            .await
-            .to_be_bytes()
-            .to_vec(),
+            CurveType::RedJubjub => {
+                let fr = interpolate_secret_for_key::<jubjub::SubgroupPoint>(
+                    peers, pubkey, epoch, curve_type,
+                )
+                .await;
+                let mut bytes = fr.to_bytes();
+                bytes.reverse();
+                bytes.to_vec()
+            }
         };
 
     secret

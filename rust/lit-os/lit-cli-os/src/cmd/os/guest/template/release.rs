@@ -131,7 +131,7 @@ pub(crate) async fn do_release_template(
 
     cfg.verify_env_available(&build_release_env).expect("env verification failed");
 
-    let subnet_id = remove_0x_prefix(&args.subnet_id.unwrap_or_else(|| {
+    let subnet_id = remove_0x_prefix(args.subnet_id.unwrap_or_else(|| {
         if !cfg.env().eq_str(build_release) {
             panic!("--subnet-id is required when releasing to a different environment than the default ({})", cfg.env());
         }
@@ -554,7 +554,7 @@ async fn request_remote_pinning(cfg: &LitConfig, pins: &mut Vec<IpfsPinItem>, qu
     // TODO: Hardcoded to pinata atm.
     let pinata_sdk = cfg.pinata_client().expect("failed to load PinataApi client");
     let remote = "pinata";
-    let remotes = vec![remote];
+    let remotes = [remote];
     for pin in pins.iter() {
         cur += 1;
 

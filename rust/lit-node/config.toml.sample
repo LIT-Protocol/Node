@@ -24,7 +24,6 @@ rpc_url = "https://rpc.ankr.com/polygon_mumbai"
 enable_rate_limiting = false
 enable_actions_allowlist = false
 enable_epoch_transitions = false
-enable_ecdsa_dkg = true
 
 staker_address = ""
 admin_address = ""

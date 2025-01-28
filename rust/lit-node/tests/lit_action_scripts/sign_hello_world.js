@@ -7,7 +7,9 @@ const go = async () => {
   // *** The sigName field will be "sig1" ***
 
   let utf8Encode = new TextEncoder();
-  const toSign = utf8Encode.encode('Hello World');
+  const toSign = ethers.utils.arrayify(
+    ethers.utils.keccak256(utf8Encode.encode('Hello World'))
+  );
   const sigShare = await LitActions.signEcdsa({ toSign, publicKey, sigName });
 };
 go();

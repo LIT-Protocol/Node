@@ -1,7 +1,6 @@
 use crate::error::{unexpected_err, Result};
 use crate::peers::peer_state::models::{SimplePeer, SimplePeerExt};
 use crate::peers::PeerState;
-use crate::tasks::utils::generate_hash;
 use rand::seq::SliceRandom;
 use rand::{rngs::StdRng, SeedableRng};
 use std::time::SystemTime;
@@ -9,6 +8,7 @@ use std::time::SystemTime;
 #[derive(Debug)]
 pub struct DeterministicSubset {
     pub all_peers: Vec<SimplePeer>, // list of nodes, by index >>> replace this with complaints?
+    #[allow(dead_code)]
     pub created_at: SystemTime,
 }
 
@@ -70,7 +70,7 @@ impl DeterministicSubset {
 
         let mut to_hash = message_bytes.to_vec();
         to_hash.extend_from_slice(request_id);
-        let message_hash = generate_hash(&to_hash);
+        let message_hash = Vec::<SimplePeer>::generate_hash(&to_hash);
         let mut rng = StdRng::seed_from_u64(message_hash);
 
         let mut shuffled_subset = self.all_peers.active_peers().clone();

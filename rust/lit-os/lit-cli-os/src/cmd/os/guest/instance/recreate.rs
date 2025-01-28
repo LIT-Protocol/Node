@@ -14,6 +14,7 @@ use lit_core::config::LitConfig;
 use lit_os_core::guest::types::GuestType;
 
 use crate::guest::instance::helper::GuestInstanceHelper;
+use crate::guest::instance::helper::GuestInstanceItemHelper;
 use crate::guest::instance::{find_latest_guest_instance, find_one_guest_instance};
 
 #[derive(Debug, Args)]
@@ -85,6 +86,8 @@ pub(crate) struct GuestInstanceRecreate {
     /// Do not automatically delete the old instance.
     #[arg(long, short)]
     preserve: bool,
+    #[arg(long, short)]
+    force: bool,
 }
 
 pub(crate) async fn handle_cmd_os_guest_instance_recreate(
@@ -103,6 +106,21 @@ pub(crate) async fn handle_cmd_os_guest_instance_recreate(
 
     if let Some(item) = item {
         let guest_type = item.build_env.guest_type().expect("build.env missing GuestType");
+
+        if guest_type == GuestType::Prov {
+            // Note (Harry): Should be handeled gracefully but all other functions panic here...
+            panic!("Cannot recreate an instance with guest type: Prov");
+        }
+        if guest_type == GuestType::Node
+            && !args.force
+            && item.is_active_on_network(&cfg).await.expect("node type should never fail")
+        {
+            panic!(
+                "NOT recreating, node is active on subnet {:?}. Leave first, or AT RISK OF SLASHING set --force to override",
+                item.instance_env.subnet_id.unwrap()
+            );
+        }
+
         let common_args = GuestInstanceCreateArgsCommon {
             name: args.name.clone(),
             label: args.label.clone(),

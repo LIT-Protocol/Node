@@ -8,7 +8,8 @@ members = [
     "lit-os-prov-api",
     "lit-os-prov-api-client",
     "lit-attestation-service",
-    "lit-logging-service"
+    "lit-logging-service",
+    "lit-node-operator"
 ]
 default-members = [
     "lit-os-core",

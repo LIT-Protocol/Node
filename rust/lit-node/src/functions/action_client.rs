@@ -8,7 +8,6 @@ use std::collections::{BTreeMap, HashMap};
 use std::error::Error as _;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::time::Duration;
 
 use anyhow::{bail, Context as _, Result};
 use base64_light::base64_decode;
@@ -26,6 +25,7 @@ use lit_core::config::LitConfig;
 use lit_core::error::Unexpected;
 use lit_core::utils::binary::bytes_to_hex;
 use moka::future::Cache;
+use tokio::time::Duration;
 use tracing::{debug, instrument};
 
 use crate::access_control::rpc_url;
@@ -38,13 +38,13 @@ use crate::models::{self, RequestConditions, UnifiedConditionCheckResult};
 use crate::p2p_comms::CommsManager;
 use crate::peers::peer_state::models::SimplePeerExt;
 use crate::pkp;
-use crate::tasks::beaver_manager::listener::leader_addr;
 use crate::tasks::beaver_manager::models::generate_hash;
 use crate::tss::dkg::curves::common::CurveType;
 use crate::utils::encoding::{self, BeBytes, BeHex, CompressedPointHex, UncompressedPointHex};
 use crate::utils::web::{get_bls_root_pubkey, hash_access_control_conditions, EndpointVersion};
 
 const DEFAULT_TIMEOUT_MS: u64 = 30000; // 30s
+const DEFAULT_CLIENT_TIMEOUT_MS_BUFFER: u64 = 5000;
 const DEFAULT_MEMORY_LIMIT_MB: u32 = 256; // 256MB
 
 const DEFAULT_MAX_CODE_LENGTH: usize = 16 * 1024 * 1024; // 16MB
@@ -55,7 +55,7 @@ const DEFAULT_MAX_RESPONSE_LENGTH: usize = 1024 * 100; // 100KB
 const DEFAULT_MAX_SIGN_COUNT: u32 = 10; // 10 signature requests per action execution
 const DEFAULT_MAX_BROADCAST_AND_COLLECT_COUNT: u32 = 30;
 const DEFAULT_MAX_CALL_DEPTH: u32 = 5;
-const DEFAULT_CLIENT_TIMEOUT_MS_BUFFER: u64 = 5000;
+const DEFAULT_MAX_RETRIES: u32 = 3;
 
 #[derive(Debug, Default, Builder)]
 pub struct Client {
@@ -80,6 +80,8 @@ pub struct Client {
     timeout_ms: u64,
     #[builder(default = "DEFAULT_MEMORY_LIMIT_MB")]
     memory_limit_mb: u32,
+    #[builder(default = "DEFAULT_MAX_CODE_LENGTH")]
+    max_code_length: usize,
     #[builder(default = "DEFAULT_MAX_RESPONSE_LENGTH")]
     max_response_length: usize,
     #[builder(default = "DEFAULT_MAX_CONSOLE_LOG_LENGTH")]
@@ -94,6 +96,8 @@ pub struct Client {
     max_broadcast_and_collect_count: u32,
     #[builder(default = "DEFAULT_MAX_CALL_DEPTH")]
     max_call_depth: u32,
+    #[builder(default = "DEFAULT_MAX_RETRIES")]
+    max_retries: u32,
 
     // State
     #[builder(setter(skip))]
@@ -111,6 +115,7 @@ pub struct ExecutionState {
     pub claim_data: HashMap<String, models::JsonPKPClaimKeyResponse>,
     pub contract_call_count: u32,
     pub broadcast_and_collect_count: u32,
+    pub ops_count: u32,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -158,6 +163,10 @@ impl Client {
         })
     }
 
+    fn client_timeout(&self) -> Duration {
+        Duration::from_millis(self.timeout_ms + DEFAULT_CLIENT_TIMEOUT_MS_BUFFER)
+    }
+
     pub fn request_id(&self) -> String {
         self.request_id.clone().unwrap_or_default()
     }
@@ -203,33 +212,78 @@ impl Client {
         std::mem::take(&mut self.state);
     }
 
-    #[instrument(skip_all, ret)]
+    #[instrument(skip_all, ret, level = "debug")]
     pub async fn execute_js(
         &mut self,
         opts: impl Into<ExecutionOptions>,
     ) -> Result<ExecutionState, crate::error::Error> {
         self.reset_state();
         let opts = opts.into();
-        Box::pin(self.execute_js_inner(opts.code, opts.globals, opts.action_ipfs_id, 0))
-            .await
-            .map_err(|e| {
-                if let Some(status) = e.downcast_ref::<Status>() {
-                    match status.code() {
-                        Code::DeadlineExceeded => timeout_err(status.message(), None),
-                        Code::ResourceExhausted => memory_limit_err(status.message(), None),
-                        _ => unexpected_err(e, None),
+        let timeout = self.client_timeout();
+
+        // Hand-roll retry loop as crates like tokio-retry or again don't play well with &mut self
+        let mut retry = 0;
+        loop {
+            let execution = Box::pin(self.execute_js_inner(
+                opts.code.clone(),
+                opts.globals.clone(),
+                opts.action_ipfs_id.clone(),
+                0,
+            ));
+            let execution_result =
+                tokio::time::timeout(timeout, execution)
+                    .await
+                    .map_err(|_| {
+                        timeout_err(
+                            format!("lit_actions didn't respond within {timeout:?}"),
+                            None,
+                        )
+                    })?;
+            match execution_result {
+                Ok(state) => return Ok(state),
+                Err(e) => {
+                    let last_error = if let Some(status) = e.downcast_ref::<Status>() {
+                        let msg = status.message();
+                        match status.code() {
+                            Code::DeadlineExceeded => return Err(timeout_err(msg, None)),
+                            Code::ResourceExhausted => return Err(memory_limit_err(msg, None)),
+                            Code::Unavailable => {
+                                // This error occurs when NGINX can't connect to any healthy
+                                // lit_actions instance and returns the gRPC status code 14
+                                connect_err(msg, None)
+                            }
+                            // NB: We could also retry on `Code::Internal if msg == "h2 protocol error: error reading a body from connection"`.
+                            // However, that likely means lit_actions has crashed *while* executing JS, which we can't recover from.
+                            _ => return Err(unexpected_err(msg, None)),
+                        }
+                    } else if let Some(te) = e.downcast_ref::<TransportError>() {
+                        // This error occurs when the socket file is missing or lit_actions is down
+                        // - connection error: No such file or directory (os error 2)
+                        // - connection error: Connection refused (os error 61)
+                        connect_err(te.source().unwrap_or(te).to_string(), None)
+                    } else if let Some(se) = e.downcast_ref::<flume::SendError<ExecuteJsRequest>>()
+                    {
+                        // This error occurs when NGINX can't connect to any healthy lit_actions instance
+                        // - connection error: sending on a closed channel
+                        connect_err(se.source().unwrap_or(se).to_string(), None)
+                    } else {
+                        return Err(unexpected_err(e, None));
+                    };
+
+                    // Never retry in-flight requests, which may have modified state
+                    if retry >= self.max_retries || self.state.ops_count != 0 {
+                        return Err(last_error);
                     }
-                } else if let Some(te) = e.downcast_ref::<TransportError>() {
-                    connect_err(te.source().unwrap_or(te).to_string(), None)
-                } else if let Some(se) = e.downcast_ref::<flume::SendError<ExecuteJsRequest>>() {
-                    connect_err(se.source().unwrap_or(se).to_string(), None)
-                } else {
-                    unexpected_err(e, None)
+                    let backoff = tokio::time::Duration::from_secs(2u64.pow(retry));
+                    error!("Retrying execute_js in {backoff:?}, cause: {last_error:?}");
+                    tokio::time::sleep(backoff).await;
+                    retry += 1;
                 }
-            })
+            }
+        }
     }
 
-    #[instrument(skip(self), err)]
+    #[instrument(skip(self), err, level = "debug")]
     async fn execute_js_inner(
         &mut self,
         code: Arc<String>,
@@ -237,57 +291,28 @@ impl Client {
         action_ipfs_id: Option<String>,
         call_depth: u32,
     ) -> Result<ExecutionState> {
-        if code.len() > DEFAULT_MAX_CODE_LENGTH {
+        if code.len() > self.max_code_length {
             bail!(
                 "Code payload is too large ({} bytes). Max length is {} bytes.",
                 code.len(),
-                DEFAULT_MAX_CODE_LENGTH,
+                self.max_code_length,
             );
         }
 
         let (outbound_tx, outbound_rx) = flume::bounded(0);
         let channel = unix::connect_to_socket(self.socket_path()).await?;
-
-        let mut stream = match tokio::time::timeout(
-            Duration::from_millis(self.timeout_ms + DEFAULT_CLIENT_TIMEOUT_MS_BUFFER),
-            ActionClient::new(channel)
-                .execute_js(Request::from_parts(
-                    self.metadata()?,
-                    Extensions::default(),
-                    outbound_rx.into_stream(),
-                ))
-                // Fix "implementation of `std::marker::Send` is not general enough"
-                // Workaround for compiler bug https://github.com/rust-lang/rust/issues/96865
-                // See https://github.com/rust-lang/rust/issues/100013#issuecomment-2052045872
-                .boxed(),
-        )
-        .await
-        {
-            Ok(stream) => stream?.into_inner(),
-            Err(e) => {
-                return Err(timeout_err(
-                    format!(
-                        "execution timeout of {}ms on lit-node side was hit",
-                        self.timeout_ms + DEFAULT_CLIENT_TIMEOUT_MS_BUFFER
-                    ),
-                    None,
-                )
-                .into())
-            }
-        };
-
-        // let mut stream = ActionClient::new(channel)
-        // .execute_js(Request::from_parts(
-        //     self.metadata()?,
-        //     Extensions::default(),
-        //     outbound_rx.into_stream(),
-        // ))
-        // // Fix "implementation of `std::marker::Send` is not general enough"
-        // // Workaround for compiler bug https://github.com/rust-lang/rust/issues/96865
-        // // See https://github.com/rust-lang/rust/issues/100013#issuecomment-2052045872
-        // .boxed()
-        // .await?
-        // .into_inner();
+        let mut stream = ActionClient::new(channel)
+            .execute_js(Request::from_parts(
+                self.metadata()?,
+                Extensions::default(),
+                outbound_rx.into_stream(),
+            ))
+            // Fix "implementation of `std::marker::Send` is not general enough"
+            // Workaround for compiler bug https://github.com/rust-lang/rust/issues/96865
+            // See https://github.com/rust-lang/rust/issues/100013#issuecomment-2052045872
+            .boxed()
+            .await?
+            .into_inner();
 
         let auth_context = {
             // Add current ipfs id to the end of the action_ipfs_ids vec
@@ -315,54 +340,48 @@ impl Client {
             .context("failed to send execution request")?;
 
         // Handle responses from server
-        while let Some(resp) = stream.next().await {
+        while let Some(resp) = stream.try_next().await? {
             debug!(?resp);
-            match resp {
-                Ok(resp) => {
-                    match resp.union {
-                        // Return final result from server
-                        Some(UnionResponse::Result(res)) => {
-                            if !res.success {
-                                bail!(res.error);
-                            }
-                            // Return current state, which might be updated by subsequent code executions
-                            return Ok(self.state.clone());
-                        }
-                        // Handle op requests
-                        Some(op) => {
-                            let resp = match self
-                                .handle_op(op, action_ipfs_id.clone(), call_depth)
-                                .await
-                            {
-                                Ok(resp) => resp,
-                                Err(e) => ErrorResponse {
-                                    error: e.to_string(),
-                                }
-                                .into(),
-                            };
-                            outbound_tx
-                                .send_async(resp)
-                                .await
-                                .context("failed to send op response")?;
-                        }
-                        // Ignore empty responses
-                        None => {}
-                    };
+            match resp.union {
+                // Return final result from server
+                Some(UnionResponse::Result(res)) => {
+                    if !res.success {
+                        bail!(res.error);
+                    }
+                    // Return current state, which might be updated by subsequent code executions
+                    return Ok(self.state.clone());
                 }
-                Err(e) => return Err(e.into()),
-            }
+                // Handle op requests
+                Some(op) => {
+                    let resp = match self.handle_op(op, action_ipfs_id.clone(), call_depth).await {
+                        Ok(resp) => resp,
+                        Err(e) => ErrorResponse {
+                            error: e.to_string(),
+                        }
+                        .into(),
+                    };
+                    outbound_tx
+                        .send_async(resp)
+                        .await
+                        .context("failed to send op response")?;
+                }
+                // Ignore empty responses
+                None => {}
+            };
         }
 
-        unreachable!()
+        bail!("Server unexpectedly closed connection")
     }
 
-    #[instrument(skip(self), err)]
+    #[instrument(skip(self), err, level = "debug")]
     async fn handle_op(
         &mut self,
         op: UnionResponse,
         action_ipfs_id: Option<String>,
         mut call_depth: u32,
     ) -> Result<ExecuteJsRequest> {
+        self.state.ops_count += 1;
+
         Ok(match op {
             UnionResponse::SetResponse(SetResponseRequest { response }) => {
                 if response.len() > self.max_response_length {
@@ -713,7 +732,7 @@ impl Client {
                 let bls_root_pubkey = self.get_bls_root_pubkey().await?;
 
                 let identity_parameter =
-                    self.get_identity_param(&conditions, &data_to_encrypt_hash)?;
+                    Self::get_identity_param(&conditions, &data_to_encrypt_hash)?;
 
                 // Load the BLS secret key share as a blsful key for signing.
                 let cipher_state = match tss_state.get_cipher_state(CurveType::BLS) {
@@ -819,7 +838,7 @@ impl Client {
                 }
 
                 let identity_parameter =
-                    self.get_identity_param(&conditions, &data_to_encrypt_hash)?;
+                    Self::get_identity_param(&conditions, &data_to_encrypt_hash)?;
 
                 // Load the BLS secret key share as a blsful key for signing.
                 let cipher_state = match tss_state.get_cipher_state(CurveType::BLS) {
@@ -1066,7 +1085,7 @@ impl Client {
                     serde_json::from_slice(&access_control_conditions)?;
 
                 let message_bytes = &to_encrypt;
-                let identity_param = self.get_identity_param(&conditions, &data_to_encrypt_hash)?;
+                let identity_param = Self::get_identity_param(&conditions, &data_to_encrypt_hash)?;
 
                 trace!("Identity parameter: {:?}", identity_param);
 
@@ -1115,8 +1134,7 @@ impl Client {
         Ok(())
     }
 
-    fn get_identity_param(
-        &self,
+    pub fn get_identity_param(
         conditions: &Vec<models::UnifiedAccessControlConditionItem>,
         data_to_encrypt_hash: &str,
     ) -> Result<Vec<u8>> {
@@ -1282,10 +1300,10 @@ impl Client {
         };
         let peers = tss_state.peer_state.peers().await?;
         let addr = &tss_state.addr;
-        let leader_addr = leader_addr(request_hash, &peers)?;
+        let leader = peers.leader_for_active_peers(request_hash)?;
 
-        let is_leader = addr == leader_addr;
+        let is_leader = addr == &leader.socket_address;
 
-        Ok((leader_addr.clone(), is_leader))
+        Ok((leader.socket_address.clone(), is_leader))
     }
 }

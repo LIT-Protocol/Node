@@ -12,7 +12,10 @@ use std::convert::TryInto;
 use crate::auth::auth_material::JsonAuthSig;
 use crate::config::LitNodeConfig as _;
 use crate::utils::encoding;
-use ethers::{types::Signature, utils::keccak256};
+use ethers::{
+    types::{Address, Signature},
+    utils::keccak256,
+};
 use libsecp256k1::PublicKey;
 use lit_core::config::LitConfig;
 use siwe::Message;
@@ -70,20 +73,62 @@ async fn validate_wallet_sig(auth_sig: &JsonAuthSig, enable_siwe_validation: boo
         )
     })?;
 
-    let presented_address = ethers::types::Address::from_str(&auth_sig.address)
+    let presented_address = Address::from_str(&auth_sig.address)
         .map_err(|e| validation_err_code(e, EC::NodeAuthSigAddressConversionError, None))?;
 
-    // Verify the signature
     sig.verify(auth_sig.signed_message.clone(), presented_address)
         .map_err(|e| validation_err(e, Some("Invalid signature verification".into())))?;
 
-    // check for SIWE
+    let message = validate_siwe_message(auth_sig, enable_siwe_validation)?;
+
+    let sig_as_array = encoding::hex_to_bytes(&auth_sig.sig)
+        .map_err(|e| parser_err_code(e, EC::NodeSIWESigConversionError, None))?
+        .try_into()
+        .map_err(|_| conversion_err("Could not convert into fixed size slice", None))?;
+
+    // Verify the signature against the hashed message this is delegated to the EIP1271 contract for derived_via = "EIP1271"
+    let verification_result = message
+        .verify_eip191(&sig_as_array)
+        .map_err(|err| validation_err(err, Some("Error verifying SIWE signature".into())))?;
+    debug!(
+        "SIWE verification result: {:?}",
+        encoding::bytes_to_hex(&verification_result)
+    );
+
+    // Convert compressed pubkey to uncompressed
+    let mut pubkey_fixed_length: [u8; 33] = [0; 33];
+    pubkey_fixed_length.copy_from_slice(&verification_result);
+    let pubkey = PublicKey::parse_compressed(&pubkey_fixed_length)
+        .map_err(|e| parser_err(e, Some("Error parsing pubkey".into())))?;
+
+    // Convert verification_result public key to eth address
+    let pubkey_hash = keccak256(&pubkey.serialize()[1..]);
+    let mut pubkey_hash_fixed_length: [u8; 20] = [0; 20];
+    pubkey_hash_fixed_length.copy_from_slice(&pubkey_hash[12..]);
+    let siwe_recovered_address = Address::from_slice(&pubkey_hash_fixed_length);
+
+    // Verify the address only when the Optional param is available
+    if siwe_recovered_address != presented_address {
+        return Err(unexpected_err(
+            "Recovered address does not match presented address",
+            None,
+        ));
+    }
+
+    Ok(())
+}
+
+/// Validate the SIWE message and returns the SIWE Message
+pub(crate) fn validate_siwe_message(
+    auth_sig: &JsonAuthSig,
+    enable_siwe_validation: bool,
+) -> Result<Message> {
     let message: Message = auth_sig
         .signed_message
         .parse()
         .map_err(|e| parser_err(e, Some("Parse error on SIWE".into())).add_msg_to_details())?;
 
-    // do not let delegation or session signatures be used as an auth sig here
+    // Do not let delegation or session signatures be used as an auth sig here
     if INVALID_SIWE_URIS_FOR_AUTH
         .iter()
         .any(|uri| message.uri.to_string().starts_with(uri))
@@ -98,44 +143,13 @@ async fn validate_wallet_sig(auth_sig: &JsonAuthSig, enable_siwe_validation: boo
         ));
     }
 
-    // validate time-related parameters
+    // Validate time-related parameters
     if enable_siwe_validation {
         validate_siwe(&message)
             .map_err(|e| validation_err(e, Some("SIWE validation failed".into())))?;
     }
 
-    let sig_as_array = encoding::hex_to_bytes(&auth_sig.sig)
-        .map_err(|e| parser_err_code(e, EC::NodeSIWESigConversionError, None))?
-        .try_into()
-        .map_err(|_| conversion_err("Could not convert into fixed size slice", None))?;
-
-    let verification_result = message
-        .verify_eip191(&sig_as_array)
-        .map_err(|err| validation_err(err, Some("Error verifying SIWE signature".into())))?;
-    debug!(
-        "SIWE verification result: {:?}",
-        encoding::bytes_to_hex(&verification_result)
-    );
-    // convert compressed pubkey to uncompressed
-    let mut pubkey_fixed_length: [u8; 33] = [0; 33];
-    pubkey_fixed_length.copy_from_slice(&verification_result);
-    let pubkey = PublicKey::parse_compressed(&pubkey_fixed_length)
-        .map_err(|e| parser_err(e, Some("Error parsing pubkey".into())))?;
-
-    // convert verification_result public key to eth address
-    let pubkey_hash = keccak256(&pubkey.serialize()[1..]);
-    let mut pubkey_hash_fixed_length: [u8; 20] = [0; 20];
-    pubkey_hash_fixed_length.copy_from_slice(&pubkey_hash[12..]);
-    let siwe_recovered_address = ethers::types::Address::from_slice(&pubkey_hash_fixed_length);
-    if siwe_recovered_address != presented_address {
-        return Err(unexpected_err(
-            "Recovered address does not match presented address",
-            None,
-        ));
-    }
-
-    Ok(())
-    // TODO: Add more error info
+    Ok(message)
 }
 
 #[cfg(test)]

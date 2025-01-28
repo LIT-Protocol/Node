@@ -1,7 +1,7 @@
 use super::models::*;
 use super::models::{BeaverMessage, RequestMapResponse, SimpleHash};
 use crate::config::{LitNodeConfig, CFG_KEY_ECDSA_ROUND_TIMEOUT_MS_DEFAULT};
-use crate::error::{self, unexpected_err, Result};
+use crate::error::{self, unexpected_err};
 use crate::p2p_comms::CommsManager;
 use crate::peers::peer_state::models::{SimplePeer, SimplePeerExt};
 #[cfg(feature = "rtmetrics")]
@@ -116,6 +116,9 @@ impl BeaverManager {
                         BeaverMessage::Clear => {
                             self.beaver_message_clear(&mut triple_list).await;
                         }
+                        BeaverMessage::Count => {
+                            self.beaver_message_count(&mut triple_list).await;
+                        }
                         BeaverMessage::RemoveGenerationHash(txn_hash) => {
                             self.generating_txn_ids.retain(|&x| x != txn_hash);
                             warn!("Removed {}, remaining: {:?}", txn_hash, &self.generating_txn_ids);
@@ -157,7 +160,7 @@ impl BeaverManager {
                 return false;
             }
         };
-        addr_is_leader(request_key_hash, &peers, &self.tss_state.addr)
+        peers.address_is_leader(request_key_hash, &self.tss_state.addr)
     }
 
     #[instrument(skip_all, fields(txn_prefix = req.txn_prefix))]
@@ -418,6 +421,17 @@ impl BeaverManager {
                 }
             });
         }
+
+        info!("Cleared triple list; actual triples on disk are being deleted.");
+    }
+
+    #[doc = "Counts the triples for this node from it's internal map."]
+    #[instrument(skip_all)]
+    async fn beaver_message_count(&mut self, triple_list: &mut TripleListByGroup) {
+        info!(
+            "This node is the leader for {} triples.",
+            triple_list.total_shares_count()
+        );
     }
 
     #[doc = "Stores a triple pair to disk and adds it to the triple list.  Will request another triple to be generated if the list is not full."]
@@ -455,7 +469,7 @@ impl BeaverManager {
                 return;
             }
         };
-        if addr_is_leader(triple_storage_key, &peers, &self.tss_state.addr) {
+        if peers.address_is_leader(triple_storage_key, &self.tss_state.addr) {
             triple_list.add_storage_key(triple_pair.peer_group_id, triple_storage_key);
         }
         let xor_filter_with_threshold = XorFilterWithThreshold {
@@ -978,7 +992,7 @@ impl BeaverManager {
         };
 
         let all_peers_cloned = all_peers.clone();
-        let leader_peer = match leader(request_key_hash, &all_peers_cloned) {
+        let leader_peer = match all_peers_cloned.leader_for_active_peers(request_key_hash) {
             Ok(peer) => peer,
             Err(e) => {
                 if tx.send_async(Err(e)).await.is_err() {
@@ -1084,40 +1098,6 @@ async fn send_real_time_metrics(
         let item = MetricsMessage::TripleStatus(triple_counter);
         let _r = tx.send_async(item).await;
     });
-}
-
-#[instrument(skip_all)]
-pub fn addr_is_leader(request_key_hash: u64, peers: &Vec<SimplePeer>, addr: &String) -> bool {
-    let leader_address = match leader_addr(request_key_hash, peers) {
-        Ok(addr) => addr,
-        Err(e) => {
-            error!("Error getting leader address: {}", e);
-            return false;
-        }
-    };
-
-    addr == leader_address
-}
-
-#[instrument(skip_all)]
-pub fn leader_addr(request_key_hash: u64, peers: &Vec<SimplePeer>) -> Result<&String> {
-    match leader(request_key_hash, peers) {
-        Ok(leader) => Ok(&leader.socket_address),
-        Err(e) => Err(e),
-    }
-}
-
-#[instrument(skip_all)]
-pub fn leader(request_key_hash: u64, peers: &Vec<SimplePeer>) -> Result<&SimplePeer> {
-    let leader_hash = generate_hash(request_key_hash);
-    let group_size = match peers.len() {
-        0 => {
-            return Err(unexpected_err("No peers found in leader_addr.", None));
-        }
-        size => size,
-    };
-    let leader_id = leader_hash % group_size as u64;
-    Ok(&peers[leader_id as usize])
 }
 
 #[instrument(skip_all, fields(txn_prefix = req.txn_prefix))]

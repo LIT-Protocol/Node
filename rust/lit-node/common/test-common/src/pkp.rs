@@ -531,7 +531,7 @@ async fn verify_ecdsa_using_cait_sith_shares(
 }
 
 #[doc = "Recombine a set of shares using code imported from the Lit ECDSA WASM module."]
-fn recombine_shares_using_wasm(shares: Vec<String>) -> Result<(Signature, RecoveryId)> {
+pub fn recombine_shares_using_wasm(shares: Vec<String>) -> Result<(Signature, RecoveryId)> {
     // use the WASM module
     tracing::trace!("shares for wasm combine: {:?}", &shares);
     let result = lit_ecdsa_wasm_combine::combiners::k256_cait_sith::combine_signature(shares);

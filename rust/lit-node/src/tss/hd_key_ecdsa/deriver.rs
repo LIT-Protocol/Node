@@ -7,7 +7,7 @@ use k256::elliptic_curve::{
     CurveArithmetic, Field,
 };
 
-pub fn update_cait_sith_presig<C: cait_sith::CSCurve>(
+pub fn update_cait_sith_presig<C>(
     verifying_key: C::AffinePoint,
     pre_sig: &PresignOutput<C>,
     message: &[u8],
@@ -15,7 +15,7 @@ pub fn update_cait_sith_presig<C: cait_sith::CSCurve>(
     cxt: &[u8],
 ) -> Result<PresignOutput<C>, Error>
 where
-    C: GroupDigest,
+    C: cait_sith::CSCurve + GroupDigest,
     <C as CurveArithmetic>::ProjectivePoint: CofactorGroup,
     <C as CurveArithmetic>::Scalar: FromOkm,
 {

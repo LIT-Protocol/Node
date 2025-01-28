@@ -31,7 +31,8 @@ async function run() {
     inputs.diamondContractAddress,
     newFacet,
     inputs.facetCutAction,
-    inputs.contractName
+    inputs.contractName,
+    inputs.oldFacetAddress
   );
 }
 
@@ -67,6 +68,11 @@ async function getInputsFromCliOptions(): Promise<Inputs> {
       describe: 'Address of the diamond contract',
       required: true,
     },
+    'old-facet-address': {
+      type: 'string',
+      describe: 'Address of the old facet contract - only used for removal',
+      required: false,
+    },
   }).argv;
 
   if (argv.facetCutAction < 0 || argv.facetCutAction > 2) {
@@ -83,4 +89,5 @@ interface Inputs {
   facetCutAction: number;
   newFacetAddress: string;
   diamondContractAddress: string;
+  oldFacetAddress?: string;
 }

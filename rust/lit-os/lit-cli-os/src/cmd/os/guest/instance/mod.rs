@@ -24,6 +24,9 @@ use crate::cmd::os::guest::instance::repair::{
 use crate::cmd::os::guest::instance::resize::{
     handle_cmd_os_guest_instance_resize, GuestInstanceResize,
 };
+use crate::cmd::os::guest::instance::restart::{
+    handle_cmd_os_guest_instance_restart, GuestInstanceRestart,
+};
 use crate::cmd::os::guest::instance::start::{
     handle_cmd_os_guest_instance_start, GuestInstanceStart,
 };
@@ -42,6 +45,7 @@ pub(crate) mod ps;
 pub(crate) mod recreate;
 pub(crate) mod repair;
 pub(crate) mod resize;
+pub(crate) mod restart;
 pub(crate) mod start;
 pub(crate) mod status;
 pub(crate) mod stop;
@@ -78,6 +82,9 @@ pub(crate) enum GuestInstanceCommands {
     /// Stop a guest instance
     #[command(arg_required_else_help = true)]
     Stop(GuestInstanceStop),
+    /// Restart a guest instance
+    #[command(arg_required_else_help = true)]
+    Restart(GuestInstanceRestart),
     /// Show details for a guest instance
     #[command(arg_required_else_help = true)]
     Describe(GuestInstanceDescribe),
@@ -119,6 +126,9 @@ pub(crate) async fn handle_cmd_os_guest_instance(
         GuestInstanceCommands::Logs(args) => handle_cmd_os_guest_instance_logs(&cfg, &opts, args),
         GuestInstanceCommands::Start(args) => handle_cmd_os_guest_instance_start(cfg, opts, args),
         GuestInstanceCommands::Stop(args) => handle_cmd_os_guest_instance_stop(cfg, opts, args),
+        GuestInstanceCommands::Restart(args) => {
+            handle_cmd_os_guest_instance_restart(cfg, opts, args).await
+        }
         GuestInstanceCommands::CleanUp {} => handle_cmd_os_guest_instances_cleanup(&cfg, &opts),
     }
 }

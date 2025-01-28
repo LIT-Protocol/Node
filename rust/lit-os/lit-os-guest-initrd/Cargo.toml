@@ -44,7 +44,7 @@ ipnet = { version = "2.9.0" }
 serde = { version = "1.0.189", features = ["derive"] }
 serde_json = { version = "1.0.107" }
 serde_bytes_base64 = { version = "0.1.1" }
-nix = { version = "0.26.4" }
+nix = { version = "0.26.2" }
 file-mode = { version = "0.1.2" }
 posix-acl = { version = "1.1.0" }
 users = { version = "0.11.0" }

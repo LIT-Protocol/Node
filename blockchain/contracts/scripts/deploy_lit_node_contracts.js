@@ -23,6 +23,7 @@ const {
   jsonStringify,
   hardhatDeployAndVerifySingleContract,
 } = require('./utils');
+const { cloneNetFacetAbi } = require('../abis/generated');
 
 async function getChainId() {
   const { chainId } = await ethers.provider.getNetwork();
@@ -181,10 +182,42 @@ async function deployLitNodeContracts(deployNodeConfig) {
     'Staking',
     [resolverContractAddress, deployEnvEnum],
     true,
-    ['StakingFacet', 'StakingViewsFacet', 'StakingVersionFacet']
+    [
+      'StakingFacet',
+      'StakingViewsFacet',
+      'StakingVersionFacet',
+      'StakingAdminFacet',
+    ]
   );
   const stakingContract = deployResult.diamond;
   deployedFacets['Staking'] = deployResult.deployedFacets;
+
+  // *** 2.4 Deploy CloneNet Contract
+  console.log(
+    'Deploying CloneNet Contract with resolver address ' +
+      deployNodeConfig.resolverContractAddress
+  );
+  deployResult = await getOrDeployContract(
+    deployNodeConfig.existingContracts,
+    chainName,
+    'CloneNet',
+    [resolverContractAddress, deployEnvEnum],
+    true,
+    ['CloneNetFacet']
+  );
+  const cloneNetContract = deployResult.diamond;
+  deployedFacets['CloneNet'] = deployResult.deployedFacets;
+
+  // Set the active staking contract to the staking contract we just deployed
+  const cloneNetFacet = await ethers.getContractAt(
+    'CloneNetFacet',
+    await cloneNetContract.getAddress()
+  );
+  const setActiveStakingContractTx =
+    await cloneNetFacet.adminAddActiveStakingContract(
+      await stakingContract.getAddress()
+    );
+  await setActiveStakingContractTx.wait();
 
   // *** 3.1 Deploy Allowlist Contract
   const allowlistContract = await hardhatDeployAndVerifySingleContract(
@@ -627,6 +660,11 @@ async function deployLitNodeContracts(deployNodeConfig) {
       abi: await getAbi('StakingBalances'),
       name: 'StakingBalances',
     },
+    CloneNet: {
+      address: await cloneNetContract.getAddress(),
+      abi: cloneNetFacetAbi,
+      name: 'CloneNet',
+    },
     ContractResolver: {
       address: await resolverContract.getAddress(),
       abi: await getAbi('ContractResolver'),
@@ -683,6 +721,14 @@ async function deployLitNodeContracts(deployNodeConfig) {
 
   txs.push(
     await resolverContract.setContract(
+      await resolverContract.CLONE_NET_CONTRACT(),
+      deployEnvEnum,
+      await cloneNetContract.getAddress()
+    )
+  );
+
+  txs.push(
+    await resolverContract.setContract(
       await resolverContract.PAYMENT_DELEGATION_CONTRACT(),
       deployEnvEnum,
       await paymentDelegationContract.getAddress()
@@ -705,6 +751,7 @@ async function deployLitNodeContracts(deployNodeConfig) {
     backupRecoveryContractAddress: await backupRecoveryContract.getAddress(),
     stakingBalancesContractAddress: await stakingBalancesContract.getAddress(),
     stakingContractAddress: await stakingContract.getAddress(),
+    cloneNetContractAddress: await cloneNetContract.getAddress(),
     multisenderContractAddress: await multisenderContract.getAddress(),
     litTokenContractAddress: await litToken.getAddress(),
     // used for the config file generation

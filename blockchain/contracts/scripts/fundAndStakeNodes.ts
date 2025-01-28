@@ -17,7 +17,7 @@ import {
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 
 import { ContractTransactionResponse } from 'ethers';
-import { StakingFacet } from '../typechain-types';
+import { Ownable, OwnershipFacet, StakingFacet } from '../typechain-types';
 import { CONTRACT_NAME_TO_JSON_CONTRACT_ADDRESS_KEY } from './constants';
 import {
   contractAddressAlreadyExists,
@@ -127,6 +127,11 @@ const stakeTokensAndLockValidatorSet = async (
   );
 
   const stakingContract = await getStakingContract(contracts, signer);
+  const stakingAdminContract = await ethers.getContractAt(
+    'StakingAdminFacet',
+    contracts.stakingContractAddress,
+    signer
+  );
 
   let litTokenContract;
   if (wlitAddress) {
@@ -267,7 +272,9 @@ const stakeTokensAndLockValidatorSet = async (
   // so we don't have to wait so long to lock.
   console.log('setting epoch length to 5 mins');
   const epochLength = 300n;
-  const setEpochLengthTx = await stakingContract.setEpochLength(epochLength);
+  const setEpochLengthTx = await stakingAdminContract.setEpochLength(
+    epochLength
+  );
   console.log('setEpochLengthTx: ', setEpochLengthTx.hash);
   await setEpochLengthTx.wait();
   console.log('setEpochLengthTx mined');
@@ -464,12 +471,12 @@ async function transferContractsOwnership(
   console.info('Transferring ownership for Allowlist contract...');
   await transferOwnershipToNewOwner(allowlistContract, newOwnerAddress);
 
-  const stakingContract = await getContractInstance(
+  const stakingContract: OwnershipFacet = await getContractInstance(
     ethers,
     'Staking',
     contracts.stakingContractAddress,
     signer,
-    true
+    'OwnershipFacet'
   );
   console.info('Transferring ownership for Staking contract...');
   await transferOwnershipToNewOwner(stakingContract, newOwnerAddress);
@@ -482,6 +489,7 @@ async function transferContractsOwnership(
     { name: 'PKPHelper', isDiamond: false },
     { name: 'PKPNFT', isDiamond: true },
     { name: 'DomainWalletRegistry', isDiamond: true },
+    { name: 'CloneNet', isDiamond: true },
   ];
 
   for (const remainingContract of remainingContracts) {
@@ -506,18 +514,18 @@ async function transferOwnershipIfNotAlreadyExist(
       contract.name
     )
   ) {
-    const contractInstance = await getContractInstance(
-      ethers,
-      contract.name,
-      // @ts-ignore
-      contracts[
+    const contractInstance: OwnershipFacet | Ownable =
+      await getContractInstance(
+        ethers,
+        contract.name,
         // @ts-ignore
-        CONTRACT_NAME_TO_JSON_CONTRACT_ADDRESS_KEY[contract.name]
-      ],
-      signer,
-      contract.isDiamond
-    );
-    console.info(`Transferring ownership for ${contract.name} contract...`);
+        contracts[
+          // @ts-ignore
+          CONTRACT_NAME_TO_JSON_CONTRACT_ADDRESS_KEY[contract.name]
+        ],
+        signer,
+        contract.isDiamond ? 'OwnershipFacet' : undefined
+      );
     await transferOwnershipToNewOwner(
       contractInstance,
       deployNodeConfig.newOwnerAddress
@@ -526,7 +534,7 @@ async function transferOwnershipIfNotAlreadyExist(
 }
 
 async function transferOwnershipToNewOwner(
-  contract: any,
+  contract: Ownable | OwnershipFacet,
   newOwnerAddress: string
 ) {
   console.log(`Setting new owner to ${newOwnerAddress}`);

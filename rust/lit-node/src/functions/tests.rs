@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use indoc::{formatdoc, indoc};
-use lit_actions_server::TestServer;
+use lit_actions_server::{init_v8, TestServer};
 use moka::future::Cache;
 use pretty_assertions::assert_eq;
 use rstest::*;
@@ -18,7 +18,9 @@ fn init() {
     // Set RUST_LOG to get logs during testing
     pretty_env_logger::init();
 
-    lit_actions_server::init_v8();
+    lit_core::utils::unix::raise_fd_limit();
+
+    init_v8();
 }
 
 #[fixture]
@@ -350,6 +352,7 @@ async fn call_child(server: TestServer) {
             .join("\n")
                 + "\n",
             fetch_count: 3,
+            ops_count: 14,
             ..Default::default()
         }
     );
@@ -512,9 +515,30 @@ async fn oom(server: TestServer) {
 #[tokio::test]
 async fn server_down() {
     let socket = temp_file::empty();
-    let mut client_without_server = Client::new(socket.path());
+    let mut client_without_server = ClientBuilder::default()
+        .socket_path(socket.path())
+        .max_retries(1) // speed up test
+        .build()
+        .unwrap();
 
     let res = client_without_server.execute_js("ignored").await;
 
     assert_eq!(res.unwrap_err().kind(), lit_core::error::Kind::Connect);
+}
+
+#[rstest]
+#[tokio::test]
+async fn max_code_length(server: TestServer) {
+    let mut client = ClientBuilder::default()
+        .socket_path(server.socket_path())
+        .max_code_length(10)
+        .build()
+        .unwrap();
+
+    let res = client.execute_js(r#"const n = 1000"#).await;
+
+    assert_eq!(
+        res.unwrap_err().to_string().lines().next().unwrap(),
+        "unexpected error: Code payload is too large (14 bytes). Max length is 10 bytes."
+    );
 }

@@ -307,6 +307,7 @@ const config: HardhatUserConfig = {
         'StakingFacet',
         'StakingViewsFacet',
         'StakingVersionFacet',
+        'StakingAdminFacet',
         'DiamondCutFacet',
         'DiamondLoupeFacet',
       ],
@@ -411,6 +412,24 @@ const config: HardhatUserConfig = {
         'DiamondCutFacet',
         'DiamondLoupeFacet',
       ],
+    },
+    {
+      // (required) The name of your Diamond ABI.
+      name: 'CloneNetDiamond',
+      // (optional) An array of strings, matched against fully qualified contract names, to
+      // determine which contracts are included in your Diamond ABI.
+      include: [
+        'OwnershipFacet',
+        'CloneNetFacet',
+        'DiamondCutFacet',
+        'DiamondLoupeFacet',
+      ],
+    },
+    {
+      name: 'HostCommandsDiamond',
+      // (optional) An array of strings, matched against fully qualified contract names, to
+      // determine which contracts are included in your Diamond ABI.
+      include: ['HostCommandsFacet', 'DiamondCutFacet', 'DiamondLoupeFacet'],
     },
   ],
   mocha: {

@@ -1,6 +1,6 @@
 (async () => {
   let temp = await Lit.Actions.runOnce(
-    { waitForResponse: false, name: 'weather' },
+    { waitForResponse: true, name: 'weather' },
     async () => {
       const url = 'https://api.weather.gov/gridpoints/TOP/31,80/forecast';
       const resp = await fetch(url).then((response) => response.json());
@@ -11,3 +11,4 @@
 
   Lit.Actions.setResponse({ response: JSON.stringify(temp) });
 })();
+

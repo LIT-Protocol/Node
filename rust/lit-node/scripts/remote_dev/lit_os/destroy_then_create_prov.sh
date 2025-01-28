@@ -42,6 +42,6 @@ cd ../../rust/lit-node
 ./scripts/remote_dev/lit_os/expect/create_prov_template.exp "$PROV_HOST_IP"
 
 # create prov instance
-./scripts/remote_dev/lit_os/expect/create_prov.exp "$PROV_HOST_IP" "$new_staking_contract_address" "$LIT_DEV_PROV_WALLET_PRIVATE_KEY" "$LIT_DEV_PROV_ADMIN_PRIVATE_KEY"
+./scripts/remote_dev/lit_os/expect/create_prov.exp "$PROV_HOST_IP" "$PROV_GUEST_IP" "$PROV_GUEST_GATEWAY" "$new_staking_contract_address" "$LIT_DEV_PROV_WALLET_PRIVATE_KEY" "$LIT_DEV_PROV_ADMIN_PRIVATE_KEY"
 
 echo "Please commit changes in the networks directory"

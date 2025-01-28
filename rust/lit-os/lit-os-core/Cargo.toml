@@ -15,7 +15,7 @@ serde_yaml = { version = "0.9.25" }
 serde_bytes_base64 = { version = "0.1.1" }
 sev-snp-utilities = { version = "1.4.9" }
 config = { version = "0.13.3" }
-nix = { version = "0.26.4" }
+nix = { version = "0.26.2" }
 regex = { version = "1.10.2" }
 once_cell = { version = "1.18.0" }
 ipnet = { version = "2.9.0" }

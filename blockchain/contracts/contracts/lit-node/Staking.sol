@@ -14,7 +14,6 @@ import { IDiamondLoupe } from "../interfaces/IDiamondLoupe.sol";
 import { IERC173 } from "../interfaces/IERC173.sol";
 import { IERC165 } from "../interfaces/IERC165.sol";
 import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-
 import { ContractResolver } from "../lit-core/ContractResolver.sol";
 import { LibStakingStorage } from "./Staking/LibStakingStorage.sol";
 
@@ -56,7 +55,7 @@ contract Staking {
             DEPRECATED_complaintTolerance: 10,
             DEPRECATED_complaintIntervalSecs: 900,
             keyTypes: keyTypesTemp,
-            minimumValidatorCount: 2,
+            minimumValidatorCount: 3,
             maxConcurrentRequests: 1000,
             maxTripleCount: 25,
             minTripleCount: 10,
@@ -115,6 +114,8 @@ contract Staking {
             intervalSecs: 90,
             kickPenaltyPercent: 5
         });
+
+        LibStakingStorage.getStorage().devopsAdmin = _args.owner;
     }
 
     // Find facet for function that is called and execute the

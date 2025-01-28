@@ -13,8 +13,9 @@ doctest = false
 [dependencies]
 anyhow = { workspace = true }
 concat-idents = "1"
-http = "0.2"
-prost = "0.12"
+http = "1"
+hyper-util = "0.1"
+prost = "0.13"
 tokio = { workspace = true }
 tokio-stream = { workspace = true }
 tonic = { workspace = true }

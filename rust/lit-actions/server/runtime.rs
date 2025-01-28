@@ -1,5 +1,4 @@
 use std::collections::BTreeMap;
-use std::fmt::Write as _;
 use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -20,7 +19,7 @@ use indoc::formatdoc;
 use lit_actions_grpc::proto::{ExecuteJsRequest, ExecuteJsResponse};
 use tokio::sync::{mpsc, oneshot};
 use tonic::Status;
-use tracing::{debug, info_span, instrument, warn};
+use tracing::{debug, info_span, instrument};
 
 // Same default limits as in lit-node's action client
 const DEFAULT_TIMEOUT_MS: u64 = 30000; // 30s
@@ -43,20 +42,7 @@ fn deno_isolate_init() -> Option<&'static [u8]> {
 }
 
 fn get_error_class_name(e: &anyhow::Error) -> &'static str {
-    deno_runtime::errors::get_error_class_name(e).unwrap_or_else(|| {
-        #[allow(unexpected_cfgs)]
-        if cfg!(debug) {
-            warn!(
-                "Error '{}' contains boxed error of unknown type:{}",
-                e,
-                e.chain().fold(String::new(), |mut output, e| {
-                    let _ = write!(output, "\n  {e:?}");
-                    output
-                })
-            );
-        }
-        "Error"
-    })
+    deno_runtime::errors::get_error_class_name(e).unwrap_or("Error")
 }
 
 // using the worker built into deno
@@ -91,11 +77,9 @@ fn build_main_worker_and_inject_sdk(
         seed: None,
         fs: Arc::new(RealFs),
         module_loader: Rc::new(NoopModuleLoader), // avoid loading any modules
-        node_resolver: None,
-        npm_resolver: None,
+        node_services: None,
         create_web_worker_cb: Arc::new(|_| unimplemented!("web workers are not supported")),
         format_js_error_fn: Some(Arc::new(format_js_error)),
-        source_map_getter: None,
         maybe_inspector_server: None,
         should_break_on_first_statement: false,
         should_wait_for_inspector_session: false,
@@ -205,12 +189,9 @@ pub fn init_v8() {
     // To get a list of supported flags: deno run --v8-flags=-help
     let unknown_flags = &deno_core::v8_set_flags(vec![
         "UNUSED_BUT_NECESSARY_ARG0".into(), // See https://github.com/denoland/deno/blob/v1.37/cli/util/v8.rs#L17
-        // "--jitless".into(),                 // Disable runtime allocation of executable memory
-        "--no-expose-wasm".into(), // Don't expose wasm interface to JavaScript
-        // "--no-use-ic".into(),      // Don't use inline caching
         "--disallow-code-generation-from-strings".into(), // Disallow eval and friends
-        "--memory-protection-keys".into(), // Protect code memory with PKU if available
-        "--clear-free-memory".into(),      // Initialize free memory with 0
+        "--memory-protection-keys".into(),  // Protect code memory with PKU if available
+        "--clear-free-memory".into(),       // Initialize free memory with 0
     ])[1..];
     assert_eq!(
         unknown_flags,
@@ -218,7 +199,7 @@ pub fn init_v8() {
         "unknown V8 flags specified"
     );
 
-    JsRuntime::init_platform(None);
+    JsRuntime::init_platform(None, false);
 }
 
 #[allow(clippy::too_many_arguments)]

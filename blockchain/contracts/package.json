@@ -55,13 +55,13 @@
         "bs58": "^5.0.0",
         "dotenv": "^16.4.5",
         "ethers": "^6.1.0",
-        "ethers-v5": "npm:ethers@5.7.1",
         "hardhat-tracer": "^2.8.1",
         "inquirer": "8.0.1",
         "solidity-bytes-utils": "^0.8.2",
         "tweetnacl": "^1.0.3",
         "uint8arrays": "3",
-        "uuid": "^8.3.2"
+        "uuid": "^8.3.2",
+        "viem": "^2.21.35"
     },
     "resolutions": {
         "ethereumjs-abi": "0.6.5"

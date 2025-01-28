@@ -619,40 +619,106 @@ fn parse_auth_factor_from_token(
 
 #[cfg(test)]
 mod tests {
-    use crate::pkp::auth::auth_method_verifier::AuthMethodVerifier;
-    use crate::pkp::auth::stytch::StytchJWTAuthMethodVerifier;
+    use crate::pkp::auth::stytch::{
+        get_auth_key, parse_and_verify_otp_jwt, StytchJWTAuthMethodVerifier,
+    };
+    use serde_json::json;
 
     #[tokio::test]
     async fn should_verify_stytch_no_auth_factor() {
         // token from test project, not used in any production context
-        const TEST_TOKEN: &str = "eyJhbGciOiJSUzI1NiIsImtpZCI6Imp3ay10ZXN0LWVlZGI5YjU1LTRjNWItNGE4Ni1iODVmLWVjOTlkZmMwY2EyNyIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicHJvamVjdC10ZXN0LTI3OTA2MzVkLWJhMzEtNDcwNS1hYWY0LTIxM2JiMGYwNjgxMiJdLCJleHAiOjE3MjAwOTgwODQsImh0dHBzOi8vc3R5dGNoLmNvbS9zZXNzaW9uIjp7ImlkIjoic2Vzc2lvbi10ZXN0LWUzYzhiMmIyLTRjYjctNDI1MS1iZGZiLTNjM2I4YzZjOTEzOCIsInN0YXJ0ZWRfYXQiOiIyMDI0LTA3LTA0VDEyOjU2OjI0WiIsImxhc3RfYWNjZXNzZWRfYXQiOiIyMDI0LTA3LTA0VDEyOjU2OjI0WiIsImV4cGlyZXNfYXQiOiIyMDI0LTA3LTExVDEyOjU2OjI0WiIsImF0dHJpYnV0ZXMiOnsidXNlcl9hZ2VudCI6IiIsImlwX2FkZHJlc3MiOiIifSwiYXV0aGVudGljYXRpb25fZmFjdG9ycyI6W3sidHlwZSI6Im90cCIsImRlbGl2ZXJ5X21ldGhvZCI6ImVtYWlsIiwibGFzdF9hdXRoZW50aWNhdGVkX2F0IjoiMjAyNC0wNy0wNFQxMjo1NjoyNFoiLCJlbWFpbF9mYWN0b3IiOnsiZW1haWxfaWQiOiJlbWFpbC10ZXN0LWUyOTZjMjZmLTMwYzQtNDljZS1hOTdhLTRmNTM0YTRhNjk3MSIsImVtYWlsX2FkZHJlc3MiOiJqb3NoQGxpdHByb3RvY29sLmNvbSJ9fV19LCJpYXQiOjE3MjAwOTc3ODQsImlzcyI6InN0eXRjaC5jb20vcHJvamVjdC10ZXN0LTI3OTA2MzVkLWJhMzEtNDcwNS1hYWY0LTIxM2JiMGYwNjgxMiIsIm5iZiI6MTcyMDA5Nzc4NCwic3ViIjoidXNlci10ZXN0LTk3MWYyYjAxLWRjYWMtNGNhOC04OGQ4LTFlMTI0MDViMTc5MyJ9.DKFizX3EUPFvf7BYw17gsY0I3k3EfIORQg_VpKsKSWa0X-yqGEyll6cP2MxjyTmh5N_0XZ1po-7EAWZWYYZ9tJ-XH-st3pdjmB_-R1JoTxlFgpoQw0joaqfQlTMxC8oCnTgi6MAFgDJY-37KU1ddg-JrAib-6GUrKDyos0SI6a5D_i1iYIiF7EbF2q8RTUbJQnbxSZs-fO9Xcl9qDXZztFQcL7y7qOSH5XzoqNhE2X0UqYYETWRFi3YUgQZ8e1RDxX1Ik2sjE5xWCUiWJ91OzEXWBHzGKLSkLQ-jJUKrA3l-5UzYuay5dorKz1w4bQVlKOXZljC6Zpwx0QYGB50paQ";
+        const TEST_TOKEN: &str = "eyJhbGciOiJSUzI1NiIsImtpZCI6Imp3ay10ZXN0LWRhOThjOGZmLTk5YjAtNDVjMy1iMjAzLTZkNDBiMWZkYTgwYSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicHJvamVjdC10ZXN0LWRlNGUyNjkwLTE1MDYtNGNmNS04YmNlLTQ0NTcxZGRhZWJjOSJdLCJleHAiOjE3Mjk3MzUxODMsImh0dHBzOi8vc3R5dGNoLmNvbS9zZXNzaW9uIjp7ImlkIjoic2Vzc2lvbi10ZXN0LTZmMzZjMGYxLTFkMDMtNGFmYi1hYzgwLTljYjIzMWM3Y2JhOSIsInN0YXJ0ZWRfYXQiOiIyMDI0LTEwLTI0VDAxOjU0OjQzWiIsImxhc3RfYWNjZXNzZWRfYXQiOiIyMDI0LTEwLTI0VDAxOjU0OjQzWiIsImV4cGlyZXNfYXQiOiIyMDI0LTEwLTI0VDAyOjU0OjQzWiIsImF0dHJpYnV0ZXMiOnsidXNlcl9hZ2VudCI6Ik1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xMzAuMC4wLjAgU2FmYXJpLzUzNy4zNiIsImlwX2FkZHJlc3MiOiIxNjIuMjE4LjIyNi4xMTcifSwiYXV0aGVudGljYXRpb25fZmFjdG9ycyI6W3sidHlwZSI6Im90cCIsImRlbGl2ZXJ5X21ldGhvZCI6ImVtYWlsIiwibGFzdF9hdXRoZW50aWNhdGVkX2F0IjoiMjAyNC0xMC0yNFQwMTo1NDo0M1oiLCJlbWFpbF9mYWN0b3IiOnsiZW1haWxfaWQiOiJlbWFpbC10ZXN0LWQxNWZiMTk1LTUxYTMtNDNlNi05ZDIyLTcwMzlhMmYzNzJmMiIsImVtYWlsX2FkZHJlc3MiOiJjaHJpcys3NjM0MjczMkBsaXRwcm90b2NvbC5jb20ifX1dfSwiaWF0IjoxNzI5NzM0ODgzLCJpc3MiOiJzdHl0Y2guY29tL3Byb2plY3QtdGVzdC1kZTRlMjY5MC0xNTA2LTRjZjUtOGJjZS00NDU3MWRkYWViYzkiLCJuYmYiOjE3Mjk3MzQ4ODMsInN1YiI6InVzZXItdGVzdC04MjgxMzJkNy1lZmMwLTQ5NTEtODdlYy04ZDkzMjhlYTFjMmUifQ.cG8SOb5JrzfBLUyjNYydt5wfSPzJQfxBg7Cqf0jn0wmnjW9o4GEToiIRtYTlISRP6k6G9icDwHLXkJ1-5Ju208pY7AzLhY0NaTWObua08HJVTQL4Uv9Bc_qtyr_wcuWuQFpDz5oALvtkVX-Phxx9lKeIuJQkRN0JqPw-5UrUkEDUhx_Aw8vzRupNZxdeH3IGmSAeeylTw8hOkK0Gvsb-W2IpX1bbLJ4mQzg6l-udHXZbdB56WIJQ_sig8x4IFxrouIqatNxEES6cT1qKoAkk2p0ujvctKpwd89pczWo_-nh5X64mZ0XhP_HpXxBszF1w0vA2rWb1P8XLaJBvD46GkQ";
         let verifier = StytchJWTAuthMethodVerifier { factor: None };
-        let res = verifier.verify(TEST_TOKEN).await;
-        let res = res.unwrap();
-        println!("response {:?}", res);
+
+        // we actually want to test this, below, but the keys from stytch can expire.  so we do the same things that the auth verifier does, except we supply static auth_keys
+        // let res = verifier.verify(TEST_TOKEN).await;
+        // let res = res.unwrap();
+
+        // show that we could get auth keys
+        let auth_keys = match get_auth_key(TEST_TOKEN).await {
+            Ok(keys) => keys,
+            Err(e) => {
+                panic!("error getting auth keys {:?}", e);
+            }
+        };
+
+        // the auth keys are likely expired for the static token (they're rotated every 6 months), so let's supply the old ones that match the token, and test verification.
+        let auth_keys = vec![
+            json!({"alg":"RS256","e":"AQAB","key_ops":["verify"],"kid":"jwk-test-da98c8ff-99b0-45c3-b203-6d40b1fda80a","kty":"RSA","n":"3_pmAAoloKxWwjES0jcxQCtIcR1IdMeNHXUzKxasFENoybIsbkmLzSHzmx4ZpSMy8ACjRNkEWDq54zG-fN-haA24sNuSM6Se1jf9B1LnE5iuPTqh-rxFWvbYeLCZBii3Pii7mXAjI6jBMJ0WFKv_4D7IVSIR0PLUp67kBN-qF8P1zv6nue8ezpK2BrUsuuttt4E248lWooPfTzcgxnTMAonym2PoZ3P0NqNxh2AgJxwEZtd5-uIFQ0zc-yE8XJjL3yVNLwdJY54N_jigJldmJp3eAVU1iJofAJBwU0PukHJiY9vpwvaqX0BtrIpmoql-Wjs-DsAB12pl1skHvU5i3Q","use":"sig","x5c":["MIICvTCCAaWgAwIBAgIBATANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQKEwZTdHl0Y2gwHhcNMjQxMDI0MDE1NzMwWhcNMzQxMDI0MDE1NzMwWjARMQ8wDQYDVQQKEwZTdHl0Y2gwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDf+mYACiWgrFbCMRLSNzFAK0hxHUh0x40ddTMrFqwUQ2jJsixuSYvNIfObHhmlIzLwAKNE2QRYOrnjMb5836FoDbiw25IzpJ7WN/0HUucTmK49OqH6vEVa9th4sJkGKLc+KLuZcCMjqMEwnRYUq//gPshVIhHQ8tSnruQE36oXw/XO/qe57x7OkrYGtSy66223gTbjyVaig99PNyDGdMwCifKbY+hnc/Q2o3GHYCAnHARm13n64gVDTNz7ITxcmMvfJU0vB0ljng3+OKAmV2Ymnd4BVTWImh8AkHBTQ+6QcmJj2+nC9qpfQG2simaiqX5aOz4OwAHXamXWyQe9TmLdAgMBAAGjIDAeMA4GA1UdDwEB/wQEAwIHgDAMBgNVHRMBAf8EAjAAMA0GCSqGSIb3DQEBCwUAA4IBAQByw2SnHBTQghn0DiBr8amOKntUIog5qR8fXR27s9GEgCENtV7UawXFi6VXG5yqTwI9brfbkEfMO8/KIL+C6zm/p9Y+/BNedIfmwx3p9ZaGohKGwwMAmqc7f/J32/luGYLaiZ1OyUmVwNLhm+XCc1GtXH8HaW00C9b+51ZSPmZpOgIaBSovHp4QipbNCZeqW7dRMAo562NP4aRdcBAGLo5qe12DtagAQnrpBwn3wBw6C7nSROeIZ4BaiuHXDUj01gXcRaNLpb9NRlsBTo1hllvklclG6JnEYHLAChccouaQyo1B/kXX1iPn0xKxZ6P2mOxNoDEaZofZExs3S2x2TqtG"],"x5tS256":"GDzHNYs0jiROjAheP4ndw8y9veFXzlzwCgbT9z50D_I="}),
+        ];
+
+        let res = match parse_and_verify_otp_jwt(TEST_TOKEN, &auth_keys, verifier.factor).await {
+            Ok(res) => res,
+            Err(e) => {
+                panic!("error verifying token {:?}", e);
+            }
+        };
     }
 
     #[tokio::test]
     async fn should_verify_stytch_email_auth_factor() {
         // token from test project, not used in any production context
-        const TEST_TOKEN: &str = "eyJhbGciOiJSUzI1NiIsImtpZCI6Imp3ay10ZXN0LWVlZGI5YjU1LTRjNWItNGE4Ni1iODVmLWVjOTlkZmMwY2EyNyIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicHJvamVjdC10ZXN0LTI3OTA2MzVkLWJhMzEtNDcwNS1hYWY0LTIxM2JiMGYwNjgxMiJdLCJleHAiOjE3MjAwOTgwODQsImh0dHBzOi8vc3R5dGNoLmNvbS9zZXNzaW9uIjp7ImlkIjoic2Vzc2lvbi10ZXN0LWUzYzhiMmIyLTRjYjctNDI1MS1iZGZiLTNjM2I4YzZjOTEzOCIsInN0YXJ0ZWRfYXQiOiIyMDI0LTA3LTA0VDEyOjU2OjI0WiIsImxhc3RfYWNjZXNzZWRfYXQiOiIyMDI0LTA3LTA0VDEyOjU2OjI0WiIsImV4cGlyZXNfYXQiOiIyMDI0LTA3LTExVDEyOjU2OjI0WiIsImF0dHJpYnV0ZXMiOnsidXNlcl9hZ2VudCI6IiIsImlwX2FkZHJlc3MiOiIifSwiYXV0aGVudGljYXRpb25fZmFjdG9ycyI6W3sidHlwZSI6Im90cCIsImRlbGl2ZXJ5X21ldGhvZCI6ImVtYWlsIiwibGFzdF9hdXRoZW50aWNhdGVkX2F0IjoiMjAyNC0wNy0wNFQxMjo1NjoyNFoiLCJlbWFpbF9mYWN0b3IiOnsiZW1haWxfaWQiOiJlbWFpbC10ZXN0LWUyOTZjMjZmLTMwYzQtNDljZS1hOTdhLTRmNTM0YTRhNjk3MSIsImVtYWlsX2FkZHJlc3MiOiJqb3NoQGxpdHByb3RvY29sLmNvbSJ9fV19LCJpYXQiOjE3MjAwOTc3ODQsImlzcyI6InN0eXRjaC5jb20vcHJvamVjdC10ZXN0LTI3OTA2MzVkLWJhMzEtNDcwNS1hYWY0LTIxM2JiMGYwNjgxMiIsIm5iZiI6MTcyMDA5Nzc4NCwic3ViIjoidXNlci10ZXN0LTk3MWYyYjAxLWRjYWMtNGNhOC04OGQ4LTFlMTI0MDViMTc5MyJ9.DKFizX3EUPFvf7BYw17gsY0I3k3EfIORQg_VpKsKSWa0X-yqGEyll6cP2MxjyTmh5N_0XZ1po-7EAWZWYYZ9tJ-XH-st3pdjmB_-R1JoTxlFgpoQw0joaqfQlTMxC8oCnTgi6MAFgDJY-37KU1ddg-JrAib-6GUrKDyos0SI6a5D_i1iYIiF7EbF2q8RTUbJQnbxSZs-fO9Xcl9qDXZztFQcL7y7qOSH5XzoqNhE2X0UqYYETWRFi3YUgQZ8e1RDxX1Ik2sjE5xWCUiWJ91OzEXWBHzGKLSkLQ-jJUKrA3l-5UzYuay5dorKz1w4bQVlKOXZljC6Zpwx0QYGB50paQ";
+        const TEST_TOKEN: &str = "eyJhbGciOiJSUzI1NiIsImtpZCI6Imp3ay10ZXN0LWRhOThjOGZmLTk5YjAtNDVjMy1iMjAzLTZkNDBiMWZkYTgwYSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicHJvamVjdC10ZXN0LWRlNGUyNjkwLTE1MDYtNGNmNS04YmNlLTQ0NTcxZGRhZWJjOSJdLCJleHAiOjE3Mjk3MzUxODMsImh0dHBzOi8vc3R5dGNoLmNvbS9zZXNzaW9uIjp7ImlkIjoic2Vzc2lvbi10ZXN0LTZmMzZjMGYxLTFkMDMtNGFmYi1hYzgwLTljYjIzMWM3Y2JhOSIsInN0YXJ0ZWRfYXQiOiIyMDI0LTEwLTI0VDAxOjU0OjQzWiIsImxhc3RfYWNjZXNzZWRfYXQiOiIyMDI0LTEwLTI0VDAxOjU0OjQzWiIsImV4cGlyZXNfYXQiOiIyMDI0LTEwLTI0VDAyOjU0OjQzWiIsImF0dHJpYnV0ZXMiOnsidXNlcl9hZ2VudCI6Ik1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xMzAuMC4wLjAgU2FmYXJpLzUzNy4zNiIsImlwX2FkZHJlc3MiOiIxNjIuMjE4LjIyNi4xMTcifSwiYXV0aGVudGljYXRpb25fZmFjdG9ycyI6W3sidHlwZSI6Im90cCIsImRlbGl2ZXJ5X21ldGhvZCI6ImVtYWlsIiwibGFzdF9hdXRoZW50aWNhdGVkX2F0IjoiMjAyNC0xMC0yNFQwMTo1NDo0M1oiLCJlbWFpbF9mYWN0b3IiOnsiZW1haWxfaWQiOiJlbWFpbC10ZXN0LWQxNWZiMTk1LTUxYTMtNDNlNi05ZDIyLTcwMzlhMmYzNzJmMiIsImVtYWlsX2FkZHJlc3MiOiJjaHJpcys3NjM0MjczMkBsaXRwcm90b2NvbC5jb20ifX1dfSwiaWF0IjoxNzI5NzM0ODgzLCJpc3MiOiJzdHl0Y2guY29tL3Byb2plY3QtdGVzdC1kZTRlMjY5MC0xNTA2LTRjZjUtOGJjZS00NDU3MWRkYWViYzkiLCJuYmYiOjE3Mjk3MzQ4ODMsInN1YiI6InVzZXItdGVzdC04MjgxMzJkNy1lZmMwLTQ5NTEtODdlYy04ZDkzMjhlYTFjMmUifQ.cG8SOb5JrzfBLUyjNYydt5wfSPzJQfxBg7Cqf0jn0wmnjW9o4GEToiIRtYTlISRP6k6G9icDwHLXkJ1-5Ju208pY7AzLhY0NaTWObua08HJVTQL4Uv9Bc_qtyr_wcuWuQFpDz5oALvtkVX-Phxx9lKeIuJQkRN0JqPw-5UrUkEDUhx_Aw8vzRupNZxdeH3IGmSAeeylTw8hOkK0Gvsb-W2IpX1bbLJ4mQzg6l-udHXZbdB56WIJQ_sig8x4IFxrouIqatNxEES6cT1qKoAkk2p0ujvctKpwd89pczWo_-nh5X64mZ0XhP_HpXxBszF1w0vA2rWb1P8XLaJBvD46GkQ";
         let verifier = StytchJWTAuthMethodVerifier {
             factor: Some("email".to_string()),
         };
-        let res = verifier.verify(TEST_TOKEN).await;
-        let res = res.unwrap();
-        println!("response {:?}", res);
+
+        // we actually want to test this, below, but the keys from stytch can expire.  so we do the same things that the auth verifier does, except we supply static auth_keys
+        // let res = verifier.verify(TEST_TOKEN).await;
+        // let res = res.unwrap();
+
+        // show that we could get auth keys
+        let auth_keys = match get_auth_key(TEST_TOKEN).await {
+            Ok(keys) => keys,
+            Err(e) => {
+                panic!("error getting auth keys {:?}", e);
+            }
+        };
+
+        // the auth keys are likely expired for the static token (they're rotated every 6 months), so let's supply the old ones that match the token, and test verification.
+        let auth_keys = vec![
+            json!({"alg":"RS256","e":"AQAB","key_ops":["verify"],"kid":"jwk-test-da98c8ff-99b0-45c3-b203-6d40b1fda80a","kty":"RSA","n":"3_pmAAoloKxWwjES0jcxQCtIcR1IdMeNHXUzKxasFENoybIsbkmLzSHzmx4ZpSMy8ACjRNkEWDq54zG-fN-haA24sNuSM6Se1jf9B1LnE5iuPTqh-rxFWvbYeLCZBii3Pii7mXAjI6jBMJ0WFKv_4D7IVSIR0PLUp67kBN-qF8P1zv6nue8ezpK2BrUsuuttt4E248lWooPfTzcgxnTMAonym2PoZ3P0NqNxh2AgJxwEZtd5-uIFQ0zc-yE8XJjL3yVNLwdJY54N_jigJldmJp3eAVU1iJofAJBwU0PukHJiY9vpwvaqX0BtrIpmoql-Wjs-DsAB12pl1skHvU5i3Q","use":"sig","x5c":["MIICvTCCAaWgAwIBAgIBATANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQKEwZTdHl0Y2gwHhcNMjQxMDI0MDE1NzMwWhcNMzQxMDI0MDE1NzMwWjARMQ8wDQYDVQQKEwZTdHl0Y2gwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDf+mYACiWgrFbCMRLSNzFAK0hxHUh0x40ddTMrFqwUQ2jJsixuSYvNIfObHhmlIzLwAKNE2QRYOrnjMb5836FoDbiw25IzpJ7WN/0HUucTmK49OqH6vEVa9th4sJkGKLc+KLuZcCMjqMEwnRYUq//gPshVIhHQ8tSnruQE36oXw/XO/qe57x7OkrYGtSy66223gTbjyVaig99PNyDGdMwCifKbY+hnc/Q2o3GHYCAnHARm13n64gVDTNz7ITxcmMvfJU0vB0ljng3+OKAmV2Ymnd4BVTWImh8AkHBTQ+6QcmJj2+nC9qpfQG2simaiqX5aOz4OwAHXamXWyQe9TmLdAgMBAAGjIDAeMA4GA1UdDwEB/wQEAwIHgDAMBgNVHRMBAf8EAjAAMA0GCSqGSIb3DQEBCwUAA4IBAQByw2SnHBTQghn0DiBr8amOKntUIog5qR8fXR27s9GEgCENtV7UawXFi6VXG5yqTwI9brfbkEfMO8/KIL+C6zm/p9Y+/BNedIfmwx3p9ZaGohKGwwMAmqc7f/J32/luGYLaiZ1OyUmVwNLhm+XCc1GtXH8HaW00C9b+51ZSPmZpOgIaBSovHp4QipbNCZeqW7dRMAo562NP4aRdcBAGLo5qe12DtagAQnrpBwn3wBw6C7nSROeIZ4BaiuHXDUj01gXcRaNLpb9NRlsBTo1hllvklclG6JnEYHLAChccouaQyo1B/kXX1iPn0xKxZ6P2mOxNoDEaZofZExs3S2x2TqtG"],"x5tS256":"GDzHNYs0jiROjAheP4ndw8y9veFXzlzwCgbT9z50D_I="}),
+        ];
+
+        let res = match parse_and_verify_otp_jwt(TEST_TOKEN, &auth_keys, verifier.factor).await {
+            Ok(res) => res,
+            Err(e) => {
+                panic!("error verifying token {:?}", e);
+            }
+        };
     }
 
     #[tokio::test]
     async fn should_verify_stytch_sms_auth_factor() {
         // token from test project, not used in any production context
-        const TEST_TOKEN: &str = "eyJhbGciOiJSUzI1NiIsImtpZCI6Imp3ay10ZXN0LWVlZGI5YjU1LTRjNWItNGE4Ni1iODVmLWVjOTlkZmMwY2EyNyIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicHJvamVjdC10ZXN0LTI3OTA2MzVkLWJhMzEtNDcwNS1hYWY0LTIxM2JiMGYwNjgxMiJdLCJleHAiOjE3MjAwOTg3MDUsImh0dHBzOi8vc3R5dGNoLmNvbS9zZXNzaW9uIjp7ImlkIjoic2Vzc2lvbi10ZXN0LWVjOGU3ZWRiLTc5YzctNDg3Mi05NjQ3LTlkMzY1YzlkYTEzOSIsInN0YXJ0ZWRfYXQiOiIyMDI0LTA3LTA0VDEzOjA2OjQ1WiIsImxhc3RfYWNjZXNzZWRfYXQiOiIyMDI0LTA3LTA0VDEzOjA2OjQ1WiIsImV4cGlyZXNfYXQiOiIyMDI0LTA3LTExVDEzOjA2OjQ1WiIsImF0dHJpYnV0ZXMiOnsidXNlcl9hZ2VudCI6IiIsImlwX2FkZHJlc3MiOiIifSwiYXV0aGVudGljYXRpb25fZmFjdG9ycyI6W3sidHlwZSI6Im90cCIsImRlbGl2ZXJ5X21ldGhvZCI6InNtcyIsImxhc3RfYXV0aGVudGljYXRlZF9hdCI6IjIwMjQtMDctMDRUMTM6MDY6NDVaIiwicGhvbmVfbnVtYmVyX2ZhY3RvciI6eyJwaG9uZV9pZCI6InBob25lLW51bWJlci10ZXN0LWNmYTJjYTFlLTVmNzMtNGM0NS1hOWU2LWNjYWE5MWZkYjE3ZCIsInBob25lX251bWJlciI6IisxMjAxNDA3MjA3MyJ9fV19LCJpYXQiOjE3MjAwOTg0MDUsImlzcyI6InN0eXRjaC5jb20vcHJvamVjdC10ZXN0LTI3OTA2MzVkLWJhMzEtNDcwNS1hYWY0LTIxM2JiMGYwNjgxMiIsIm5iZiI6MTcyMDA5ODQwNSwic3ViIjoidXNlci10ZXN0LWFhMGUwZmFhLTFjZTgtNGY4Yy05MGJhLWU2OTZmMWY4OTFlZiJ9.ms0b45kuOTKRePK2hLNZQO73-2VujpcaKBEHYVDGewsNTWCdLW0eqqpGSep8CMyDQtdnfcnffJ3wH_r0FP4vLHsls7YtuF9hR2fPK73G0pTkzebobpSYWTVyUs_bOewgRniQIiUXfvZQ1Dy21t4vIhUj_tkFrMrguskWFSPhPY_z8BPwQjCll-l0WPGrQF5rDzP3tuJwrjmL9mIm6hoIfIxYfBlO-c8x22ZIwxVUiiAltFSlgiILOLFz7byV5UcroEqUm7MYJm7HgiXzGJ2QY3QiRNKsl7x745Hj3dLz2G2ZTTvA-nta_6yFhCiGThmjgJtvO6ksd9KMes5O937Q4g";
+        const TEST_TOKEN: &str = "eyJhbGciOiJSUzI1NiIsImtpZCI6Imp3ay10ZXN0LWRhOThjOGZmLTk5YjAtNDVjMy1iMjAzLTZkNDBiMWZkYTgwYSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicHJvamVjdC10ZXN0LWRlNGUyNjkwLTE1MDYtNGNmNS04YmNlLTQ0NTcxZGRhZWJjOSJdLCJleHAiOjE3Mjk3MzU3NTEsImh0dHBzOi8vc3R5dGNoLmNvbS9zZXNzaW9uIjp7ImlkIjoic2Vzc2lvbi10ZXN0LTE4ZDRmYThjLWE3ODUtNDUyMC1hZTA5LWUxNDY2NDgyNzRlMyIsInN0YXJ0ZWRfYXQiOiIyMDI0LTEwLTI0VDAyOjA0OjExWiIsImxhc3RfYWNjZXNzZWRfYXQiOiIyMDI0LTEwLTI0VDAyOjA0OjExWiIsImV4cGlyZXNfYXQiOiIyMDI0LTEwLTI0VDAzOjA0OjExWiIsImF0dHJpYnV0ZXMiOnsidXNlcl9hZ2VudCI6Ik1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xMzAuMC4wLjAgU2FmYXJpLzUzNy4zNiIsImlwX2FkZHJlc3MiOiIxNjIuMjE4LjIyNi4xMTcifSwiYXV0aGVudGljYXRpb25fZmFjdG9ycyI6W3sidHlwZSI6Im90cCIsImRlbGl2ZXJ5X21ldGhvZCI6InNtcyIsImxhc3RfYXV0aGVudGljYXRlZF9hdCI6IjIwMjQtMTAtMjRUMDI6MDQ6MTFaIiwicGhvbmVfbnVtYmVyX2ZhY3RvciI6eyJwaG9uZV9pZCI6InBob25lLW51bWJlci10ZXN0LWM3NDNjOTg5LTc5YzktNDU0OS1hNTVmLWVmNjQ1MDdmZTE4MSIsInBob25lX251bWJlciI6IisxNDE1NjEwNjg1MiJ9fV19LCJpYXQiOjE3Mjk3MzU0NTEsImlzcyI6InN0eXRjaC5jb20vcHJvamVjdC10ZXN0LWRlNGUyNjkwLTE1MDYtNGNmNS04YmNlLTQ0NTcxZGRhZWJjOSIsIm5iZiI6MTcyOTczNTQ1MSwic3ViIjoidXNlci10ZXN0LTAwODEyM2M3LTdlNjAtNGFmNy1hMGRiLTViOWRhODQyYTUzMSJ9.FMBZqQ8KNd3K-scH3NUE71f2OLRzllBoEAo4Aw1wa-SWssccpQG0ymkrlJKqHxTJgYVXv3OYFFLR_EjvOGTeWnP2Dnv_Z4y55dAcJKwpbrKpMJ2h437CXhWwcFSvQArfL2W2kSd0xjwJbRIsjuLFgEizwSTsgKpZymL_98g0fNeROeoTtxa49VkFWgWUHwGGrl1_dkfRu7w8I6EBP_xHkajbeGjb-04N7Kquh_-BIPH0tx9Nj04x7Q0OlhaKMwhRurp4rRC8IhcAnK1nyingsZUPsFSSKnadRBDr832XsGlUPWL5C-Qj4ZqLZFosyFmweOdpLgPJrSPG_CLtIQUogg";
+
         let verifier = StytchJWTAuthMethodVerifier {
             factor: Some("sms".to_string()),
         };
-        let res = verifier.verify(TEST_TOKEN).await;
-        let res = res.unwrap();
-        println!("response {:?}", res);
+
+        // we actually want to test this, below, but the keys from stytch can expire.  so we do the same things that the auth verifier does, except we supply static auth_keys
+        // let res = verifier.verify(TEST_TOKEN).await;
+        // let res = res.unwrap();
+
+        // show that we could get auth keys
+        let auth_keys = match get_auth_key(TEST_TOKEN).await {
+            Ok(keys) => keys,
+            Err(e) => {
+                panic!("error getting auth keys {:?}", e);
+            }
+        };
+
+        // the auth keys are likely expired for the static token (they're rotated every 6 months), so let's supply the old ones that match the token, and test verification.
+        let auth_keys = vec![
+            json!({"alg":"RS256","e":"AQAB","key_ops":["verify"],"kid":"jwk-test-da98c8ff-99b0-45c3-b203-6d40b1fda80a","kty":"RSA","n":"3_pmAAoloKxWwjES0jcxQCtIcR1IdMeNHXUzKxasFENoybIsbkmLzSHzmx4ZpSMy8ACjRNkEWDq54zG-fN-haA24sNuSM6Se1jf9B1LnE5iuPTqh-rxFWvbYeLCZBii3Pii7mXAjI6jBMJ0WFKv_4D7IVSIR0PLUp67kBN-qF8P1zv6nue8ezpK2BrUsuuttt4E248lWooPfTzcgxnTMAonym2PoZ3P0NqNxh2AgJxwEZtd5-uIFQ0zc-yE8XJjL3yVNLwdJY54N_jigJldmJp3eAVU1iJofAJBwU0PukHJiY9vpwvaqX0BtrIpmoql-Wjs-DsAB12pl1skHvU5i3Q","use":"sig","x5c":["MIICvTCCAaWgAwIBAgIBATANBgkqhkiG9w0BAQsFADARMQ8wDQYDVQQKEwZTdHl0Y2gwHhcNMjQxMDI0MDE1NzMwWhcNMzQxMDI0MDE1NzMwWjARMQ8wDQYDVQQKEwZTdHl0Y2gwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDf+mYACiWgrFbCMRLSNzFAK0hxHUh0x40ddTMrFqwUQ2jJsixuSYvNIfObHhmlIzLwAKNE2QRYOrnjMb5836FoDbiw25IzpJ7WN/0HUucTmK49OqH6vEVa9th4sJkGKLc+KLuZcCMjqMEwnRYUq//gPshVIhHQ8tSnruQE36oXw/XO/qe57x7OkrYGtSy66223gTbjyVaig99PNyDGdMwCifKbY+hnc/Q2o3GHYCAnHARm13n64gVDTNz7ITxcmMvfJU0vB0ljng3+OKAmV2Ymnd4BVTWImh8AkHBTQ+6QcmJj2+nC9qpfQG2simaiqX5aOz4OwAHXamXWyQe9TmLdAgMBAAGjIDAeMA4GA1UdDwEB/wQEAwIHgDAMBgNVHRMBAf8EAjAAMA0GCSqGSIb3DQEBCwUAA4IBAQByw2SnHBTQghn0DiBr8amOKntUIog5qR8fXR27s9GEgCENtV7UawXFi6VXG5yqTwI9brfbkEfMO8/KIL+C6zm/p9Y+/BNedIfmwx3p9ZaGohKGwwMAmqc7f/J32/luGYLaiZ1OyUmVwNLhm+XCc1GtXH8HaW00C9b+51ZSPmZpOgIaBSovHp4QipbNCZeqW7dRMAo562NP4aRdcBAGLo5qe12DtagAQnrpBwn3wBw6C7nSROeIZ4BaiuHXDUj01gXcRaNLpb9NRlsBTo1hllvklclG6JnEYHLAChccouaQyo1B/kXX1iPn0xKxZ6P2mOxNoDEaZofZExs3S2x2TqtG"],"x5tS256":"GDzHNYs0jiROjAheP4ndw8y9veFXzlzwCgbT9z50D_I="}),
+        ];
+
+        let res = match parse_and_verify_otp_jwt(TEST_TOKEN, &auth_keys, verifier.factor).await {
+            Ok(res) => res,
+            Err(e) => {
+                panic!("error verifying token {:?}", e);
+            }
+        };
     }
 }

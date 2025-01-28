@@ -1,4 +1,5 @@
 use crate::{
+    config::LitNodeConfig as _,
     constants::{
         Chain, CHAIN_CHEQD, CHAIN_COSMOS, CHAIN_ETHEREUM, CHAIN_JUNO, CHAIN_KYVE, CHAIN_SOLANA,
     },
@@ -25,12 +26,13 @@ use super::{
         extract_requested_resources_from_session_sig, extract_wallet_sig,
         validate_and_extract_wallet_sig, validate_session_sig,
     },
-    validators::wallet_sig::validate_wallet_sig_by_chain,
+    validators::wallet_sig::{validate_siwe_message, validate_wallet_sig_by_chain},
 };
 
 pub const AUTH_SIG_DERIVED_VIA_SESSION_SIG: &str = "litSessionSignViaNacl";
 pub const AUTH_SIG_DERIVED_VIA_BLS_NETWORK_SIG: &str = "lit.bls";
 pub const AUTH_SIG_DERIVED_VIA_CONTRACT_SIG: &str = "EIP1271";
+pub const AUTH_SIG_DERIVED_VIA_CONTRACT_SIG_SHA256: &str = "EIP1271_SHA256";
 pub const AUTH_SIG_SESSION_SIG_ALGO: &str = "ed25519";
 pub const AUTH_SIG_BLS_NETWORK_SIG_ALGO: &str = "LIT_BLS";
 
@@ -283,7 +285,7 @@ impl JsonAuthSig {
         Ok(false)
     }
 
-    pub(self) fn new_with_type(
+    pub fn new_with_type(
         sig: String,
         derived_via: String,
         signed_message: String,
@@ -328,7 +330,9 @@ impl JsonAuthSig {
             }
         }
 
-        if derived_via == AUTH_SIG_DERIVED_VIA_CONTRACT_SIG {
+        if derived_via == AUTH_SIG_DERIVED_VIA_CONTRACT_SIG
+            || derived_via == AUTH_SIG_DERIVED_VIA_CONTRACT_SIG_SHA256
+        {
             return AuthMaterialType::ContractSig;
         }
 
@@ -390,6 +394,8 @@ impl JsonAuthSig {
                 ));
             }
             AuthMaterialType::ContractSig => {
+                let enable_siwe_validation = matches!(cfg.enable_siwe_validation(), Ok(true));
+                let _ = validate_siwe_message(self, enable_siwe_validation)?;
                 validate_eip1271_signature(self, chain).await?;
                 self.clone()
             }

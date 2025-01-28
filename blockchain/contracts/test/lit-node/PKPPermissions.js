@@ -91,6 +91,7 @@ describe('PKPPermissions', function () {
           'StakingFacet',
           'StakingViewsFacet',
           'StakingVersionFacet',
+          'StakingAdminFacet',
         ],
         verifyContracts: false,
         waitForDeployment: false,
@@ -98,6 +99,10 @@ describe('PKPPermissions', function () {
     );
     const stakingContract = await ethers.getContractAt(
       'StakingFacet',
+      await stakingDiamond.getAddress()
+    );
+    const stakingAdminFacet = await ethers.getContractAt(
+      'StakingAdminFacet',
       await stakingDiamond.getAddress()
     );
     const { diamond: stakingBalancesDiamond } = await deployDiamond(
@@ -131,6 +136,7 @@ describe('PKPPermissions', function () {
     const stakingAccounts = await setupStakingWithValidatorsAndAdvance(
       ethers,
       stakingContract,
+      stakingAdminFacet,
       stakingBalancesContract,
       tokenContract,
       deployer,

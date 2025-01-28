@@ -1,5 +1,4 @@
 const chai = require('chai');
-const { BigNumber, utils } = require('ethers-v5');
 const { ip2int, int2ip } = require('../../utils');
 const {
   Environment,
@@ -10,7 +9,8 @@ const {
 } = require('../../utils/contract');
 const { expect } = chai;
 const { deployDiamond } = require('../../scripts/deployDiamond');
-const { toBigInt } = require('ethers');
+const { toBigInt, randomBytes } = require('ethers');
+const { staking } = require('../../typechain-types/contracts/lit-node');
 
 describe('Staking', function () {
   let deployer;
@@ -25,6 +25,7 @@ describe('Staking', function () {
   let stakingContract;
   let stakingViewsFacet;
   let stakingVersionFacet;
+  let stakingAdminFacet;
   let ownershipFacet;
   let stakingBalances;
   let contractResolver;
@@ -84,6 +85,7 @@ describe('Staking', function () {
           'StakingFacet',
           'StakingViewsFacet',
           'StakingVersionFacet',
+          'StakingAdminFacet',
         ],
         verifyContracts: false,
         waitForDeployment: false,
@@ -95,6 +97,10 @@ describe('Staking', function () {
     );
     stakingViewsFacet = await ethers.getContractAt(
       'StakingViewsFacet',
+      await stakingDiamond.getAddress()
+    );
+    stakingAdminFacet = await ethers.getContractAt(
+      'StakingAdminFacet',
       await stakingDiamond.getAddress()
     );
     ownershipFacet = await ethers.getContractAt(
@@ -151,6 +157,7 @@ describe('Staking', function () {
     stakingAccounts = await setupStakingWithValidatorsAndAdvance(
       ethers,
       stakingContract,
+      stakingAdminFacet,
       stakingBalances,
       token,
       deployer,
@@ -253,8 +260,8 @@ describe('Staking', function () {
           0,
           7777,
           nodeAccount1.address,
-          toBigInt(utils.randomBytes(32)),
-          toBigInt(utils.randomBytes(32))
+          toBigInt(randomBytes(32)),
+          toBigInt(randomBytes(32))
         )
       ).revertedWithCustomError(stakingContract, 'CannotStakeZero');
     });
@@ -271,13 +278,55 @@ describe('Staking', function () {
           0,
           7777,
           nodeAccount2.address,
-          toBigInt(utils.randomBytes(32)),
-          toBigInt(utils.randomBytes(32))
+          toBigInt(randomBytes(32)),
+          toBigInt(randomBytes(32))
         )
       ).revertedWithCustomError(
         stakingBalances,
         'StakeMustBeGreaterThanMinimumStake'
       );
+    });
+
+    it('devopsAdmin functionality works', async () => {
+      stakingAdminFacet = stakingAdminFacet.connect(stakingAccount1);
+
+      const stakingUtilsLib = await ethers.getContractAt(
+        'StakingUtilsLib',
+        await stakingAdminFacet.getAddress()
+      );
+
+      // try to use an admin function without being the devopsAdmin
+      await expect(
+        stakingAdminFacet.adminKickValidatorInNextEpoch(
+          stakingAccounts[0].stakingAddress
+        )
+      ).to.be.revertedWithCustomError(
+        stakingUtilsLib,
+        'CallerNotOwnerOrDevopsAdmin'
+      );
+
+      // try to set the devopsAdmin to a non-owner
+      await expect(
+        stakingAdminFacet.setDevopsAdmin(stakingAccount2.address)
+      ).to.be.revertedWithCustomError(stakingUtilsLib, 'CallerNotOwner');
+
+      // actually set the devopsAdmin
+      stakingAdminFacet = stakingAdminFacet.connect(deployer);
+      await stakingAdminFacet.setDevopsAdmin(stakingAccount1.address);
+      stakingAdminFacet = stakingAdminFacet.connect(stakingAccount1);
+
+      // now the admin function should work
+      stakingAdminFacet = stakingAdminFacet.connect(stakingAccount1);
+      await stakingAdminFacet.adminKickValidatorInNextEpoch(
+        stakingAccounts[0].stakingAddress
+      );
+
+      // confirm the validator was kicked
+      const validatorsInNextEpoch =
+        await stakingViewsFacet.getValidatorsInNextEpoch();
+      expect(validatorsInNextEpoch.length).equal(9);
+      expect(validatorsInNextEpoch.includes(stakingAccounts[0].stakingAddress))
+        .to.be.false;
     });
   });
 
@@ -323,8 +372,8 @@ describe('Staking', function () {
         );
 
       // generate new unused communication keys
-      const communicationSenderPubKey = toBigInt(utils.randomBytes(32));
-      const communicationReceiverPubKey = toBigInt(utils.randomBytes(32));
+      const communicationSenderPubKey = toBigInt(randomBytes(32));
+      const communicationReceiverPubKey = toBigInt(randomBytes(32));
 
       // can only join if permitted
       await stakingBalances.setPermittedStakersOn(true);
@@ -410,11 +459,11 @@ describe('Staking', function () {
       await stakingBalances.setPermittedStakersOn(false);
 
       // set min validator count to 11 which is the current validator count
-      stakingContract = stakingContract.connect(deployer);
+      stakingAdminFacet = stakingAdminFacet.connect(deployer);
 
       await updateMinimumValidatorCount(
         stakingViewsFacet,
-        stakingContract,
+        stakingAdminFacet,
         11n
       );
 
@@ -440,7 +489,11 @@ describe('Staking', function () {
       );
 
       stakingContract = stakingContract.connect(deployer);
-      await updateMinimumValidatorCount(stakingViewsFacet, stakingContract, 7n);
+      await updateMinimumValidatorCount(
+        stakingViewsFacet,
+        stakingAdminFacet,
+        7n
+      );
 
       postStakeBal = await stakingBalances.balanceOf(stakingAccount1.address);
       postTokenBalance = await token.balanceOf(stakingAccount1.address);
@@ -466,7 +519,7 @@ describe('Staking', function () {
       );
     });
 
-    it('works in all scenarios with kicked nodes', async function () {
+    it('works with kicked nodes from the current epoch', async function () {
       const validatorsInNextEpochBeforeTest =
         await stakingViewsFacet.getValidatorsInNextEpoch();
       expect(validatorsInNextEpochBeforeTest.length).equal(10);
@@ -475,7 +528,7 @@ describe('Staking', function () {
         await stakingViewsFacet.getActiveUnkickedValidatorStructsAndCounts();
       expect(allStructs.length).equal(10);
 
-      const stakingAsAdmin = stakingContract.connect(deployer);
+      const stakingAsAdmin = stakingAdminFacet.connect(deployer);
 
       // kick the first 3 nodes
       for (let i = 0; i < 3; i++) {
@@ -490,11 +543,51 @@ describe('Staking', function () {
       expect(allStructs.length).equal(7);
     });
 
+    it('works with kicked nodes from the next epoch', async function () {
+      const validatorsInNextEpochBeforeTest =
+        await stakingViewsFacet.getValidatorsInNextEpoch();
+      expect(validatorsInNextEpochBeforeTest.length).equal(10);
+
+      let [epoch, currentValidatorCountForConsensus, allStructs] =
+        await stakingViewsFacet.getActiveUnkickedValidatorStructsAndCounts();
+      expect(allStructs.length).equal(10);
+
+      const stakingAsAccount1 = stakingContract.connect(stakingAccount1);
+      // generate new unused communication keys
+      const communicationSenderPubKey = toBigInt(randomBytes(32));
+      const communicationReceiverPubKey = toBigInt(randomBytes(32));
+      await stakingAsAccount1.stakeAndJoin(
+        minStake,
+        ip2int(stakingAccount1IpAddress),
+        0,
+        stakingAccount1Port,
+        nodeAccount1.address,
+        communicationSenderPubKey,
+        communicationReceiverPubKey
+      );
+
+      // still 10 nodes
+      [epoch, currentValidatorCountForConsensus, allStructs] =
+        await stakingViewsFacet.getActiveUnkickedValidatorStructsAndCounts();
+      expect(allStructs.length).equal(10);
+
+      // kick 1
+      const stakingAsAdmin = stakingAdminFacet.connect(deployer);
+      await stakingAsAdmin.adminKickValidatorInNextEpoch(
+        stakingAccount1.address
+      );
+
+      // still 10 nodes
+      [epoch, currentValidatorCountForConsensus, allStructs] =
+        await stakingViewsFacet.getActiveUnkickedValidatorStructsAndCounts();
+      expect(allStructs.length).equal(10);
+    });
+
     it('can join as a validator and can leave', async function () {
       // stakingAccount1 requests to join
       // generate new unused communication keys
-      const communicationSenderPubKey = toBigInt(utils.randomBytes(32));
-      const communicationReceiverPubKey = toBigInt(utils.randomBytes(32));
+      const communicationSenderPubKey = toBigInt(randomBytes(32));
+      const communicationReceiverPubKey = toBigInt(randomBytes(32));
 
       // can only join if permitted
       await stakingBalances.setPermittedStakersOn(true);
@@ -529,10 +622,10 @@ describe('Staking', function () {
       expect(currentState).to.equal(StakingState.Active);
 
       // make sure that we can't lock if less than min validator count
-      stakingContract = stakingContract.connect(deployer);
+      stakingAdminFacet = stakingAdminFacet.connect(deployer);
       await updateMinimumValidatorCount(
         stakingViewsFacet,
-        stakingContract,
+        stakingAdminFacet,
         12n
       );
 
@@ -543,7 +636,11 @@ describe('Staking', function () {
         'NotEnoughValidatorsInNextEpoch'
       );
       // reset it back to 7
-      await updateMinimumValidatorCount(stakingViewsFacet, stakingContract, 7n);
+      await updateMinimumValidatorCount(
+        stakingViewsFacet,
+        stakingAdminFacet,
+        7n
+      );
 
       // lock new validators
       await stakingContract.lockValidatorsForNextEpoch();
@@ -670,8 +767,8 @@ describe('Staking', function () {
     it('can join as a validator and the node can request to leave', async function () {
       // stakingAccount1 requests to join
       // generate new unused communication keys
-      const communicationSenderPubKey = toBigInt(utils.randomBytes(32));
-      const communicationReceiverPubKey = toBigInt(utils.randomBytes(32));
+      const communicationSenderPubKey = toBigInt(randomBytes(32));
+      const communicationReceiverPubKey = toBigInt(randomBytes(32));
 
       // can only join if permitted
       await stakingBalances.setPermittedStakersOn(true);
@@ -706,10 +803,10 @@ describe('Staking', function () {
       expect(currentState).to.equal(StakingState.Active);
 
       // make sure that we can't lock if less than min validator count
-      stakingContract = stakingContract.connect(deployer);
+      stakingAdminFacet = stakingAdminFacet.connect(deployer);
       await updateMinimumValidatorCount(
         stakingViewsFacet,
-        stakingContract,
+        stakingAdminFacet,
         12n
       );
 
@@ -720,7 +817,11 @@ describe('Staking', function () {
         'NotEnoughValidatorsInNextEpoch'
       );
       // reset it back to 7
-      await updateMinimumValidatorCount(stakingViewsFacet, stakingContract, 7n);
+      await updateMinimumValidatorCount(
+        stakingViewsFacet,
+        stakingAdminFacet,
+        7n
+      );
 
       // lock new validators
       await stakingContract.lockValidatorsForNextEpoch();
@@ -1084,7 +1185,7 @@ describe('Staking', function () {
 
   describe('setting new resolver contract address', () => {
     it('sets the new contract address', async () => {
-      stakingContract = stakingContract.connect(deployer);
+      stakingAdminFacet = stakingAdminFacet.connect(deployer);
       const existingResolverContractAddress =
         await stakingViewsFacet.contractResolver();
       const newResolverContractAddress =
@@ -1092,13 +1193,13 @@ describe('Staking', function () {
       expect(existingResolverContractAddress).not.equal(
         newResolverContractAddress
       );
-      await stakingContract.setContractResolver(newResolverContractAddress);
+      await stakingAdminFacet.setContractResolver(newResolverContractAddress);
       expect(await stakingViewsFacet.contractResolver()).equal(
         newResolverContractAddress
       );
 
       // revert this change
-      await stakingContract.setContractResolver(
+      await stakingAdminFacet.setContractResolver(
         existingResolverContractAddress
       );
     });
@@ -1138,7 +1239,7 @@ describe('Staking', function () {
       const ipAddress = ip2int(stakingAccount1IpAddress);
       const port = 1337;
       const nodeAddress = newNodeAddress.address;
-      const comsKeys = toBigInt(utils.randomBytes(32));
+      const comsKeys = toBigInt(randomBytes(32));
 
       // Stake and join
       await stakingContract
@@ -1167,7 +1268,7 @@ describe('Staking', function () {
         .addAlias(aliasStakingAddress.address);
 
       // show that the node can join with the alias address
-      const aliasCommsKeys = toBigInt(utils.randomBytes(32));
+      const aliasCommsKeys = toBigInt(randomBytes(32));
       await stakingContract
         .connect(aliasStakingAddress)
         .requestToJoin(
@@ -1261,19 +1362,23 @@ describe('Staking', function () {
     it('tries to call the admin functions as a non admin and fails', async () => {
       stakingContract = stakingContract.connect(nodeAccount1);
       stakingBalances = stakingBalances.connect(nodeAccount1);
+      const stakingUtilsLib = await ethers.getContractAt(
+        'StakingUtilsLib',
+        await stakingContract.getAddress()
+      );
 
-      expect(stakingContract.setEpochLength(25)).revertedWithCustomError(
-        stakingContract,
+      expect(stakingAdminFacet.setEpochLength(25)).revertedWithCustomError(
+        stakingUtilsLib,
         'CallerNotOwner()'
       );
 
-      expect(stakingContract.setEpochTimeout(25)).revertedWithCustomError(
-        stakingContract,
+      expect(stakingAdminFacet.setEpochTimeout(25)).revertedWithCustomError(
+        stakingUtilsLib,
         'CallerNotOwner()'
       );
 
       expect(
-        stakingContract.setConfig([
+        stakingAdminFacet.setConfig([
           25,
           1,
           10,
@@ -1286,48 +1391,48 @@ describe('Staking', function () {
           10,
           true,
         ])
-      ).revertedWithCustomError(stakingContract, 'CallerNotOwner()');
+      ).revertedWithCustomError(stakingUtilsLib, 'CallerNotOwner()');
 
       expect(
-        stakingContract.setKickPenaltyPercent(1, 5)
-      ).revertedWithCustomError(stakingContract, 'CallerNotOwner()');
+        stakingAdminFacet.setKickPenaltyPercent(1, 5)
+      ).revertedWithCustomError(stakingUtilsLib, 'CallerNotOwner()');
 
       expect(
         stakingBalances.setContractResolver(routerContract.address)
       ).revertedWithCustomError(stakingBalances, 'CallerNotOwner()');
 
       expect(
-        stakingContract.setContractResolver(routerContract.address)
-      ).revertedWithCustomError(stakingContract, 'CallerNotOwner()');
+        stakingAdminFacet.setContractResolver(routerContract.address)
+      ).revertedWithCustomError(stakingUtilsLib, 'CallerNotOwner()');
 
       expect(
-        stakingContract.setEpochState(StakingState.NextValidatorSetLocked)
-      ).revertedWithCustomError(stakingContract, 'CallerNotOwner()');
+        stakingAdminFacet.setEpochState(StakingState.NextValidatorSetLocked)
+      ).revertedWithCustomError(stakingUtilsLib, 'CallerNotOwner()');
 
       expect(
-        stakingContract.setEpochState(StakingState.Paused)
-      ).revertedWithCustomError(stakingContract, 'CallerNotOwner()');
+        stakingAdminFacet.setEpochState(StakingState.Paused)
+      ).revertedWithCustomError(stakingUtilsLib, 'CallerNotOwner()');
 
       expect(
-        stakingContract.adminKickValidatorInNextEpoch(stakingAccount1.address)
-      ).revertedWithCustomError(stakingContract, 'CallerNotOwner()');
+        stakingAdminFacet.adminKickValidatorInNextEpoch(stakingAccount1.address)
+      ).revertedWithCustomError(stakingUtilsLib, 'CallerNotOwner()');
 
       expect(
-        stakingContract.adminSlashValidator(stakingAccount1.address, 100)
-      ).revertedWithCustomError(stakingContract, 'CallerNotOwner()');
+        stakingAdminFacet.adminSlashValidator(stakingAccount1.address, 100)
+      ).revertedWithCustomError(stakingUtilsLib, 'CallerNotOwner()');
     });
   });
 
   describe('the admin can pause', () => {
     it('tries to pause then unpause as admin', async () => {
-      stakingContract = stakingContract.connect(deployer);
+      stakingAdminFacet = stakingAdminFacet.connect(deployer);
 
       const currentState = await stakingViewsFacet.state();
-      await stakingContract.setEpochState(StakingState.Paused);
+      await stakingAdminFacet.setEpochState(StakingState.Paused);
       expect(await stakingViewsFacet.state()).to.equal(StakingState.Paused);
 
       // move the state back
-      await stakingContract.setEpochState(currentState);
+      await stakingAdminFacet.setEpochState(currentState);
       expect(await stakingViewsFacet.state()).to.equal(currentState);
     });
   });
@@ -1337,13 +1442,13 @@ describe('Staking', function () {
 
     beforeEach(async () => {
       stateBeforePause = await stakingViewsFacet.state();
-      await stakingContract
+      await stakingAdminFacet
         .connect(deployer)
         .setEpochState(StakingState.Paused);
     });
 
     afterEach(async () => {
-      await stakingContract.connect(deployer).setEpochState(stateBeforePause);
+      await stakingAdminFacet.connect(deployer).setEpochState(stateBeforePause);
     });
 
     describe('can call mutative functions', function () {
@@ -1434,7 +1539,7 @@ describe('Staking', function () {
         const ipAddress = ip2int(stakingAccount1IpAddress);
         const port = 1337;
         const nodeAddress = newNodeAddress.address;
-        const comsKeys = toBigInt(utils.randomBytes(32));
+        const comsKeys = toBigInt(randomBytes(32));
 
         // Stake and join
         await stakingContract
@@ -1480,14 +1585,14 @@ describe('Staking', function () {
 
 async function updateMinimumValidatorCount(
   stakingViewsFacet,
-  stakingContract,
+  stakingAdminFacet,
   newMinimumValidatorCount
 ) {
   // Get currrent config
   const currentConfig = await stakingViewsFacet.config();
 
   // Update config
-  await stakingContract.setConfig({
+  await stakingAdminFacet.setConfig({
     tokenRewardPerTokenPerEpoch: currentConfig.tokenRewardPerTokenPerEpoch,
     DEPRECATED_complaintTolerance: 0,
     DEPRECATED_complaintIntervalSecs: 0,

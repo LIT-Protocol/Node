@@ -32,9 +32,9 @@ lit_node = {  path = "../../../lit-node", features = ["lit-actions", "testing"] 
 anyhow = "1.0.41"
 
 async-trait = "0.1.53"
-blsful = "2.5"
+blsful = "2.5.7"
 base64_light = "0.1"
-bulletproofs = { version = "4.0.0", git = "https://github.com/LIT-Protocol/bulletproofs" }
+bulletproofs = { version = "4.0.0", git = "https://github.com/LIT-Protocol/bulletproofs", branch = "datil" }
 bytes = "1.5.0"
 bs58 = "0.5.0"
 command-group = "1.0.8"
@@ -45,16 +45,16 @@ data-encoding = "2.3.2"
 digest = { version = "0.10.6", default-features = false, features = ["alloc", "oid"] }
 dotenv = "0.15.0"
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
-ed448-goldilocks = { version = "0.11", package = "ed448-goldilocks-plus" }
+ed448-goldilocks = { version = "0.13", package = "ed448-goldilocks-plus" }
 elliptic-curve = { version = "0.13.5", features = ["serde"] }
 ethers = { version = "2.0.8", features = [ "abigen", "legacy" ]}
 futures = "0.3.17"
 hex = { version = "0.4.3" }
 hex-literal = "0.4.1"
-jubjub = { version = "0.10", git = "https://github.com/LIT-Protocol/jubjub.git" }
+jubjub = { version = "0.10", git = "https://github.com/LIT-Protocol/jubjub.git", branch = "jubjub-datil" }
 lazy_static = "1.4.0"
 libaes = { version = "0.6.4", optional = true }
-lit-bls-wasm = { git = "https://github.com/LIT-Protocol/lit-bls-wasm" }
+lit-bls-wasm = { git = "https://github.com/LIT-Protocol/lit-bls-wasm", branch = "datil" }
 lit-ecdsa-wasm-combine = { git = "https://github.com/LIT-Protocol/lit-ecdsa-wasm-combine" }
 
 k256 = { version = "0.13.0", features = ["sha256", "ecdsa", "serde", "ecdsa-core", "expose-field", "hash2curve", "schnorr"], optional = false }
@@ -79,7 +79,7 @@ toml_edit = "0.20.7"
 tracing = "0.1.40"
 url = { version = "2", features = ["serde"] }
 uuid = { version = "1.4", features = ["v4"] }
-vsss-rs = { version = "4.0.1", features = ["std"] }
+vsss-rs = { version = "4.3.8", features = ["std"] }
 generic-array = "0.14.0"
 #ECDSA
 lit-core = { path = "../../../lit-core/lit-core", features = ["ipfs", "chrono"] }

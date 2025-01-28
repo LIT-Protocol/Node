@@ -16,7 +16,10 @@ use std::sync::Arc;
 use std::time::{Duration, SystemTime};
 use tokio::fs;
 use tonic;
-use tonic::transport::{Channel, ClientTlsConfig};
+use tonic::{
+    transport::{Channel, ClientTlsConfig},
+    Code,
+};
 use tracing::instrument;
 
 #[allow(clippy::unwrap_used)]
@@ -187,10 +190,8 @@ async fn send_direct_grpc(
         }
     };
 
-    let res = match call_with_retry_condition(closure, |e: &tonic::Status| {
-        e.code() == tonic::Code::DeadlineExceeded
-    })
-    .await
+    let res = match call_with_retry_condition(closure, |e: &tonic::Status| e.code() != Code::Ok)
+        .await
     {
         Ok(res) => res,
         Err(error) => {
@@ -199,11 +200,11 @@ async fn send_direct_grpc(
                 round, &data.src_index, data.dest_index, dest_addr_full, error
             );
 
-            if error.code() == tonic::Code::DeadlineExceeded {
+            if error.code() == Code::DeadlineExceeded && data.key.contains("DKG") {
                 warn!(
-                    "sending grpc message to {:?} has failed, attempting to get peer staker address for complaint {:?}",
-                    &transmission_details.dest_peer.socket_address, error
-                );
+                        "sending grpc message to {:?} has failed, attempting to get peer staker address for complaint {:?}",
+                        &transmission_details.dest_peer.socket_address, error
+                    );
                 let complainer = peer_state.addr.clone();
                 let complaint_channel = peer_state.complaint_channel.clone();
                 if let Err(e) = complaint_channel

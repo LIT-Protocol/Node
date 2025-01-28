@@ -43,6 +43,17 @@ library LibStakingStorage {
         uint256 receiverPubKey;
     }
 
+    struct StakingAggregateDetails {
+        Epoch epoch;
+        uint256 currentValidatorCountForConsensus;
+        Validator[] activeUnkickedValidators;
+    }
+
+    struct KeyedStakingAggregateDetails {
+        address stakingContractAddress;
+        StakingAggregateDetails details;
+    }
+
     struct AddressMapping {
         address nodeAddress;
         address stakerAddress;
@@ -135,6 +146,7 @@ library LibStakingStorage {
         EnumerableSet.AddressSet currentValidatorsKickedFromNextEpoch;
         // Mapping of the complaint reason code to the config for that reason
         mapping(uint256 => ComplaintConfig) complaintReasonToConfig;
+        address devopsAdmin;
     }
 
     // Return ERC721 storage struct for reading and writing

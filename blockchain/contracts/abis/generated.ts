@@ -273,6 +273,220 @@ export const allowlistAbi = [
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ArbitrumKeyDeriver
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const arbitrumKeyDeriverAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_resolver', internalType: 'address', type: 'address' },
+      {
+        name: '_env',
+        internalType: 'enum ContractResolver.Env',
+        type: 'uint8',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'role', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      {
+        name: 'previousAdminRole',
+        internalType: 'bytes32',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'newAdminRole',
+        internalType: 'bytes32',
+        type: 'bytes32',
+        indexed: true,
+      },
+    ],
+    name: 'RoleAdminChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'role', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      {
+        name: 'account',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'RoleGranted',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'role', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      {
+        name: 'account',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'RoleRevoked',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'ADMIN_ROLE',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'DEFAULT_ADMIN_ROLE',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'HD_KDF_K256',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'HD_KDF_P256',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'derivedKeyId', internalType: 'bytes32', type: 'bytes32' },
+      {
+        name: 'rootHDKeys',
+        internalType: 'struct IPubkeyRouter.RootKey[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'pubkey', internalType: 'bytes', type: 'bytes' },
+          { name: 'keyType', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      { name: 'keyType', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'computeHDPubKey',
+    outputs: [
+      { name: '', internalType: 'bool', type: 'bool' },
+      { name: '', internalType: 'bytes', type: 'bytes' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'contractResolver',
+    outputs: [
+      { name: '', internalType: 'contract ContractResolver', type: 'address' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'env',
+    outputs: [
+      { name: '', internalType: 'enum ContractResolver.Env', type: 'uint8' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'role', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getRoleAdmin',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'role', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'account', internalType: 'address', type: 'address' },
+    ],
+    name: 'grantRole',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'role', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'account', internalType: 'address', type: 'address' },
+    ],
+    name: 'hasRole',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'role', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'account', internalType: 'address', type: 'address' },
+    ],
+    name: 'renounceRole',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'role', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'account', internalType: 'address', type: 'address' },
+    ],
+    name: 'revokeRole',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'contractResolverAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    name: 'setContractResolver',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // BackupRecovery
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1105,6 +1319,19 @@ export const backupRecoveryDiamondAbi = [
     outputs: [],
     stateMutability: 'nonpayable',
   },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getNonSubmitingBackupMembersInNextState',
+    outputs: [
+      {
+        name: 'missingRecoveryMembers',
+        internalType: 'address[]',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+  },
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1571,6 +1798,653 @@ export const backupRecoveryTestFacetAbi = [
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// BackupRecoveryViewFacet
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const backupRecoveryViewFacetAbi = [
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getNonSubmitingBackupMembersInNextState',
+    outputs: [
+      {
+        name: 'missingRecoveryMembers',
+        internalType: 'address[]',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CloneNet
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const cloneNetAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_diamondCut',
+        internalType: 'struct IDiamond.FacetCut[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'facetAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'action',
+            internalType: 'enum IDiamond.FacetCutAction',
+            type: 'uint8',
+          },
+          {
+            name: 'functionSelectors',
+            internalType: 'bytes4[]',
+            type: 'bytes4[]',
+          },
+        ],
+      },
+      {
+        name: '_args',
+        internalType: 'struct CloneNetArgs',
+        type: 'tuple',
+        components: [
+          { name: 'owner', internalType: 'address', type: 'address' },
+          { name: 'init', internalType: 'address', type: 'address' },
+          { name: 'initCalldata', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotAddFunctionToDiamondThatAlreadyExists',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+    ],
+    name: 'CannotAddSelectorsToZeroAddress',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotRemoveFunctionThatDoesNotExist',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotRemoveImmutableFunction',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceFunctionThatDoesNotExists',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+    ],
+    name: 'CannotReplaceFunctionsFromFacetWithZeroAddress',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceImmutableFunction',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_functionSelector', internalType: 'bytes4', type: 'bytes4' },
+    ],
+    name: 'FunctionNotFound',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_action', internalType: 'uint8', type: 'uint8' }],
+    name: 'IncorrectFacetCutAction',
+  },
+  {
+    type: 'error',
+    inputs: [
+      {
+        name: '_initializationContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+      { name: '_calldata', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'InitializationFunctionReverted',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_contractAddress', internalType: 'address', type: 'address' },
+      { name: '_message', internalType: 'string', type: 'string' },
+    ],
+    name: 'NoBytecodeAtAddress',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_facetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'NoSelectorsProvidedForFacetForCut',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_facetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'RemoveFacetAddressMustBeZeroAddress',
+  },
+  { type: 'fallback', stateMutability: 'nonpayable' },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CloneNetDiamond
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const cloneNetDiamondAbi = [
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotAddFunctionToDiamondThatAlreadyExists',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+    ],
+    name: 'CannotAddSelectorsToZeroAddress',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotRemoveFunctionThatDoesNotExist',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotRemoveImmutableFunction',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceFunctionThatDoesNotExists',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+    ],
+    name: 'CannotReplaceFunctionsFromFacetWithZeroAddress',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceImmutableFunction',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_action', internalType: 'uint8', type: 'uint8' }],
+    name: 'IncorrectFacetCutAction',
+  },
+  {
+    type: 'error',
+    inputs: [
+      {
+        name: '_initializationContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+      { name: '_calldata', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'InitializationFunctionReverted',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_contractAddress', internalType: 'address', type: 'address' },
+      { name: '_message', internalType: 'string', type: 'string' },
+    ],
+    name: 'NoBytecodeAtAddress',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_facetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'NoSelectorsProvidedForFacetForCut',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_user', internalType: 'address', type: 'address' },
+      { name: '_contractOwner', internalType: 'address', type: 'address' },
+    ],
+    name: 'NotContractOwner',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_facetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'RemoveFacetAddressMustBeZeroAddress',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: '_diamondCut',
+        internalType: 'struct IDiamond.FacetCut[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'facetAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'action',
+            internalType: 'enum IDiamond.FacetCutAction',
+            type: 'uint8',
+          },
+          {
+            name: 'functionSelectors',
+            internalType: 'bytes4[]',
+            type: 'bytes4[]',
+          },
+        ],
+        indexed: false,
+      },
+      {
+        name: '_init',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: '_calldata',
+        internalType: 'bytes',
+        type: 'bytes',
+        indexed: false,
+      },
+    ],
+    name: 'DiamondCut',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_diamondCut',
+        internalType: 'struct IDiamond.FacetCut[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'facetAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'action',
+            internalType: 'enum IDiamond.FacetCutAction',
+            type: 'uint8',
+          },
+          {
+            name: 'functionSelectors',
+            internalType: 'bytes4[]',
+            type: 'bytes4[]',
+          },
+        ],
+      },
+      { name: '_init', internalType: 'address', type: 'address' },
+      { name: '_calldata', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'diamondCut',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_functionSelector', internalType: 'bytes4', type: 'bytes4' },
+    ],
+    name: 'facetAddress',
+    outputs: [
+      { name: 'facetAddress_', internalType: 'address', type: 'address' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'facetAddresses',
+    outputs: [
+      { name: 'facetAddresses_', internalType: 'address[]', type: 'address[]' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_facet', internalType: 'address', type: 'address' }],
+    name: 'facetFunctionSelectors',
+    outputs: [
+      {
+        name: '_facetFunctionSelectors',
+        internalType: 'bytes4[]',
+        type: 'bytes4[]',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'facets',
+    outputs: [
+      {
+        name: 'facets_',
+        internalType: 'struct IDiamondLoupe.Facet[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'facetAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'functionSelectors',
+            internalType: 'bytes4[]',
+            type: 'bytes4[]',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'newOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: 'owner_', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'error', inputs: [], name: 'CallerNotOwner' },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'stakingContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    name: 'adminAddActiveStakingContract',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'stakingContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    name: 'adminRemoveActiveStakingContract',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getActiveStakingContracts',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getAllActiveUnkickedValidatorStructsAndCounts',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.KeyedStakingAggregateDetails[]',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'stakingContractAddress',
+            internalType: 'address',
+            type: 'address',
+          },
+          {
+            name: 'details',
+            internalType: 'struct LibStakingStorage.StakingAggregateDetails',
+            type: 'tuple',
+            components: [
+              {
+                name: 'epoch',
+                internalType: 'struct LibStakingStorage.Epoch',
+                type: 'tuple',
+                components: [
+                  {
+                    name: 'epochLength',
+                    internalType: 'uint256',
+                    type: 'uint256',
+                  },
+                  { name: 'number', internalType: 'uint256', type: 'uint256' },
+                  { name: 'endTime', internalType: 'uint256', type: 'uint256' },
+                  { name: 'retries', internalType: 'uint256', type: 'uint256' },
+                  { name: 'timeout', internalType: 'uint256', type: 'uint256' },
+                ],
+              },
+              {
+                name: 'currentValidatorCountForConsensus',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'activeUnkickedValidators',
+                internalType: 'struct LibStakingStorage.Validator[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'ip', internalType: 'uint32', type: 'uint32' },
+                  { name: 'ipv6', internalType: 'uint128', type: 'uint128' },
+                  { name: 'port', internalType: 'uint32', type: 'uint32' },
+                  {
+                    name: 'nodeAddress',
+                    internalType: 'address',
+                    type: 'address',
+                  },
+                  { name: 'reward', internalType: 'uint256', type: 'uint256' },
+                  {
+                    name: 'senderPubKey',
+                    internalType: 'uint256',
+                    type: 'uint256',
+                  },
+                  {
+                    name: 'receiverPubKey',
+                    internalType: 'uint256',
+                    type: 'uint256',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'numActiveStakingContracts',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CloneNetFacet
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const cloneNetFacetAbi = [
+  { type: 'error', inputs: [], name: 'CallerNotOwner' },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'stakingContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    name: 'adminAddActiveStakingContract',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'stakingContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    name: 'adminRemoveActiveStakingContract',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getActiveStakingContracts',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getAllActiveUnkickedValidatorStructsAndCounts',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.KeyedStakingAggregateDetails[]',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'stakingContractAddress',
+            internalType: 'address',
+            type: 'address',
+          },
+          {
+            name: 'details',
+            internalType: 'struct LibStakingStorage.StakingAggregateDetails',
+            type: 'tuple',
+            components: [
+              {
+                name: 'epoch',
+                internalType: 'struct LibStakingStorage.Epoch',
+                type: 'tuple',
+                components: [
+                  {
+                    name: 'epochLength',
+                    internalType: 'uint256',
+                    type: 'uint256',
+                  },
+                  { name: 'number', internalType: 'uint256', type: 'uint256' },
+                  { name: 'endTime', internalType: 'uint256', type: 'uint256' },
+                  { name: 'retries', internalType: 'uint256', type: 'uint256' },
+                  { name: 'timeout', internalType: 'uint256', type: 'uint256' },
+                ],
+              },
+              {
+                name: 'currentValidatorCountForConsensus',
+                internalType: 'uint256',
+                type: 'uint256',
+              },
+              {
+                name: 'activeUnkickedValidators',
+                internalType: 'struct LibStakingStorage.Validator[]',
+                type: 'tuple[]',
+                components: [
+                  { name: 'ip', internalType: 'uint32', type: 'uint32' },
+                  { name: 'ipv6', internalType: 'uint128', type: 'uint128' },
+                  { name: 'port', internalType: 'uint32', type: 'uint32' },
+                  {
+                    name: 'nodeAddress',
+                    internalType: 'address',
+                    type: 'address',
+                  },
+                  { name: 'reward', internalType: 'uint256', type: 'uint256' },
+                  {
+                    name: 'senderPubKey',
+                    internalType: 'uint256',
+                    type: 'uint256',
+                  },
+                  {
+                    name: 'receiverPubKey',
+                    internalType: 'uint256',
+                    type: 'uint256',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'numActiveStakingContracts',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ContextUpgradeable
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1728,6 +2602,13 @@ export const contractResolverAbi = [
   {
     type: 'function',
     inputs: [],
+    name: 'CLONE_NET_CONTRACT',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
     name: 'DEFAULT_ADMIN_ROLE',
     outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
     stateMutability: 'view',
@@ -1749,6 +2630,13 @@ export const contractResolverAbi = [
   {
     type: 'function',
     inputs: [],
+    name: 'HOST_COMMANDS_CONTRACT',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
     name: 'LIT_TOKEN_CONTRACT',
     outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
     stateMutability: 'view',
@@ -1763,7 +2651,21 @@ export const contractResolverAbi = [
   {
     type: 'function',
     inputs: [],
+    name: 'PAYMENT_DELEGATION_CONTRACT',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
     name: 'PKP_HELPER_CONTRACT',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'PKP_HELPER_V2_CONTRACT',
     outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
     stateMutability: 'view',
   },
@@ -1940,36 +2842,6 @@ export const contractResolverAbi = [
     ],
     name: 'typeAddresses',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-] as const;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DevKeyDeriver
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const devKeyDeriverAbi = [
-  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'derivedKeyId', internalType: 'bytes32', type: 'bytes32' },
-      {
-        name: 'rootHDKeys',
-        internalType: 'struct IPubkeyRouter.RootKey[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'pubkey', internalType: 'bytes', type: 'bytes' },
-          { name: 'keyType', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      { name: 'keyType', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'computeHDPubKey',
-    outputs: [
-      { name: '', internalType: 'bool', type: 'bool' },
-      { name: '', internalType: 'bytes', type: 'bytes' },
-    ],
     stateMutability: 'view',
   },
 ] as const;
@@ -2483,6 +3355,14 @@ export const domainWalletRegistryDiamondAbi = [
     name: 'InvalidNftMetadataCollectionLength',
   },
   {
+    type: 'error',
+    inputs: [
+      { name: 'length', internalType: 'uint256', type: 'uint256' },
+      { name: 'uri', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'MaximumCharacterLimitExceeded',
+  },
+  {
     type: 'event',
     anonymous: false,
     inputs: [
@@ -2670,6 +3550,13 @@ export const domainWalletRegistryDiamondAbi = [
     inputs: [{ name: 'uri', internalType: 'bytes', type: 'bytes' }],
     name: 'checkRegistration',
     outputs: [],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getDomainCharacterLimit',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -3017,6 +3904,14 @@ export const domainWalletRegistryFacetAbi = [
     name: 'InvalidNftMetadataCollectionLength',
   },
   {
+    type: 'error',
+    inputs: [
+      { name: 'length', internalType: 'uint256', type: 'uint256' },
+      { name: 'uri', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'MaximumCharacterLimitExceeded',
+  },
+  {
     type: 'event',
     anonymous: false,
     inputs: [
@@ -3211,6 +4106,13 @@ export const domainWalletRegistryViewsFacetAbi = [
     inputs: [{ name: 'uri', internalType: 'bytes', type: 'bytes' }],
     name: 'checkRegistration',
     outputs: [],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getDomainCharacterLimit',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -5121,6 +6023,260 @@ export const erc721UpgradeableAbi = [
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HostCommands
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const hostCommandsAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_diamondCut',
+        internalType: 'struct IDiamond.FacetCut[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'facetAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'action',
+            internalType: 'enum IDiamond.FacetCutAction',
+            type: 'uint8',
+          },
+          {
+            name: 'functionSelectors',
+            internalType: 'bytes4[]',
+            type: 'bytes4[]',
+          },
+        ],
+      },
+      {
+        name: '_args',
+        internalType: 'struct HostCommandArgs',
+        type: 'tuple',
+        components: [
+          { name: 'owner', internalType: 'address', type: 'address' },
+          { name: 'init', internalType: 'address', type: 'address' },
+          { name: 'initCalldata', internalType: 'bytes', type: 'bytes' },
+          {
+            name: 'contractResolver',
+            internalType: 'address',
+            type: 'address',
+          },
+          {
+            name: 'env',
+            internalType: 'enum ContractResolver.Env',
+            type: 'uint8',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotAddFunctionToDiamondThatAlreadyExists',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+    ],
+    name: 'CannotAddSelectorsToZeroAddress',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotRemoveFunctionThatDoesNotExist',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotRemoveImmutableFunction',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceFunctionThatDoesNotExists',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+    ],
+    name: 'CannotReplaceFunctionsFromFacetWithZeroAddress',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceImmutableFunction',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_functionSelector', internalType: 'bytes4', type: 'bytes4' },
+    ],
+    name: 'FunctionNotFound',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_action', internalType: 'uint8', type: 'uint8' }],
+    name: 'IncorrectFacetCutAction',
+  },
+  {
+    type: 'error',
+    inputs: [
+      {
+        name: '_initializationContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+      { name: '_calldata', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'InitializationFunctionReverted',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_contractAddress', internalType: 'address', type: 'address' },
+      { name: '_message', internalType: 'string', type: 'string' },
+    ],
+    name: 'NoBytecodeAtAddress',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_facetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'NoSelectorsProvidedForFacetForCut',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_facetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'RemoveFacetAddressMustBeZeroAddress',
+  },
+  { type: 'fallback', stateMutability: 'payable' },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HostCommandsFacet
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const hostCommandsFacetAbi = [
+  { type: 'error', inputs: [], name: 'CallerNotAuthorizedCommandSender' },
+  { type: 'error', inputs: [], name: 'CallerNotOwner' },
+  { type: 'error', inputs: [], name: 'ExpirationTimeInPast' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'newAuthorizedCommandSender',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'AuthorizedCommandSenderUpdated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'stakeAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'expirationTime',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      { name: 'force', internalType: 'bool', type: 'bool', indexed: false },
+    ],
+    name: 'Restart',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'stakeAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'expirationTime',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'releaseBranchName',
+        internalType: 'string',
+        type: 'string',
+        indexed: false,
+      },
+      {
+        name: 'releaseId',
+        internalType: 'string',
+        type: 'string',
+        indexed: false,
+      },
+      { name: 'force', internalType: 'bool', type: 'bool', indexed: false },
+    ],
+    name: 'Upgrade',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'stakeAddress', internalType: 'address', type: 'address' },
+      { name: 'expirationTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'force', internalType: 'bool', type: 'bool' },
+    ],
+    name: 'restart',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_newAuthorizedCommandSender',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    name: 'setAuthorizedCommandSender',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'stakeAddress', internalType: 'address', type: 'address' },
+      { name: 'expirationTime', internalType: 'uint256', type: 'uint256' },
+      { name: 'releaseBranchName', internalType: 'string', type: 'string' },
+      { name: 'releaseId', internalType: 'string', type: 'string' },
+      { name: 'force', internalType: 'bool', type: 'bool' },
+    ],
+    name: 'upgrade',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IAccessControl
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -6964,6 +8120,20 @@ export const ierc721UpgradeableAbi = [
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IHDKeyDeriver
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const ihdKeyDeriverAbi = [
+  {
+    type: 'function',
+    inputs: [{ name: 'data', internalType: 'bytes', type: 'bytes' }],
+    name: 'hdKeyDerive',
+    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
+    stateMutability: 'view',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IKeyDeriver
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8095,6 +9265,11 @@ export const pkpHelperAbi = [
               { name: 'v', internalType: 'uint8', type: 'uint8' },
             ],
           },
+          {
+            name: 'stakingContractAddress',
+            internalType: 'address',
+            type: 'address',
+          },
         ],
       },
       {
@@ -8175,6 +9350,11 @@ export const pkpHelperAbi = [
               { name: 's', internalType: 'bytes32', type: 'bytes32' },
               { name: 'v', internalType: 'uint8', type: 'uint8' },
             ],
+          },
+          {
+            name: 'stakingContractAddress',
+            internalType: 'address',
+            type: 'address',
           },
         ],
       },
@@ -8510,6 +9690,241 @@ export const pkpHelperAbi = [
     name: 'supportsInterface',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// PKPHelperV2
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const pkpHelperV2Abi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_resolver', internalType: 'address', type: 'address' },
+      {
+        name: '_env',
+        internalType: 'enum ContractResolver.Env',
+        type: 'uint8',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'newResolverAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'ContractResolverAddressSet',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'newOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'contractResolver',
+    outputs: [
+      { name: '', internalType: 'contract ContractResolver', type: 'address' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'env',
+    outputs: [
+      { name: '', internalType: 'enum ContractResolver.Env', type: 'uint8' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getDomainWalletRegistry',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getPKPNftMetdataAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getPkpNftAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getPkpPermissionsAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'params',
+        internalType: 'struct PKPHelperV2.NewPKPParams',
+        type: 'tuple',
+        components: [
+          { name: 'keyType', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'permittedAuthMethodTypes',
+            internalType: 'uint256[]',
+            type: 'uint256[]',
+          },
+          {
+            name: 'permittedAuthMethodIds',
+            internalType: 'bytes[]',
+            type: 'bytes[]',
+          },
+          {
+            name: 'permittedAuthMethodPubkeys',
+            internalType: 'bytes[]',
+            type: 'bytes[]',
+          },
+          {
+            name: 'permittedAuthMethodScopes',
+            internalType: 'uint256[][]',
+            type: 'uint256[][]',
+          },
+          {
+            name: 'addPkpEthAddressAsPermittedAddress',
+            internalType: 'bool',
+            type: 'bool',
+          },
+          {
+            name: 'pkpEthAddressScopes',
+            internalType: 'uint256[]',
+            type: 'uint256[]',
+          },
+          { name: 'sendPkpToItself', internalType: 'bool', type: 'bool' },
+          { name: 'burnPkp', internalType: 'bool', type: 'bool' },
+        ],
+      },
+    ],
+    name: 'mintNextAndAddAuthMethods',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'params',
+        internalType: 'struct PKPHelperV2.NewPKPParams',
+        type: 'tuple',
+        components: [
+          { name: 'keyType', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'permittedAuthMethodTypes',
+            internalType: 'uint256[]',
+            type: 'uint256[]',
+          },
+          {
+            name: 'permittedAuthMethodIds',
+            internalType: 'bytes[]',
+            type: 'bytes[]',
+          },
+          {
+            name: 'permittedAuthMethodPubkeys',
+            internalType: 'bytes[]',
+            type: 'bytes[]',
+          },
+          {
+            name: 'permittedAuthMethodScopes',
+            internalType: 'uint256[][]',
+            type: 'uint256[][]',
+          },
+          {
+            name: 'addPkpEthAddressAsPermittedAddress',
+            internalType: 'bool',
+            type: 'bool',
+          },
+          {
+            name: 'pkpEthAddressScopes',
+            internalType: 'uint256[]',
+            type: 'uint256[]',
+          },
+          { name: 'sendPkpToItself', internalType: 'bool', type: 'bool' },
+          { name: 'burnPkp', internalType: 'bool', type: 'bool' },
+        ],
+      },
+    ],
+    name: 'mintNextAndAddAuthMethodsWithTypes',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'uint256', type: 'uint256' },
+      { name: '', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'onERC721Received',
+    outputs: [{ name: '', internalType: 'bytes4', type: 'bytes4' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'newResolverAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'setContractResolver',
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -9085,6 +10500,11 @@ export const pkpnftDiamondAbi = [
           { name: 'v', internalType: 'uint8', type: 'uint8' },
         ],
       },
+      {
+        name: 'stakingContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
     ],
     name: 'claimAndMint',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
@@ -9530,6 +10950,11 @@ export const pkpnftFacetAbi = [
           { name: 's', internalType: 'bytes32', type: 'bytes32' },
           { name: 'v', internalType: 'uint8', type: 'uint8' },
         ],
+      },
+      {
+        name: 'stakingContractAddress',
+        internalType: 'address',
+        type: 'address',
       },
     ],
     name: 'claimAndMint',
@@ -10534,6 +11959,16 @@ export const pkpPermissionsDiamondAbi = [
   },
   {
     type: 'function',
+    inputs: [
+      { name: 'authMethodType', internalType: 'uint256', type: 'uint256' },
+      { name: 'id', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'getPKPPubKeysByAuthMethod',
+    outputs: [{ name: '', internalType: 'bytes[]', type: 'bytes[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
     name: 'getPermittedActions',
     outputs: [{ name: '', internalType: 'bytes[]', type: 'bytes[]' }],
@@ -11004,6 +12439,16 @@ export const pkpPermissionsFacetAbi = [
   },
   {
     type: 'function',
+    inputs: [
+      { name: 'authMethodType', internalType: 'uint256', type: 'uint256' },
+      { name: 'id', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'getPKPPubKeysByAuthMethod',
+    outputs: [{ name: '', internalType: 'bytes[]', type: 'bytes[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
     name: 'getPermittedActions',
     outputs: [{ name: '', internalType: 'bytes[]', type: 'bytes[]' }],
@@ -11393,37 +12838,260 @@ export const paymentDelegationAbi = [
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// PaymentDelegationFacet
+// PaymentDelegationDiamond
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const paymentDelegationFacetAbi = [
+export const paymentDelegationDiamondAbi = [
   {
-    type: 'event',
-    anonymous: false,
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotAddFunctionToDiamondThatAlreadyExists',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+    ],
+    name: 'CannotAddSelectorsToZeroAddress',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotRemoveFunctionThatDoesNotExist',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotRemoveImmutableFunction',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceFunctionThatDoesNotExists',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+    ],
+    name: 'CannotReplaceFunctionsFromFacetWithZeroAddress',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_selector', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'CannotReplaceImmutableFunction',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: '_action', internalType: 'uint8', type: 'uint8' }],
+    name: 'IncorrectFacetCutAction',
+  },
+  {
+    type: 'error',
     inputs: [
       {
-        name: 'payer',
+        name: '_initializationContractAddress',
         internalType: 'address',
         type: 'address',
-        indexed: true,
       },
-      { name: 'user', internalType: 'address', type: 'address', indexed: true },
+      { name: '_calldata', internalType: 'bytes', type: 'bytes' },
     ],
-    name: 'DelegationCreated',
+    name: 'InitializationFunctionReverted',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_contractAddress', internalType: 'address', type: 'address' },
+      { name: '_message', internalType: 'string', type: 'string' },
+    ],
+    name: 'NoBytecodeAtAddress',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_facetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'NoSelectorsProvidedForFacetForCut',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_user', internalType: 'address', type: 'address' },
+      { name: '_contractOwner', internalType: 'address', type: 'address' },
+    ],
+    name: 'NotContractOwner',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: '_facetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'RemoveFacetAddressMustBeZeroAddress',
   },
   {
     type: 'event',
     anonymous: false,
     inputs: [
       {
-        name: 'payer',
+        name: '_diamondCut',
+        internalType: 'struct IDiamond.FacetCut[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'facetAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'action',
+            internalType: 'enum IDiamond.FacetCutAction',
+            type: 'uint8',
+          },
+          {
+            name: 'functionSelectors',
+            internalType: 'bytes4[]',
+            type: 'bytes4[]',
+          },
+        ],
+        indexed: false,
+      },
+      {
+        name: '_init',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: '_calldata',
+        internalType: 'bytes',
+        type: 'bytes',
+        indexed: false,
+      },
+    ],
+    name: 'DiamondCut',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_diamondCut',
+        internalType: 'struct IDiamond.FacetCut[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'facetAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'action',
+            internalType: 'enum IDiamond.FacetCutAction',
+            type: 'uint8',
+          },
+          {
+            name: 'functionSelectors',
+            internalType: 'bytes4[]',
+            type: 'bytes4[]',
+          },
+        ],
+      },
+      { name: '_init', internalType: 'address', type: 'address' },
+      { name: '_calldata', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'diamondCut',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_functionSelector', internalType: 'bytes4', type: 'bytes4' },
+    ],
+    name: 'facetAddress',
+    outputs: [
+      { name: 'facetAddress_', internalType: 'address', type: 'address' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'facetAddresses',
+    outputs: [
+      { name: 'facetAddresses_', internalType: 'address[]', type: 'address[]' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_facet', internalType: 'address', type: 'address' }],
+    name: 'facetFunctionSelectors',
+    outputs: [
+      {
+        name: '_facetFunctionSelectors',
+        internalType: 'bytes4[]',
+        type: 'bytes4[]',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'facets',
+    outputs: [
+      {
+        name: 'facets_',
+        internalType: 'struct IDiamondLoupe.Facet[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'facetAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'functionSelectors',
+            internalType: 'bytes4[]',
+            type: 'bytes4[]',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousOwner',
         internalType: 'address',
         type: 'address',
         indexed: true,
       },
-      { name: 'user', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'newOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
     ],
-    name: 'DelegationRemoved',
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: 'owner_', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'event',
@@ -11469,13 +13137,20 @@ export const paymentDelegationFacetAbi = [
   {
     type: 'function',
     inputs: [{ name: 'user', internalType: 'address', type: 'address' }],
-    name: 'getPayerAndRestriction',
+    name: 'getPayers',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'users', internalType: 'address[]', type: 'address[]' }],
+    name: 'getPayersAndRestrictions',
     outputs: [
-      { name: '', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'address[][]', type: 'address[][]' },
       {
         name: '',
-        internalType: 'struct LibPaymentDelegationStorage.Restriction',
-        type: 'tuple',
+        internalType: 'struct LibPaymentDelegationStorage.Restriction[][]',
+        type: 'tuple[][]',
         components: [
           {
             name: 'requestsPerPeriod',
@@ -11515,6 +13190,160 @@ export const paymentDelegationFacetAbi = [
     name: 'getUsers',
     outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'setDefaultRestriction',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'r',
+        internalType: 'struct LibPaymentDelegationStorage.Restriction',
+        type: 'tuple',
+        components: [
+          {
+            name: 'requestsPerPeriod',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'periodSeconds', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    name: 'setRestriction',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'user', internalType: 'address', type: 'address' }],
+    name: 'undelegatePayments',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'users', internalType: 'address[]', type: 'address[]' }],
+    name: 'undelegatePaymentsBatch',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// PaymentDelegationFacet
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const paymentDelegationFacetAbi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'payer',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'restriction',
+        internalType: 'struct LibPaymentDelegationStorage.Restriction',
+        type: 'tuple',
+        components: [
+          {
+            name: 'requestsPerPeriod',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'periodSeconds', internalType: 'uint256', type: 'uint256' },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'RestrictionSet',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'user', internalType: 'address', type: 'address' }],
+    name: 'delegatePayments',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'users', internalType: 'address[]', type: 'address[]' }],
+    name: 'delegatePaymentsBatch',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'user', internalType: 'address', type: 'address' }],
+    name: 'getPayers',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'users', internalType: 'address[]', type: 'address[]' }],
+    name: 'getPayersAndRestrictions',
+    outputs: [
+      { name: '', internalType: 'address[][]', type: 'address[][]' },
+      {
+        name: '',
+        internalType: 'struct LibPaymentDelegationStorage.Restriction[][]',
+        type: 'tuple[][]',
+        components: [
+          {
+            name: 'requestsPerPeriod',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'periodSeconds', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'payer', internalType: 'address', type: 'address' }],
+    name: 'getRestriction',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct LibPaymentDelegationStorage.Restriction',
+        type: 'tuple',
+        components: [
+          {
+            name: 'requestsPerPeriod',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'periodSeconds', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'payer', internalType: 'address', type: 'address' }],
+    name: 'getUsers',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'setDefaultRestriction',
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -13127,6 +14956,13 @@ export const rateLimitNftDiamondAbi = [
   },
   {
     type: 'function',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'pruneExpired',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [
       { name: 'from', internalType: 'address', type: 'address' },
       { name: 'to', internalType: 'address', type: 'address' },
@@ -13722,6 +15558,13 @@ export const rateLimitNftFacetAbi = [
     name: 'ownerOf',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'pruneExpired',
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -16851,19 +18694,35 @@ export const stakingDiamondAbi = [
     anonymous: false,
     inputs: [
       {
+        name: 'reason',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'config',
+        internalType: 'struct LibStakingStorage.ComplaintConfig',
+        type: 'tuple',
+        components: [
+          { name: 'tolerance', internalType: 'uint256', type: 'uint256' },
+          { name: 'intervalSecs', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'kickPenaltyPercent',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'ComplaintConfigSet',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
         name: 'newTokenRewardPerTokenPerEpoch',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-      {
-        name: 'newComplaintTolerance',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-      {
-        name: 'newComplaintIntervalSecs',
         internalType: 'uint256',
         type: 'uint256',
         indexed: false,
@@ -16908,6 +18767,12 @@ export const stakingDiamondAbi = [
         name: 'newMaxTripleConcurrency',
         internalType: 'uint256',
         type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'newRpcHealthcheckEnabled',
+        internalType: 'bool',
+        type: 'bool',
         indexed: false,
       },
     ],
@@ -17260,43 +19125,74 @@ export const stakingDiamondAbi = [
   {
     type: 'function',
     inputs: [
+      { name: 'reason', internalType: 'uint256', type: 'uint256' },
       {
-        name: 'newTokenRewardPerTokenPerEpoch',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: 'config',
+        internalType: 'struct LibStakingStorage.ComplaintConfig',
+        type: 'tuple',
+        components: [
+          { name: 'tolerance', internalType: 'uint256', type: 'uint256' },
+          { name: 'intervalSecs', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'kickPenaltyPercent',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+        ],
       },
+    ],
+    name: 'setComplaintConfig',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
       {
-        name: 'newComplaintTolerance',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      {
-        name: 'newComplaintIntervalSecs',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      { name: 'newKeyTypes', internalType: 'uint256[]', type: 'uint256[]' },
-      {
-        name: 'newMinimumValidatorCount',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      {
-        name: 'newMaxConcurrentRequests',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      { name: 'newMaxTripleCount', internalType: 'uint256', type: 'uint256' },
-      { name: 'newMinTripleCount', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'newPeerCheckingIntervalSecs',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      {
-        name: 'newMaxTripleConcurrency',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: 'newConfig',
+        internalType: 'struct LibStakingStorage.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'tokenRewardPerTokenPerEpoch',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'DEPRECATED_complaintTolerance',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'DEPRECATED_complaintIntervalSecs',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'keyTypes', internalType: 'uint256[]', type: 'uint256[]' },
+          {
+            name: 'minimumValidatorCount',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'maxConcurrentRequests',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'maxTripleCount', internalType: 'uint256', type: 'uint256' },
+          { name: 'minTripleCount', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'peerCheckingIntervalSecs',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'maxTripleConcurrency',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'rpcHealthcheckEnabled', internalType: 'bool', type: 'bool' },
+        ],
       },
     ],
     name: 'setConfig',
@@ -17546,6 +19442,28 @@ export const stakingDiamondAbi = [
   },
   {
     type: 'function',
+    inputs: [{ name: 'reason', internalType: 'uint256', type: 'uint256' }],
+    name: 'complaintConfig',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.ComplaintConfig',
+        type: 'tuple',
+        components: [
+          { name: 'tolerance', internalType: 'uint256', type: 'uint256' },
+          { name: 'intervalSecs', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'kickPenaltyPercent',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [],
     name: 'config',
     outputs: [
@@ -17560,12 +19478,12 @@ export const stakingDiamondAbi = [
             type: 'uint256',
           },
           {
-            name: 'complaintTolerance',
+            name: 'DEPRECATED_complaintTolerance',
             internalType: 'uint256',
             type: 'uint256',
           },
           {
-            name: 'complaintIntervalSecs',
+            name: 'DEPRECATED_complaintIntervalSecs',
             internalType: 'uint256',
             type: 'uint256',
           },
@@ -17592,6 +19510,7 @@ export const stakingDiamondAbi = [
             internalType: 'uint256',
             type: 'uint256',
           },
+          { name: 'rpcHealthcheckEnabled', internalType: 'bool', type: 'bool' },
         ],
       },
     ],
@@ -17643,6 +19562,70 @@ export const stakingDiamondAbi = [
         ],
       },
     ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getActiveUnkickedValidatorStructs',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.Validator[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'ip', internalType: 'uint32', type: 'uint32' },
+          { name: 'ipv6', internalType: 'uint128', type: 'uint128' },
+          { name: 'port', internalType: 'uint32', type: 'uint32' },
+          { name: 'nodeAddress', internalType: 'address', type: 'address' },
+          { name: 'reward', internalType: 'uint256', type: 'uint256' },
+          { name: 'senderPubKey', internalType: 'uint256', type: 'uint256' },
+          { name: 'receiverPubKey', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getActiveUnkickedValidatorStructsAndCounts',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.Epoch',
+        type: 'tuple',
+        components: [
+          { name: 'epochLength', internalType: 'uint256', type: 'uint256' },
+          { name: 'number', internalType: 'uint256', type: 'uint256' },
+          { name: 'endTime', internalType: 'uint256', type: 'uint256' },
+          { name: 'retries', internalType: 'uint256', type: 'uint256' },
+          { name: 'timeout', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      { name: '', internalType: 'uint256', type: 'uint256' },
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.Validator[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'ip', internalType: 'uint32', type: 'uint32' },
+          { name: 'ipv6', internalType: 'uint128', type: 'uint128' },
+          { name: 'port', internalType: 'uint32', type: 'uint32' },
+          { name: 'nodeAddress', internalType: 'address', type: 'address' },
+          { name: 'reward', internalType: 'uint256', type: 'uint256' },
+          { name: 'senderPubKey', internalType: 'uint256', type: 'uint256' },
+          { name: 'receiverPubKey', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getActiveUnkickedValidators',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
     stateMutability: 'view',
   },
   {
@@ -18106,19 +20089,35 @@ export const stakingFacetAbi = [
     anonymous: false,
     inputs: [
       {
+        name: 'reason',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'config',
+        internalType: 'struct LibStakingStorage.ComplaintConfig',
+        type: 'tuple',
+        components: [
+          { name: 'tolerance', internalType: 'uint256', type: 'uint256' },
+          { name: 'intervalSecs', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'kickPenaltyPercent',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'ComplaintConfigSet',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
         name: 'newTokenRewardPerTokenPerEpoch',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-      {
-        name: 'newComplaintTolerance',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-      {
-        name: 'newComplaintIntervalSecs',
         internalType: 'uint256',
         type: 'uint256',
         indexed: false,
@@ -18163,6 +20162,12 @@ export const stakingFacetAbi = [
         name: 'newMaxTripleConcurrency',
         internalType: 'uint256',
         type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'newRpcHealthcheckEnabled',
+        internalType: 'bool',
+        type: 'bool',
         indexed: false,
       },
     ],
@@ -18515,43 +20520,74 @@ export const stakingFacetAbi = [
   {
     type: 'function',
     inputs: [
+      { name: 'reason', internalType: 'uint256', type: 'uint256' },
       {
-        name: 'newTokenRewardPerTokenPerEpoch',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: 'config',
+        internalType: 'struct LibStakingStorage.ComplaintConfig',
+        type: 'tuple',
+        components: [
+          { name: 'tolerance', internalType: 'uint256', type: 'uint256' },
+          { name: 'intervalSecs', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'kickPenaltyPercent',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+        ],
       },
+    ],
+    name: 'setComplaintConfig',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
       {
-        name: 'newComplaintTolerance',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      {
-        name: 'newComplaintIntervalSecs',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      { name: 'newKeyTypes', internalType: 'uint256[]', type: 'uint256[]' },
-      {
-        name: 'newMinimumValidatorCount',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      {
-        name: 'newMaxConcurrentRequests',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      { name: 'newMaxTripleCount', internalType: 'uint256', type: 'uint256' },
-      { name: 'newMinTripleCount', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'newPeerCheckingIntervalSecs',
-        internalType: 'uint256',
-        type: 'uint256',
-      },
-      {
-        name: 'newMaxTripleConcurrency',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: 'newConfig',
+        internalType: 'struct LibStakingStorage.Config',
+        type: 'tuple',
+        components: [
+          {
+            name: 'tokenRewardPerTokenPerEpoch',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'DEPRECATED_complaintTolerance',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'DEPRECATED_complaintIntervalSecs',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'keyTypes', internalType: 'uint256[]', type: 'uint256[]' },
+          {
+            name: 'minimumValidatorCount',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'maxConcurrentRequests',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'maxTripleCount', internalType: 'uint256', type: 'uint256' },
+          { name: 'minTripleCount', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'peerCheckingIntervalSecs',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'maxTripleConcurrency',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'rpcHealthcheckEnabled', internalType: 'bool', type: 'bool' },
+        ],
       },
     ],
     name: 'setConfig',
@@ -18816,6 +20852,28 @@ export const stakingVersionFacetAbi = [
 export const stakingViewsFacetAbi = [
   {
     type: 'function',
+    inputs: [{ name: 'reason', internalType: 'uint256', type: 'uint256' }],
+    name: 'complaintConfig',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.ComplaintConfig',
+        type: 'tuple',
+        components: [
+          { name: 'tolerance', internalType: 'uint256', type: 'uint256' },
+          { name: 'intervalSecs', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'kickPenaltyPercent',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [],
     name: 'config',
     outputs: [
@@ -18830,12 +20888,12 @@ export const stakingViewsFacetAbi = [
             type: 'uint256',
           },
           {
-            name: 'complaintTolerance',
+            name: 'DEPRECATED_complaintTolerance',
             internalType: 'uint256',
             type: 'uint256',
           },
           {
-            name: 'complaintIntervalSecs',
+            name: 'DEPRECATED_complaintIntervalSecs',
             internalType: 'uint256',
             type: 'uint256',
           },
@@ -18862,6 +20920,7 @@ export const stakingViewsFacetAbi = [
             internalType: 'uint256',
             type: 'uint256',
           },
+          { name: 'rpcHealthcheckEnabled', internalType: 'bool', type: 'bool' },
         ],
       },
     ],
@@ -18913,6 +20972,70 @@ export const stakingViewsFacetAbi = [
         ],
       },
     ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getActiveUnkickedValidatorStructs',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.Validator[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'ip', internalType: 'uint32', type: 'uint32' },
+          { name: 'ipv6', internalType: 'uint128', type: 'uint128' },
+          { name: 'port', internalType: 'uint32', type: 'uint32' },
+          { name: 'nodeAddress', internalType: 'address', type: 'address' },
+          { name: 'reward', internalType: 'uint256', type: 'uint256' },
+          { name: 'senderPubKey', internalType: 'uint256', type: 'uint256' },
+          { name: 'receiverPubKey', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getActiveUnkickedValidatorStructsAndCounts',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.Epoch',
+        type: 'tuple',
+        components: [
+          { name: 'epochLength', internalType: 'uint256', type: 'uint256' },
+          { name: 'number', internalType: 'uint256', type: 'uint256' },
+          { name: 'endTime', internalType: 'uint256', type: 'uint256' },
+          { name: 'retries', internalType: 'uint256', type: 'uint256' },
+          { name: 'timeout', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      { name: '', internalType: 'uint256', type: 'uint256' },
+      {
+        name: '',
+        internalType: 'struct LibStakingStorage.Validator[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'ip', internalType: 'uint32', type: 'uint32' },
+          { name: 'ipv6', internalType: 'uint128', type: 'uint128' },
+          { name: 'port', internalType: 'uint32', type: 'uint32' },
+          { name: 'nodeAddress', internalType: 'address', type: 'address' },
+          { name: 'reward', internalType: 'uint256', type: 'uint256' },
+          { name: 'senderPubKey', internalType: 'uint256', type: 'uint256' },
+          { name: 'receiverPubKey', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getActiveUnkickedValidators',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
     stateMutability: 'view',
   },
   {

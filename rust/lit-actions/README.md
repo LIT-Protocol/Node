@@ -27,7 +27,7 @@ sequenceDiagram
 - `grpc` - Protobuf definitions and gRPC glue code
 - `server` - gRPC server that runs JS code using Deno + Lit Actions
 - `cli` - `lit_actions` tool built on top of `server`
-- `tests` - Integration tests
+- `tests` - Integration tests and benchmarks
 
 ## Local testing
 
@@ -296,6 +296,19 @@ These are the steps to implement a new `Hello` op as an example:
 +        assert_eq!(res.response, "Hello Eric");
 +    }
  }
+```
+
+## Benchmarking
+
+```
+# Release profile
+cargo bench --bench execute_js
+
+# Dev profile
+cargo bench --bench execute_js --profile dev
+
+# Open the HTML report
+open target/criterion/report/index.html
 ```
 
 ## Tracing with Jaeger

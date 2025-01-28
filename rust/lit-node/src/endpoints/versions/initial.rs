@@ -6,9 +6,8 @@ use crate::siwe_db::rpc::EthBlockhashCache;
 use crate::tss::common::restore::RestoreState;
 use crate::tss::common::tss_state::TssState;
 use crate::tss::dkg::curves::common::CurveType;
-use crate::utils::rocket::guards::{ClientContext, RequestHeaders};
-use crate::utils::web::ConcurrencyGuard;
-use crate::utils::web::EndpointVersion;
+use crate::utils::rocket::guards::RequestHeaders;
+use crate::utils::web::{with_context_and_timeout, with_timeout, EndpointVersion};
 use lit_api_core::context::{SdkVersion, Tracing, TracingRequired};
 use lit_api_core::http::rocket::helper::stream::ChildStream;
 use lit_core::config::ReloadableLitConfig;
@@ -97,34 +96,31 @@ pub async fn admin_get_blinders(
 #[instrument(name = "POST /web/recovery/set_dec_share", skip_all, ret)]
 #[allow(dead_code)]
 pub async fn recovery_set_dec_share(
-    guard: ConcurrencyGuard<'_>,
     cfg: &State<ReloadableLitConfig>,
     restore_state: &State<Arc<RwLock<RestoreState>>>,
     request: Json<models::JsonRecoverySetDecShare>,
 ) -> status::Custom<Value> {
-    recovery::endpoints::recovery_set_dec_share(guard, cfg, restore_state, request).await
+    recovery::endpoints::recovery_set_dec_share(cfg, restore_state, request).await
 }
 
 #[post("/web/recovery/get_dec_share", format = "json", data = "<request>")]
 #[instrument(name = "POST /web/recovery/get_dec_share", skip_all, ret)]
 pub async fn recovery_get_dec_key_share(
-    guard: ConcurrencyGuard<'_>,
     restore_state: &State<Arc<TssState>>,
     cfg: &State<ReloadableLitConfig>,
     request: Json<models::DownloadShareRequest>,
 ) -> status::Custom<Value> {
-    recovery::endpoints::recovery_get_dec_key_share(guard, restore_state, cfg, request).await
+    recovery::endpoints::recovery_get_dec_key_share(restore_state, cfg, request).await
 }
 
 #[post("/web/recovery/delete_dec_share", format = "json", data = "<request>")]
 #[instrument(name = "POST /web/recovery/delete_dec_share", skip_all, ret)]
 pub async fn recovery_delete_dec_key_share(
-    guard: ConcurrencyGuard<'_>,
     restore_state: &State<Arc<TssState>>,
     cfg: &State<ReloadableLitConfig>,
     request: Json<models::DownloadShareRequest>,
 ) -> status::Custom<Value> {
-    recovery::endpoints::recovery_delete_dec_key_share(guard, restore_state, cfg, request).await
+    recovery::endpoints::recovery_delete_dec_key_share(restore_state, cfg, request).await
 }
 
 /*
@@ -137,7 +133,6 @@ curl --header "Content-Type: application/json" \
 #[instrument(name = "POST /web/handshake", skip_all)]
 #[allow(clippy::too_many_arguments)]
 pub async fn handshake(
-    guard: ConcurrencyGuard<'_>,
     session: &State<Arc<TssState>>,
     remote_addr: SocketAddr,
     json_handshake_request: Json<models::JsonSDKHandshakeRequest>,
@@ -146,16 +141,18 @@ pub async fn handshake(
     cfg: &State<ReloadableLitConfig>,
     eth_blockhash_cache: &State<Arc<EthBlockhashCache>>,
 ) -> status::Custom<Value> {
-    web_client::handshake(
-        guard,
-        session,
-        remote_addr,
-        json_handshake_request,
-        tracing_required,
-        version,
-        cfg,
-        eth_blockhash_cache,
-    )
+    with_timeout(async move {
+        web_client::handshake(
+            session,
+            remote_addr,
+            json_handshake_request,
+            tracing_required,
+            version,
+            cfg,
+            eth_blockhash_cache,
+        )
+        .await
+    })
     .await
 }
 
@@ -167,7 +164,6 @@ pub async fn handshake(
 )]
 #[instrument(name = "POST /web/encryption/sign", skip_all, ret)]
 pub(crate) async fn encryption_sign(
-    guard: ConcurrencyGuard<'_>,
     session: &State<Arc<TssState>>,
     remote_addr: SocketAddr,
     rate_limit_db: &State<Arc<RateLimitDB>>,
@@ -175,17 +171,19 @@ pub(crate) async fn encryption_sign(
     cfg: &State<ReloadableLitConfig>,
     encryption_sign_request: Json<models::EncryptionSignRequest>,
     tracing: Tracing,
-    client_context: ClientContext,
 ) -> status::Custom<Value> {
-    web_client::encryption_sign(
-        session,
-        remote_addr,
-        rate_limit_db,
-        ipfs_cache,
-        cfg,
-        encryption_sign_request,
-        tracing,
-        EndpointVersion::Initial,
+    with_context_and_timeout(
+        tracing.clone(),
+        web_client::encryption_sign(
+            session,
+            remote_addr,
+            rate_limit_db,
+            ipfs_cache,
+            cfg,
+            encryption_sign_request,
+            tracing,
+            EndpointVersion::Initial,
+        ),
     )
     .await
 }
@@ -198,7 +196,6 @@ pub(crate) async fn encryption_sign(
 )]
 #[instrument(name = "POST /web/signing/access_control_condition", skip_all, ret)]
 pub(crate) async fn signing_access_control_condition(
-    guard: ConcurrencyGuard<'_>,
     session: &State<Arc<TssState>>,
     remote_addr: SocketAddr,
     rate_limit_db: &State<Arc<RateLimitDB>>,
@@ -206,19 +203,19 @@ pub(crate) async fn signing_access_control_condition(
     cfg: &State<ReloadableLitConfig>,
     signing_access_control_condition_request: Json<models::SigningAccessControlConditionRequest>,
     tracing: Tracing,
-    client_context: ClientContext,
 ) -> status::Custom<Value> {
-    web_client::signing_access_control_condition(
-        guard,
-        session,
-        remote_addr,
-        rate_limit_db,
-        ipfs_cache,
-        cfg,
-        signing_access_control_condition_request,
-        tracing,
-        client_context,
-        EndpointVersion::Initial,
+    with_context_and_timeout(
+        tracing.clone(),
+        web_client::signing_access_control_condition(
+            session,
+            remote_addr,
+            rate_limit_db,
+            ipfs_cache,
+            cfg,
+            signing_access_control_condition_request,
+            tracing,
+            EndpointVersion::Initial,
+        ),
     )
     .await
 }
@@ -231,7 +228,6 @@ pub(crate) async fn signing_access_control_condition(
 #[instrument(name = "POST /web/sign_session_key", skip_all, ret)]
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn sign_session_key(
-    guard: ConcurrencyGuard<'_>,
     remote_addr: SocketAddr,
     tss_state: &State<Arc<crate::tss::common::tss_state::TssState>>,
     auth_context_cache: &State<Arc<models::AuthContextCache>>,
@@ -254,18 +250,20 @@ pub(crate) async fn sign_session_key(
         js_params: None,
         epoch: json_sign_session_key_request.epoch,
     };
-    web_client::sign_session_key(
-        guard,
-        remote_addr,
-        tss_state,
-        auth_context_cache,
-        rate_limit_db,
-        ipfs_cache,
-        cfg,
-        json_sign_session_key_request_v1,
-        tracing,
-        request_headers,
-        EndpointVersion::Initial,
+    with_context_and_timeout(
+        tracing.clone(),
+        web_client::sign_session_key(
+            remote_addr,
+            tss_state,
+            auth_context_cache,
+            rate_limit_db,
+            ipfs_cache,
+            cfg,
+            json_sign_session_key_request_v1,
+            tracing,
+            request_headers,
+            EndpointVersion::Initial,
+        ),
     )
     .await
 }
@@ -274,7 +272,6 @@ pub(crate) async fn sign_session_key(
 #[instrument(name = "POST /web/pkp/sign", skip_all, ret)]
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn pkp_sign(
-    guard: ConcurrencyGuard<'_>,
     remote_addr: SocketAddr,
     tss_state: &State<Arc<TssState>>,
     auth_context_cache: &State<Arc<models::AuthContextCache>>,
@@ -283,20 +280,20 @@ pub(crate) async fn pkp_sign(
     allowlist_cache: &State<Arc<models::AllowlistCache>>,
     json_pkp_signing_request: Json<models::JsonPKPSigningRequest>,
     tracing: Tracing,
-    client_context: ClientContext,
 ) -> status::Custom<Value> {
-    pkp::pkp_sign(
-        guard,
-        remote_addr,
-        tss_state,
-        auth_context_cache,
-        rate_limit_db,
-        cfg,
-        allowlist_cache,
-        json_pkp_signing_request,
-        tracing,
-        client_context,
-        EndpointVersion::Initial,
+    with_context_and_timeout(
+        tracing.clone(),
+        pkp::pkp_sign(
+            remote_addr,
+            tss_state,
+            auth_context_cache,
+            rate_limit_db,
+            cfg,
+            allowlist_cache,
+            json_pkp_signing_request,
+            tracing,
+            EndpointVersion::Initial,
+        ),
     )
     .await
 }
@@ -305,7 +302,6 @@ pub(crate) async fn pkp_sign(
 #[instrument(name = "POST /web/pkp/claim", skip_all, ret)]
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn pkp_claim(
-    guard: ConcurrencyGuard<'_>,
     remote_addr: SocketAddr,
     tss_state: &State<Arc<TssState>>,
     auth_context_cache: &State<Arc<models::AuthContextCache>>,
@@ -314,19 +310,19 @@ pub(crate) async fn pkp_claim(
     allowlist_cache: &State<Arc<models::AllowlistCache>>,
     json_pkp_claim_request: Json<models::JsonPKPClaimKeyRequest>,
     tracing: Tracing,
-    client_context: ClientContext,
 ) -> status::Custom<Value> {
-    pkp::pkp_claim(
-        guard,
-        remote_addr,
-        tss_state,
-        auth_context_cache,
-        rate_limit_db,
-        cfg,
-        allowlist_cache,
-        json_pkp_claim_request,
-        tracing,
-        client_context,
+    with_context_and_timeout(
+        tracing.clone(),
+        pkp::pkp_claim(
+            remote_addr,
+            tss_state,
+            auth_context_cache,
+            rate_limit_db,
+            cfg,
+            allowlist_cache,
+            json_pkp_claim_request,
+            tracing,
+        ),
     )
     .await
 }
@@ -342,7 +338,6 @@ curl --header "Content-Type: application/json" \
 #[instrument(name = "POST /web/execute", skip_all, ret)]
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn execute_function(
-    guard: ConcurrencyGuard<'_>,
     remote_addr: SocketAddr,
     tss_state: &State<Arc<crate::tss::common::tss_state::TssState>>,
     auth_context_cache: &State<Arc<models::AuthContextCache>>,
@@ -352,23 +347,23 @@ pub(crate) async fn execute_function(
     ipfs_cache: &State<Cache<String, Arc<String>>>,
     json_execution_request: Json<models::JsonExecutionRequest>,
     tracing: Tracing,
-    client_context: ClientContext,
     request_headers: RequestHeaders<'_>,
 ) -> status::Custom<Value> {
-    web_client::execute_function(
-        guard,
-        remote_addr,
-        tss_state,
-        auth_context_cache,
-        rate_limit_db,
-        cfg,
-        allowlist_cache,
-        ipfs_cache,
-        json_execution_request,
-        tracing,
-        client_context,
-        request_headers,
-        EndpointVersion::Initial,
+    with_context_and_timeout(
+        tracing.clone(),
+        web_client::execute_function(
+            remote_addr,
+            tss_state,
+            auth_context_cache,
+            rate_limit_db,
+            cfg,
+            allowlist_cache,
+            ipfs_cache,
+            json_execution_request,
+            tracing,
+            request_headers,
+            EndpointVersion::Initial,
+        ),
     )
     .await
 }

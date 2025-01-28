@@ -14,6 +14,7 @@ use crate::config::LitBlockchainConfig;
 use crate::contracts::allowlist::Allowlist;
 use crate::contracts::backup_recovery::BackupRecovery;
 use crate::contracts::contract_resolver::ContractResolver;
+use crate::contracts::host_commands::HostCommands;
 use crate::contracts::lit_token::LITToken;
 use crate::contracts::multisender::Multisender;
 use crate::contracts::payment_delegation::PaymentDelegation;
@@ -80,6 +81,10 @@ pub mod staking_balances;
 #[rustfmt::skip]
 pub mod payment_delegation;
 
+#[allow(clippy::all)]
+#[rustfmt::skip]
+pub mod host_commands;
+
 // Special types
 pub const STAKING_CONTRACT: &str = "STAKING";
 pub const STAKING_BALANCES_CONTRACT: &str = "STAKING_BALANCES";
@@ -98,6 +103,7 @@ pub const PKP_NFT_METADATA_CONTRACT: &str = "PKP_NFT_METADATA";
 pub const ALLOWLIST_CONTRACT: &str = "ALLOWLIST";
 pub const BACKUP_RECOVERY_CONTRACT: &str = "BACKUP_RECOVERY";
 pub const PAYMENT_DELEGATION_CONTRACT: &str = "PAYMENT_DELEGATION";
+pub const HOST_COMMANDS_CONTRACT: &str = "HOST_COMMANDS";
 
 // Staking
 
@@ -339,6 +345,14 @@ impl PaymentDelegation<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>> {
         cfg: &LitConfig, address: H160, wallet_key: Option<&str>,
     ) -> Result<PaymentDelegation<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>> {
         Ok(PaymentDelegation::new(address, default_local_client(cfg, wallet_key)?))
+    }
+}
+
+// HostCommands
+
+impl HostCommands<Provider<Http>> {
+    pub(crate) fn load(cfg: &LitConfig, address: H160) -> Result<HostCommands<Provider<Http>>> {
+        Ok(HostCommands::new(address, default_local_client_no_wallet(cfg)?))
     }
 }
 

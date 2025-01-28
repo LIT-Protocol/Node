@@ -115,6 +115,9 @@ pub trait SimplePeerExt {
     fn share_indices(&self) -> Vec<u16>;
     fn threshold_for_set(&self) -> u16;
     fn min_version_in_group(&self) -> semver::Version;
+    fn leader_for_active_peers(&self, hash_key: u64) -> Result<SimplePeer>;
+    fn address_is_leader(&self, hash_key: u64, addr: &String) -> bool;
+    fn generate_hash<T: Hash>(input: T) -> u64;
 }
 
 impl SimplePeerExt for Vec<SimplePeer> {
@@ -260,5 +263,35 @@ impl SimplePeerExt for Vec<SimplePeer> {
             }
         }
         min_version
+    }
+
+    fn leader_for_active_peers(&self, hash_key: u64) -> Result<SimplePeer> {
+        let leader_hash = Self::generate_hash(hash_key);
+        let group_size = match self.len() {
+            0 => {
+                return Err(unexpected_err("No peers found in leader_addr.", None));
+            }
+            size => size,
+        };
+        let leader_id = leader_hash % group_size as u64;
+        Ok(self[leader_id as usize].clone())
+    }
+
+    fn address_is_leader(&self, hash_key: u64, addr: &String) -> bool {
+        let leader = match self.leader_for_active_peers(hash_key) {
+            Ok(leader) => leader,
+            Err(e) => {
+                tracing::error!("Error getting leader: {}", e);
+                return false;
+            }
+        };
+
+        addr == &leader.socket_address
+    }
+
+    fn generate_hash<T: Hash>(input: T) -> u64 {
+        let mut s = DefaultHasher::new();
+        input.hash(&mut s);
+        s.finish()
     }
 }

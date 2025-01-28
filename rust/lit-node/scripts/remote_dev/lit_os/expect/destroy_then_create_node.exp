@@ -11,14 +11,14 @@ set wallet_key [lindex $argv 5]
 set coms_sender_key [lindex $argv 6]
 set coms_receiver_key [lindex $argv 7]
 
+# remove CIDR from host ip and connect
+set host_ip [lindex [split $host_ip "/"] 0] 
 spawn ssh -o StrictHostKeyChecking=no $host_ip
 
 expect -re $prompt
 
 # disable timeout so we can wait for the command to finish
 set timeout -1
-
-
 
 # destroy existing node
 send "sudo lit os guest instance delete all\n"
@@ -29,7 +29,7 @@ send "sudo lit os guest instance create node \
 --net4-ip $ip_address --net4-gw $gw \
 -f --subnet-id $subnet_id \
 --node-staker-address $staker_address \
---node-admin-address 0x50e2dac5e78B5905CB09495547452cEE64426db2 \
+--node-admin-address 0x4C06111c11556284cA3A9660Eae340c6485C2BAD \
 --vcpus 16 --mem 20G\n"
 
 
@@ -42,7 +42,7 @@ send "$coms_sender_key\n"
 expect "Enter coms receiver private key:"
 send "$coms_receiver_key\n"
 
-expect -re {Debian GNU\/Linux 11}
+expect -re {Debian GNU\/Linux 12}
 
 send "exit\n"
 expect eof

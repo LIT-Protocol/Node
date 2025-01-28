@@ -70,7 +70,10 @@ async function deployWithConfig() {
 async function _deployLitCoreContracts(
   deployCoreConfig: DeployCoreConfig
 ): Promise<any> {
-  return deployLitCoreContracts(deployCoreConfig);
+  const result = await deployLitCoreContracts(deployCoreConfig);
+  // @ts-ignore
+  globalThis.doneDeploying();
+  return result;
 }
 
 async function _deployLitNodeContracts(
@@ -84,6 +87,9 @@ async function _deployLitNodeContracts(
   const { nodeOperatorsCredentials, contracts } = await fundAndStakeNodes(
     deployNodeConfig
   );
+
+  // @ts-ignore
+  globalThis.doneDeploying();
 
   // Run the post-deploy script.
   return postDeploy(
@@ -112,6 +118,9 @@ async function _deployLitCoreAndNodeContracts(
     await deployLitNodeContracts(deployNodeConfig);
   }
 
+  // @ts-ignore
+  globalThis.doneDeploying();
+
   // Run the scripts/fund_and_stake_nodes.js script.
   const { nodeOperatorsCredentials, contracts } = await fundAndStakeNodes(
     deployNodeConfig
@@ -134,6 +143,15 @@ async function _deployLitCoreAndNodeContracts(
 function startQueue() {
   var queuedItems = 0;
   // @ts-ignore
+  // @ts-ignore
+  globalThis.doneDeploying = async () => {
+    // if the queue is idle, exit
+    // @ts-ignore
+    await globalThis.queue.onEmpty();
+    console.log('Done deploying');
+    process.exit(0);
+  };
+  // @ts-ignore
   globalThis.queue = new PQueue({ concurrency: 10 });
   // @ts-ignore
   globalThis.queue.on('add', () => {
@@ -150,10 +168,6 @@ function startQueue() {
   // @ts-ignore
   globalThis.queue.on('next', (result) => {
     console.log(`Completed item ${--queuedItems} from verification queue`);
-  });
-  // @ts-ignore
-  globalThis.queue.on('idle', () => {
-    console.log(`Queue is idle and all verification tasks have been completed`);
   });
 }
 

@@ -82,36 +82,43 @@ pub async fn node_share_await(
 
             // For all peers that have not communicated with this node yet, complain about them.
             let txn_id = params.txn_prefix.clone();
-            match peers.peer_at_share_index(params.share_index) {
-                Ok(complainer) => {
-                    for peer in peer_communication_checker.peers_not_communicated_with_self_yet() {
-                        match peers.peer_at_share_index(*peer) {
-                            Ok(peer) => {
-                                let complaint = PeerComplaint {
-                                    complainer: complainer.socket_address.clone(),
-                                    issue: Issue::NonParticipation,
-                                    peer_node_staker_address: peer.staker_address,
-                                };
-                                if let Err(e) = params.tx_pr.send_async(complaint).await {
-                                    debug!(
-                                        "Error sending complaint to PeerReviewer worker: {:?}",
-                                        e
-                                    );
+            // Only trigger nonparticipation complaints if we are doing a DKG
+            // note that if we can't connect via GRPC to the remote node, a complaint would still occur well before this timeout.
+            // given that GRPC channels are held, that would probably be a valid scenario
+            if txn_id.contains("DKG") {
+                match peers.peer_at_share_index(params.share_index) {
+                    Ok(complainer) => {
+                        for peer in
+                            peer_communication_checker.peers_not_communicated_with_self_yet()
+                        {
+                            match peers.peer_at_share_index(*peer) {
+                                Ok(peer) => {
+                                    let complaint = PeerComplaint {
+                                        complainer: complainer.socket_address.clone(),
+                                        issue: Issue::NonParticipation,
+                                        peer_node_staker_address: peer.staker_address,
+                                    };
+                                    if let Err(e) = params.tx_pr.send_async(complaint).await {
+                                        debug!(
+                                            "Error sending complaint to PeerReviewer worker: {:?}",
+                                            e
+                                        );
+                                        continue;
+                                    }
+                                }
+                                Err(e) => {
+                                    debug!("Error getting peer at share index: {:?}", e);
                                     continue;
                                 }
                             }
-                            Err(e) => {
-                                debug!("Error getting peer at share index: {:?}", e);
-                                continue;
-                            }
                         }
                     }
+                    Err(e) => {
+                        debug!("Error getting peer at share index: {:?}", e);
+                        continue;
+                    }
                 }
-                Err(e) => {
-                    debug!("Error getting peer at share index: {:?}", e);
-                    continue;
-                }
-            }
+            };
 
             return Err(unexpected_err(
                 format!(

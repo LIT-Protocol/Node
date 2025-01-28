@@ -314,7 +314,7 @@ contract StakingViewsFacet {
             .validatorsInCurrentEpoch
             .length();
         uint256 kickedCountInNextEpoch = stakingStorage()
-            .validatorsKickedFromNextEpoch
+            .currentValidatorsKickedFromNextEpoch
             .length();
         uint256 activeCount = currentCount - kickedCountInNextEpoch;
         address[] memory values = new address[](activeCount);
@@ -322,7 +322,7 @@ contract StakingViewsFacet {
         for (uint256 i = 0; i < currentCount; i++) {
             address validator = stakingStorage().validatorsInCurrentEpoch.at(i);
             if (
-                stakingStorage().validatorsKickedFromNextEpoch.contains(
+                stakingStorage().currentValidatorsKickedFromNextEpoch.contains(
                     validator
                 )
             ) {

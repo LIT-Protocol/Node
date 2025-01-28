@@ -19,6 +19,7 @@ import {
 // global scope, and execute the script.
 import hre from 'hardhat';
 import fs from 'fs';
+import { deployDiamondContract } from './deployDiamond';
 const { ethers } = hre;
 
 export const grantRolesTo = async (
@@ -52,7 +53,7 @@ export async function deployLitCoreContracts(
     }
   );
 
-  // *** 2. Deploy ReleaseRegister
+  // *** 2.1 Deploy ReleaseRegister
   const releaseRegister = await hardhatDeployAndVerifySingleContract(
     ethers,
     deployCoreConfig.networkName,
@@ -62,7 +63,7 @@ export async function deployLitCoreContracts(
     }
   );
 
-  // *** 4. Set roles for ReleaseRegister
+  // *** 2.2 Set roles for ReleaseRegister
   console.log('Setting roles for ReleaseRegister contract...');
 
   await grantRolesTo(releaseRegister, deployCoreConfig.subnetOwnerAddress, [
@@ -77,7 +78,7 @@ export async function deployLitCoreContracts(
     await releaseRegister.ACTIVATOR_ROLE(),
   ]);
 
-  // *** 5. Adding admin public keys to ReleaseRegister
+  // *** 2.3 Adding admin public keys to ReleaseRegister
   console.log(
     'Adding allowed admin public keys to ReleaseRegister contract...'
   );
@@ -86,6 +87,27 @@ export async function deployLitCoreContracts(
     deployCoreConfig.subnetAdminPublicKey
   );
 
+  // *** 3.1 Deploy HostCommands Contract
+  console.log('Deploying HostCommands contract');
+  const hostCommandsDiamond = await deployDiamondContract(
+    chainName,
+    'HostCommands',
+    [
+      await contractResolver.getAddress(),
+      mapEnvToEnum(deployCoreConfig.environment),
+    ],
+    ['HostCommandsFacet'],
+    false
+  );
+  // *** 3.2 Set the contract deployer to be authorized Sender by default
+  const hostCommandsContract = await ethers.getContractAt(
+    'HostCommandsFacet',
+    await hostCommandsDiamond.diamond.getAddress()
+  );
+  let set_authorized_sender_tx =
+    await hostCommandsContract.setAuthorizedCommandSender(deployer.address);
+  await set_authorized_sender_tx.wait();
+
   // *** 6. Set the active contract address
   console.log('Setting active contract addresses');
 
@@ -93,6 +115,11 @@ export async function deployLitCoreContracts(
     await contractResolver.RELEASE_REGISTER_CONTRACT(),
     mapEnvToEnum(deployCoreConfig.environment),
     await releaseRegister.getAddress()
+  );
+  await contractResolver.setContract(
+    await contractResolver.HOST_COMMANDS_CONTRACT(),
+    mapEnvToEnum(deployCoreConfig.environment),
+    await hostCommandsDiamond.diamond.getAddress()
   );
 
   // *** 7. Renouncing ADMIN role.
@@ -105,6 +132,7 @@ export async function deployLitCoreContracts(
   const finalJson = {
     contractResolver: await contractResolver.getAddress(),
     releaseRegisterContractAddress: await releaseRegister.getAddress(),
+    hostCommandsContractAddress: await hostCommandsDiamond.diamond.getAddress(),
   };
 
   console.log('final JSON: ');

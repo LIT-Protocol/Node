@@ -14,10 +14,8 @@ use crate::utils::web::get_auth_context;
 use crate::utils::web::EndpointVersion;
 use lit_api_core::context::Tracer;
 
-use crate::utils::rocket::guards::ClientContext;
-use crate::utils::web::get_auth_context_from_session_sigs;
 use crate::utils::web::pubkey_to_token_id;
-use crate::utils::web::{get_bls_root_pubkey, ConcurrencyGuard};
+use crate::utils::web::{get_auth_context_from_session_sigs, get_bls_root_pubkey};
 use lit_api_core::context::{with_context, Tracing};
 use lit_api_core::error::ApiError;
 use lit_core::config::ReloadableLitConfig;
@@ -32,7 +30,6 @@ use std::time::Duration;
 
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn pkp_sign(
-    _guard: ConcurrencyGuard<'_>,
     remote_addr: SocketAddr,
     tss_state: &State<Arc<TssState>>,
     auth_context_cache: &State<Arc<models::AuthContextCache>>,
@@ -41,7 +38,6 @@ pub(crate) async fn pkp_sign(
     allowlist_cache: &State<Arc<models::AllowlistCache>>,
     json_pkp_signing_request: Json<models::JsonPKPSigningRequest>,
     tracing: Tracing,
-    client_context: ClientContext,
     endpoint_version: EndpointVersion,
 ) -> status::Custom<Value> {
     let request_start = std::time::Instant::now();
@@ -278,7 +274,6 @@ pub(crate) async fn pkp_sign(
 
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn pkp_claim(
-    _guard: ConcurrencyGuard<'_>,
     remote_addr: SocketAddr,
     tss_state: &State<Arc<TssState>>,
     auth_context_cache: &State<Arc<models::AuthContextCache>>,
@@ -287,7 +282,6 @@ pub(crate) async fn pkp_claim(
     allowlist_cache: &State<Arc<models::AllowlistCache>>,
     json_pkp_claim_request: Json<models::JsonPKPClaimKeyRequest>,
     tracing: Tracing,
-    client_context: ClientContext,
 ) -> status::Custom<Value> {
     let request_start = std::time::Instant::now();
 

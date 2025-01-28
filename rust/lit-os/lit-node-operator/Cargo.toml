@@ -1,0 +1,55 @@
+[package]
+name = "lit-node-operator"
+authors = [ "Adam Reif <adam@litprotocol.com>" ]
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "lit-node-operator"
+path = "src/main.rs"
+
+[dependencies]
+serde_yaml = "0.9.33"
+tokio = { version = "1.36", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+anyhow = "1.0"
+nix = { version = "0.26.2", features = ["user"] }
+ethers = { version = "2.0.8", features = ["abigen", "legacy"] }
+regex = "1.11.1"
+derive_more = "0.99.17"
+tracing-journald = "0.3.0"
+
+[dependencies.lit-core]
+path = "../../lit-core/lit-core"
+
+[dependencies.lit-logging]
+path = "../../lit-core/lit-logging"
+
+[dependencies.lit-blockchain]
+path = "../../lit-core/lit-blockchain"
+
+# RAD: Including the full lit-cli is kinda bad, it has a lot of deps
+[dependencies.lit-cli-os]
+path = "../lit-cli-os"
+
+[dependencies.lit-core-derive]
+path = "../../lit-core/lit-core-derive"
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["full", "test-util"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+chrono = "0.4"
+
+[dev-dependencies.test-common]
+path = "../../lit-node/common/test-common"
+features = ["lit-actions", "testing", "proxy_http"]
+
+[dev-dependencies.lit-os-core]
+path = "../lit-os-core"
+
+[dev-dependencies.lit-api-core]
+path = "../../lit-core/lit-api-core"
+
+[dev-dependencies.lit_node]
+path = "../../lit-node"

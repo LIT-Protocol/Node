@@ -22,7 +22,6 @@ coms_keys_sender_privkey = "0xbfac351223a087cd679f4ec1f5f77bc949c57b9bf8e76a03bc
 enable_actions_allowlist = "false"
 enable_epoch_transitions = "true"
 enable_rate_limiting = "false"
-enable_ecdsa_dkg = "true"
 public_key = "0220b871f3ced029e14472ec4ebc3c0448164942b123aa6af91a3386c1c403e0eb"
 rpc_url = "http://localhost:8545"
 staker_address = "0x90f79bf6eb2c4f870365e785982e1f101e93b906"

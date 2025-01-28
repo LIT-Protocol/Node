@@ -6,5 +6,5 @@
     authSig: null,
     chain: 'ethereum',
   });
-  Lit.Actions.setResponse({ response: resp });
+  Lit.Actions.setResponse({ response: JSON.stringify(resp) });
 })();

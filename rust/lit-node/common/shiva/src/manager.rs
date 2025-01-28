@@ -59,7 +59,10 @@ pub fn start_runtime(transport: TransportType) -> Result<(), anyhow::Error> {
         .build()
         .map_err(|e| anyhow::anyhow!("Could not create tokio runtime {}", e))?;
 
-    let web_metrics = web_rt.metrics();
+    // Deno 1.46 pins Tokio to 1.36.0, which doesn't support metrics.
+    // TODO: Update to Deno 2.0.4+, which lifts this restriction.
+    // See https://github.com/denoland/deno/pull/26457
+    // let web_metrics = web_rt.metrics();
 
     let (rt_quit_tx, _rt_quit_rx) = broadcast::channel::<bool>(1);
     let mut quit_rx_web = rt_quit_tx.subscribe();
@@ -75,7 +78,7 @@ pub fn start_runtime(transport: TransportType) -> Result<(), anyhow::Error> {
         .thread_name("Testnet Manager")
         .build()
         .map_err(|e| anyhow::anyhow!("Could not create tokio runtime {}", e))?;
-    let tnm_metrics = tnm_rt.metrics();
+    // let tnm_metrics = tnm_rt.metrics();
     let client = ShivaClient::new();
 
     let tnm_handler = thread::spawn(move || {
@@ -372,11 +375,11 @@ pub fn start_runtime(transport: TransportType) -> Result<(), anyhow::Error> {
         }
     }
     info!("Started manager and web server runtimes");
-    info!(
-        "Manager runtime worker count {:?}",
-        tnm_metrics.num_workers()
-    );
-    info!("> Web server worker count: {:?}", web_metrics.num_workers());
+    // info!(
+    //     "Manager runtime worker count {:?}",
+    //     tnm_metrics.num_workers()
+    // );
+    // info!("> Web server worker count: {:?}", web_metrics.num_workers());
     // Consume all the incoming signals. This happens in "normal" Rust thread, not in the
     // signal handlers. This means that we are allowed to do whatever we like in here, without
     // restrictions, but it also means the kernel believes the signal already got delivered, we

@@ -3,9 +3,11 @@
 set prompt {.*\$.* }
 
 set host_ip [lindex $argv 0]
-set subnet_id [lindex $argv 1]
-set wallet_key [lindex $argv 2]
-set admin_key [lindex $argv 3]
+set guest_ip [lindex $argv 1]
+set guest_gateway [lindex $argv 2]
+set subnet_id [lindex $argv 3]
+set wallet_key [lindex $argv 4]
+set admin_key [lindex $argv 5]
 
 spawn ssh -o StrictHostKeyChecking=no $host_ip
 
@@ -16,7 +18,7 @@ set timeout -1
 
 # create the instance
 send "sudo lit os guest instance create prov \
-  --net4-ip 207.244.86.72/27 --net4-gw 207.244.86.94 \
+  --net4-ip $guest_ip --net4-gw $guest_gateway \
   --api-domain $subnet_id.getlit.sh -f --subnet-id $subnet_id --bootstrap --vcpus 4 --mem 4g\n"
 
 expect "Enter private key to node wallet:"
@@ -25,7 +27,7 @@ send "$wallet_key\n"
 expect "Enter admin key:"
 send "$admin_key\n"
 
-expect -re {Debian GNU\/Linux 11 prov}
+expect -re {Debian GNU\/Linux 12}
 
 send "exit\n"
 expect eof

@@ -7,7 +7,6 @@
 // use crate::tss::common::restore::RestoreState;
 // use crate::tss::common::tss_state::TssState;
 // use crate::utils::rocket::guards::{ClientContext, RequestHeaders};
-// use crate::utils::web::ConcurrencyGuard;
 // use lit_api_core::context::{SdkVersion, Tracing, TracingRequired};
 // use lit_api_core::http::rocket::helper::stream::ChildStream;
 // use lit_core::config::ReloadableLitConfig;
@@ -34,7 +33,6 @@ pub(crate) fn routes() -> Vec<Route> {
 // #[instrument(name = "POST /web/pkp/sign/v1", skip_all, ret)]
 // #[allow(clippy::too_many_arguments)]
 // pub(crate) async fn pkp_sign(
-//     guard: ConcurrencyGuard<'_>,
 //     remote_addr: SocketAddr,
 //     tss_state: &State<Arc<TssState>>,
 //     auth_context_cache: &State<Arc<models::AuthContextCache>>,
@@ -43,7 +41,6 @@ pub(crate) fn routes() -> Vec<Route> {
 //     allowlist_cache: &State<Arc<models::AllowlistCache>>,
 //     json_pkp_signing_request: Json<models::JsonPKPSigningRequest>,
 //     tracing: Tracing,
-//     client_context: ClientContext,
 // ) -> status::Custom<Value> {
 //     pkp::pkp_sign(
 //         guard,

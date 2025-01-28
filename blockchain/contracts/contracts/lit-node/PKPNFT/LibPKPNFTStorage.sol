@@ -18,6 +18,16 @@ library LibPKPNFTStorage {
         IPubkeyRouter.Signature[] signatures;
     }
 
+    struct ClaimMaterialV2 {
+        uint256 keyType;
+        bytes32 derivedKeyId;
+        IPubkeyRouter.Signature[] signatures;
+        /// @notice The staking contract address that validator nodes are staked against.
+        /// The "nodes" refer to the nodes where the signatures have been obtained from
+        /// in order to claim and mint a PKP.
+        address stakingContractAddress;
+    }
+
     struct PKPNFTStorage {
         ContractResolver contractResolver;
         ContractResolver.Env env;

@@ -10,6 +10,7 @@ import {
   PKPNFTFacet,
   PKPPermissionsFacet,
   PubkeyRouterFacet,
+  StakingAdminFacet,
   StakingBalancesFacet,
   StakingFacet,
 } from '../../typechain-types';
@@ -39,6 +40,7 @@ describe('DomainWalletRegistry', function () {
   let domainWalletRegistryViewsFacet: DomainWalletRegistryViewsFacet;
   let stakingFacet: StakingFacet;
   let stakingBalancesFacet: StakingBalancesFacet;
+  let stakingAdminFacet: StakingAdminFacet;
   let token: LITToken;
   let pkpTokenId = parseInt(
     '04e4df1c02a7b9bd8f0668c344bbbae3a66b72273a50890ed8e653f513a247b8d2a39ddd5a6b6bb8ef1270fd105f73d0133886c9a4890777f2f4f8127cdf5cc1fc'
@@ -146,6 +148,7 @@ describe('DomainWalletRegistry', function () {
           'StakingFacet',
           'StakingViewsFacet',
           'StakingVersionFacet',
+          'StakingAdminFacet',
         ],
         verifyContracts: false,
         waitForDeployment: false,
@@ -154,6 +157,11 @@ describe('DomainWalletRegistry', function () {
 
     stakingFacet = await ethers.getContractAt(
       'StakingFacet',
+      await stakingDiamond.getAddress()
+    );
+
+    stakingAdminFacet = await ethers.getContractAt(
+      'StakingAdminFacet',
       await stakingDiamond.getAddress()
     );
 
@@ -195,6 +203,7 @@ describe('DomainWalletRegistry', function () {
     stakingAccounts = await setupStakingWithValidatorsAndAdvance(
       ethers,
       stakingFacet,
+      stakingAdminFacet,
       stakingBalancesFacet,
       token,
       deployer,

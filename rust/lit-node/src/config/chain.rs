@@ -7,7 +7,6 @@ use lit_core::utils::binary::bytes_to_hex;
 use moka::future::Cache;
 use rocket::serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::cmp::Ordering::{Equal, Greater, Less};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::{mpsc, RwLock};
@@ -19,10 +18,9 @@ use crate::error::Result;
 use crate::error::{conversion_err, unexpected_err_code, EC};
 use crate::models::PeerValidator;
 use crate::peers::peer_reviewer::MAX_COMPLAINT_REASON_VALUE;
-use crate::tasks::utils::generate_hash;
+use crate::peers::peer_state::models::{SimplePeer, SimplePeerExt};
 use crate::tss::common::curve_type::CurveType;
 use crate::utils::networking::get_web_addr_from_chain_info;
-use crate::utils::web::{CONCURRENCY_DEFAULT, CONCURRENCY_SEMAPHORE};
 
 #[derive(PartialEq, Debug)]
 pub enum PeerGroupEpoch {
@@ -42,7 +40,6 @@ pub struct GenericConfig {
     pub token_reward_per_token_per_epoch: u64,
     pub key_types: Vec<CurveType>,
     pub minimum_validator_count: u64,
-    pub max_concurrent_requests: u64,
     pub max_triple_count: u64,
     pub min_triple_count: u64,
     pub peer_checking_interval_secs: u64,
@@ -120,7 +117,6 @@ impl ChainDataConfigManager {
                 token_reward_per_token_per_epoch: 0,
                 key_types: Vec::new(),
                 minimum_validator_count: 2,
-                max_concurrent_requests: CONCURRENCY_DEFAULT,
                 max_triple_count: 25,
                 min_triple_count: 10,
                 peer_checking_interval_secs: 5,
@@ -375,7 +371,6 @@ impl ChainDataConfigManager {
             .map(|k| CurveType::try_from(*k).expect("Key Types in Staking Config should be valid."))
             .collect::<Vec<CurveType>>();
         let minimum_validator_count = staking_contract_config.minimum_validator_count.as_u64();
-        let max_concurrent_requests = staking_contract_config.max_concurrent_requests.as_u64();
         let max_triple_count = staking_contract_config.max_triple_count.as_u64();
         let min_triple_count = staking_contract_config.min_triple_count.as_u64();
         let peer_checking_interval_secs =
@@ -383,42 +378,9 @@ impl ChainDataConfigManager {
         let max_triple_concurrency = staking_contract_config.max_triple_concurrency.as_u64();
         let rpc_healthcheck_enabled = staking_contract_config.rpc_healthcheck_enabled;
 
-        let old_max_concurrent_requests = self.generic_config.read().await.max_concurrent_requests;
-        match max_concurrent_requests.cmp(&old_max_concurrent_requests) {
-            Equal => {
-                // trace!("max_concurrent_requests is unchanged");
-            }
-            Greater => {
-                let permits_diff = max_concurrent_requests - old_max_concurrent_requests;
-                warn!(
-                    "max_concurrent_requests is set to {}, which is more than the older value of {:?}",
-                    max_concurrent_requests, old_max_concurrent_requests
-                );
-                CONCURRENCY_SEMAPHORE.add_permits(permits_diff as usize);
-            }
-            Less => {
-                let permits_diff = old_max_concurrent_requests - max_concurrent_requests;
-                warn!(
-                    "max_concurrent_requests is set to {}, which is less than the older value of {:?}",
-                    max_concurrent_requests, old_max_concurrent_requests
-                );
-                let permit = CONCURRENCY_SEMAPHORE
-                    .acquire_many(permits_diff as u32)
-                    .await
-                    .map_err(|e| {
-                        blockchain_err(
-                            e,
-                            Some("Unable to update concurrency guard from chain".into()),
-                        )
-                    })?;
-                permit.forget();
-            }
-        }
-
         let mut generic_config = self.generic_config.write().await;
         generic_config.key_types = key_types;
         generic_config.minimum_validator_count = minimum_validator_count;
-        generic_config.max_concurrent_requests = max_concurrent_requests;
         generic_config.max_triple_count = max_triple_count;
         generic_config.min_triple_count = min_triple_count;
         generic_config.peer_checking_interval_secs = peer_checking_interval_secs;
@@ -606,7 +568,7 @@ impl ChainDataConfigManager {
         // set the index on each validator
         peer_validators.iter_mut().enumerate().for_each(|(i, pv)| {
             pv.index = i as u16;
-            pv.key_hash = generate_hash(pv.staker_address);
+            pv.key_hash = Vec::<SimplePeer>::generate_hash(pv.staker_address);
         });
 
         Ok(peer_validators)

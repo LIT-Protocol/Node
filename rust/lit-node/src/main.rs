@@ -25,6 +25,7 @@ use lit_api_core::logging::FileLoggingPlugin;
 use lit_api_core::logging::TracingPlugin;
 use lit_api_core::{Engine, Launcher};
 use lit_blockchain::resolver::contract::ContractResolver;
+use lit_core::utils::unix::raise_fd_limit;
 use lit_logging::plugin::log_service::LogServicePlugin;
 use lit_node::config::LitNodeConfig;
 use lit_node::error::PKG_NAME;
@@ -138,6 +139,14 @@ fn internal_server_error_catcher(status: Status, req: &Request<'_>) -> status::C
 }
 
 pub fn main() {
+    raise_fd_limit();
+
+    // When starting an internal lit_actions server for testing, we need to
+    // init the V8 platform on the parent thread that will spawn V8 isolates
+    // to avoid crashing the node process.
+    #[cfg(feature = "lit-actions-server")]
+    lit_actions_server::init_v8();
+
     // Load config
     let cfg = load_cfg().expect("failed to load LitConfig");
 

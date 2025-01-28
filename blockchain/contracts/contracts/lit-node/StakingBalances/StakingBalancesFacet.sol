@@ -161,6 +161,29 @@ contract StakingBalancesFacet {
         emit Staked(account, amount);
     }
 
+    /// Stake tokens for another user
+    function stakeForValidator(
+        uint256 amount,
+        address account,
+        address sender
+    ) public onlyStakingContract {
+        if (amount == 0) {
+            revert CannotStakeZero();
+        }
+
+        if (s().permittedStakersOn && !s().permittedStakers[account]) {
+            revert StakerNotPermitted(account);
+        }
+
+        ERC20Burnable stakingToken = ERC20Burnable(getTokenAddress());
+        stakingToken.transferFrom(sender, address(this), amount);
+        s().balances[account] += amount;
+
+        s().totalStaked += amount;
+
+        emit Staked(account, amount);
+    }
+
     /// Withdraw staked tokens.  This can only be done by users who are not active in the validator set.
     /// @param amount The amount of tokens to withdraw
     function withdraw(

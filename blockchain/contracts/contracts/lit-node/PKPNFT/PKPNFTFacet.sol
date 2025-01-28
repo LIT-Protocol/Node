@@ -206,17 +206,18 @@ contract PKPNFTFacet is
     function claimAndMint(
         uint256 keyType,
         bytes32 derivedKeyId,
-        IPubkeyRouter.Signature[] memory signatures
+        IPubkeyRouter.Signature[] memory signatures,
+        address stakingContractAddress
     ) public payable returns (uint256) {
         require(msg.value == s().mintCost, "You must pay exactly mint cost");
         PubkeyRouterFacet router = PubkeyRouterFacet(getRouterAddress());
         router.checkNodeSignatures(
             signatures,
             abi.encodePacked(derivedKeyId),
-            getStakingAddress()
+            stakingContractAddress
         );
         bytes memory pubkey = router.getDerivedPubkey(
-            getStakingAddress(),
+            stakingContractAddress,
             derivedKeyId
         );
         uint256 tokenId = uint256(keccak256(pubkey));

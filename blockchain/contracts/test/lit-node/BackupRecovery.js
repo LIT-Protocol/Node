@@ -1,5 +1,4 @@
 const chai = require('chai');
-const { BigNumber, utils } = require('ethers-v5');
 const {
   Environment,
   setContractResolver,
@@ -19,6 +18,7 @@ describe('BackupRecovery', function () {
   let stakingAccount1;
   let stakingAccount2;
   let stakingContract;
+  let stakingAdminFacet;
   let stakingBalances;
   let contractResolver;
   let backupRecoveryContract;
@@ -91,6 +91,7 @@ describe('BackupRecovery', function () {
           'StakingFacet',
           'StakingViewsFacet',
           'StakingVersionFacet',
+          'StakingAdminFacet',
         ],
         verifyContracts: false,
         waitForDeployment: false,
@@ -102,6 +103,10 @@ describe('BackupRecovery', function () {
     );
     stakingViewsFacet = await ethers.getContractAt(
       'StakingViewsFacet',
+      await stakingDiamond.getAddress()
+    );
+    stakingAdminFacet = await ethers.getContractAt(
+      'StakingAdminFacet',
       await stakingDiamond.getAddress()
     );
     ownershipFacet = await ethers.getContractAt(
@@ -180,6 +185,7 @@ describe('BackupRecovery', function () {
     stakingAccounts = await setupStakingWithValidatorsAndAdvance(
       ethers,
       stakingContract,
+      stakingAdminFacet,
       stakingBalances,
       token,
       deployer,

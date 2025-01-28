@@ -19,8 +19,6 @@ indoc = { workspace = true }
 lit-actions-ext = { workspace = true }
 lit-actions-grpc = { workspace = true }
 lit-api-core = { workspace = true }
-# FIXME: use of deprecated macro `as_error`: use the `key:err = value` macro syntax instead (in lit-api-core)
-log = "=0.4.20"
 serde_json = { workspace = true }
 temp-file = "0.1"
 tokio = { workspace = true }

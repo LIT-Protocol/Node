@@ -12,10 +12,12 @@ use crate::{
 };
 
 #[cfg(feature = "rtmetrics")]
-use crate::tasks::{
-    realtime_metrics::MetricsMessage::NewAction,
-    realtime_metrics::{MetricAction, MetricActionType},
-    utils::generate_hash,
+use crate::{
+    peers::peer_state::models::{SimplePeer, SimplePeerExt},
+    tasks::{
+        realtime_metrics::MetricsMessage::NewAction,
+        realtime_metrics::{MetricAction, MetricActionType},
+    },
 };
 
 use ethers::{prelude::*, utils::keccak256};
@@ -450,7 +452,7 @@ pub async fn sign_ecdsa(
     let _ = tx_metrics
         .send_async(NewAction(MetricAction {
             type_id: MetricActionType::SignEcdsa,
-            txn_id: generate_hash(&request_id),
+            txn_id: Vec::<SimplePeer>::generate_hash(&request_id),
             is_start: true,
             is_success: true,
         }))
@@ -472,7 +474,7 @@ pub async fn sign_ecdsa(
     let _ = tx_metrics
         .send_async(NewAction(MetricAction {
             type_id: MetricActionType::SignEcdsa,
-            txn_id: generate_hash(request_id),
+            txn_id: Vec::<SimplePeer>::generate_hash(request_id),
             is_start: false,
             is_success: sign_result.is_ok(),
         }))

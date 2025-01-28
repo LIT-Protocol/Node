@@ -9,11 +9,13 @@ import {
   PKPPermissions,
   PKPPermissionsFacet,
   PubkeyRouterFacet,
+  StakingAdminFacet,
   StakingBalancesFacet,
   StakingFacet,
 } from '../typechain-types';
 import { LITToken } from '../typechain-types/contracts/lit-node/LITToken';
 import { ip2int } from './index.js';
+import { CloneNetFacet } from '../typechain-types/contracts/lit-node/CloneNet/CloneNetFacet.sol';
 
 export enum Environment {
   DEV,
@@ -34,6 +36,7 @@ export async function setContractResolver(
   env: Environment,
   {
     backupRecoveryContract,
+    cloneNetContract,
     tokenContract,
     stakingContract,
     stakingBalancesContract,
@@ -48,6 +51,7 @@ export async function setContractResolver(
     stylusContractK256,
   }: {
     backupRecoveryContract?: BackupRecovery;
+    cloneNetContract?: CloneNetFacet;
     tokenContract?: LITToken;
     stakingContract?: StakingFacet;
     stakingBalancesContract?: StakingBalancesFacet;
@@ -62,6 +66,14 @@ export async function setContractResolver(
     stylusContractK256?: string;
   }
 ) {
+  if (cloneNetContract) {
+    await contractResolver.setContract(
+      await contractResolver.CLONE_NET_CONTRACT(),
+      env,
+      await cloneNetContract.getAddress()
+    );
+  }
+
   if (tokenContract) {
     await contractResolver.setContract(
       await contractResolver.LIT_TOKEN_CONTRACT(),
@@ -178,7 +190,7 @@ export interface CreateValidatorOptions {
   port: number;
 }
 
-interface StakingAccount {
+export interface StakingAccount {
   nodeAddress: ethers.HDNodeWallet;
   stakingAddress: ethers.HDNodeWallet;
   commsKeys: {
@@ -336,21 +348,27 @@ export async function createValidatorAndStake(
 export async function setupStakingWithValidatorsAndAdvance(
   ethers: any,
   stakingContract: StakingFacet,
+  stakingAdminContract: StakingAdminFacet,
   stakingBalancesContract: StakingBalancesFacet,
   tokenContract: LITToken,
   deployer: Signer,
   options: SetupStakingOptions
 ): Promise<StakingAccount[]> {
   // Validate number of validators is greater than 1
-  if (options.numValidators < 2) {
-    throw new Error('Must have at least 2 validator');
+  if (options.numValidators < 3) {
+    throw new Error('Must have at least 3 validators');
   }
 
+  console.log(`deploying staking with ${options.numValidators} validators`);
+
+  const provider = deployer.provider!;
+
   // set epoch length to 1 so that we can test quickly
-  await stakingContract.setEpochLength(1);
+  await stakingAdminContract.setEpochLength(1);
 
   let stakingAccounts: StakingAccount[] = [];
   for (let i = 0; i < options.numValidators; i++) {
+    console.log(`creating validator ${i}`);
     const stakingAccount = await createValidatorAndStake(
       ethers,
       stakingContract,
@@ -362,7 +380,7 @@ export async function setupStakingWithValidatorsAndAdvance(
         port: options.startingPort + i + 1,
       }
     );
-
+    console.log('requesting to join');
     // Call requestToJoin for each validator
     await stakingContract
       .connect(stakingAccount.stakingAddress)
@@ -378,16 +396,39 @@ export async function setupStakingWithValidatorsAndAdvance(
   }
 
   // unpause staking contract
-  await stakingContract.connect(deployer).setEpochState(StakingState.Active);
+  await stakingAdminContract.setEpochState(StakingState.Active);
+
+  // uncomment for debugging Staking contract state
+  // const stakingViewsFacet = await ethers.getContractAt(
+  //   'StakingViewsFacet',
+  //   await stakingContract.getAddress()
+  // );
+  // const epoch = await stakingViewsFacet.epoch();
+  // const epochNumber = epoch[1];
+  // const endTime = epoch[2];
+  // console.log('epoch number', epochNumber);
+  // console.log('epoch end time', endTime);
+  // // get latest block timestamp
+  // const latestBlockNumber = await provider.getBlockNumber();
+  // const blockTimestamp = (await provider.getBlock(latestBlockNumber))
+  //   ?.timestamp;
+  // console.log('block timestamp', blockTimestamp);
+  // const state = await stakingViewsFacet.state();
+  // console.log('epoch state', state);
+  // const nextSet = await stakingViewsFacet.getValidatorsInNextEpoch();
+  // console.log('next set length', nextSet.length);
 
   // okay now that we're all staked, let's kickoff the first epoch
+  console.log('locking validators for next epoch');
   await stakingContract.lockValidatorsForNextEpoch();
 
+  console.log('signalling ready for next epoch');
   for (let i = 0; i < options.numValidators; i++) {
     stakingContract = stakingContract.connect(stakingAccounts[i].nodeAddress);
     await stakingContract.signalReadyForNextEpoch(1);
   }
 
+  console.log('advancing epoch');
   await stakingContract.advanceEpoch();
 
   console.info(

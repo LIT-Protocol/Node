@@ -22,12 +22,10 @@ use crate::models::{self};
 use crate::tss::common::restore::RestoreState;
 use crate::tss::common::tss_state::TssState;
 use crate::utils::contract::get_backup_recovery_contract_with_signer;
-use crate::utils::web::ConcurrencyGuard;
 
 #[instrument(name = "POST /web/recovery/set_dec_share", skip_all, ret)]
 #[allow(dead_code)]
 pub async fn recovery_set_dec_share(
-    _guard: ConcurrencyGuard<'_>,
     cfg: &State<ReloadableLitConfig>,
     restore_state: &State<Arc<RwLock<RestoreState>>>,
     request: Json<models::JsonRecoverySetDecShare>,
@@ -94,7 +92,6 @@ pub async fn recovery_set_dec_share(
 
 #[instrument(name = "POST /web/recovery/get_dec_share", skip_all, ret)]
 pub async fn recovery_get_dec_key_share(
-    _guard: ConcurrencyGuard<'_>,
     restore_state: &State<Arc<TssState>>,
     cfg: &State<ReloadableLitConfig>,
     request: Json<models::DownloadShareRequest>,
@@ -139,7 +136,6 @@ pub async fn recovery_get_dec_key_share(
 
 #[instrument(name = "POST /web/recovery/delete_dec_share", skip_all, ret)]
 pub async fn recovery_delete_dec_key_share(
-    _guard: ConcurrencyGuard<'_>,
     restore_state: &State<Arc<TssState>>,
     cfg: &State<ReloadableLitConfig>,
     request: Json<models::DownloadShareRequest>,

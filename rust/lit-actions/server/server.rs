@@ -17,7 +17,9 @@ pub struct Server;
 
 impl Server {
     fn into_service(self) -> ActionServer<Self> {
-        ActionServer::new(self).max_decoding_message_size(16_777_215)
+        ActionServer::new(self)
+            // Let lit_node enforce size limits
+            .max_decoding_message_size(usize::MAX)
     }
 }
 
@@ -55,21 +57,15 @@ impl Action for Server {
                 .inspect_err(|e| error!("failed to receive request: {e:#}"))
                 .await
                 .unwrap_or_default();
-            debug!(?req);
 
             let outbound_tx = outbound_tx.clone();
             let inbound_rx = inbound_rx.clone();
 
             #[allow(clippy::single_match)]
             match req.union {
-                Some(UnionRequest::Execute(ExecutionRequest {
-                    code,
-                    js_params,
-                    auth_context,
-                    timeout,
-                    memory_limit,
-                    http_headers,
-                })) => {
+                Some(UnionRequest::Execute(req)) => {
+                    debug!("{:?}", DebugExecutionRequest::from(&req));
+
                     std::thread::spawn(move || {
                         let rt = tokio::runtime::Builder::new_current_thread()
                             .enable_all()
@@ -78,12 +74,13 @@ impl Action for Server {
 
                         rt.block_on(with_context(tracer.clone(), async move {
                             let res = crate::runtime::execute_js(
-                                code,
-                                js_params.and_then(|v| serde_json::from_slice(&v).ok()),
-                                auth_context.and_then(|v| serde_json::from_slice(&v).ok()),
-                                http_headers,
-                                timeout,
-                                memory_limit.map(|limit| limit as usize),
+                                req.code,
+                                req.js_params.and_then(|v| serde_json::from_slice(&v).ok()),
+                                req.auth_context
+                                    .and_then(|v| serde_json::from_slice(&v).ok()),
+                                req.http_headers,
+                                req.timeout,
+                                req.memory_limit.map(|limit| limit as usize),
                                 outbound_tx.clone(),
                                 inbound_rx.clone(),
                             )

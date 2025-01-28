@@ -1,6 +1,6 @@
 use crate::auth::auth_material::JsonAuthSig;
 use crate::auth::auth_material::AUTH_SIG_DERIVED_VIA_BLS_NETWORK_SIG;
-use crate::config::LitNodeConfig;
+use crate::config::CFG_KEY_HTTP_CLIENT_TIMEOUT;
 use crate::error::parser_err_code;
 use crate::error::{conversion_err, ipfs_err, unexpected_err, validation_err_code, Result, EC};
 use crate::error::{unexpected_err_code, validation_err};
@@ -16,44 +16,36 @@ use ethers::utils::keccak256;
 use ipfs_hasher::IpfsHasher;
 use iri_string::spec::UriSpec;
 use iri_string::types::RiString;
-use lazy_static::lazy_static;
-use lit_core::config::{LitConfig, ReloadableLitConfig};
+use lit_api_core::context::with_context;
+use lit_api_core::context::Tracing;
+use lit_core::config::LitConfig;
 use lit_core::error::Unexpected;
 use lit_core::utils::binary::bytes_to_hex;
 use moka::future::Cache;
 use rocket::http::Status;
-use rocket::request::{FromRequest, Outcome};
-use rocket::serde::json::json;
-use rocket::serde::json::Value;
+use rocket::response::status::Custom;
+use rocket::serde::json::{json, Value};
 #[allow(unused_imports)]
 use rocket::time::OffsetDateTime;
-use rocket::{Request, State};
 use sha2::{Digest, Sha256};
 use siwe::Message;
 #[allow(unused_imports)]
 use siwe::VerificationOpts;
 use siwe_recap::Capability;
+use std::future::Future;
 use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
 use std::time::SystemTime;
-use tokio::sync::{Semaphore, SemaphorePermit};
 use tokio::time::timeout;
 use tracing::instrument;
 
 const MAX_CACHE_DURATION_FOR_AUTH_CONTEXT: u64 = 60 * 60; // 1 hour
 pub const MAX_CONDITION_COUNT: u64 = 30;
-pub const CONCURRENCY_DEFAULT: u64 = 1000;
 const AUTH_METHOD_CONTEXTS: &str = "authMethodContexts";
 const AUTH_CONTEXT: &str = "auth_context";
 const LAST_RETRIEVED_AT: &str = "lastRetrievedAt";
 const EXPIRATION: &str = "expiration";
-
-lazy_static! {
-    pub static ref CONCURRENCY_SEMAPHORE: Arc<Semaphore> =
-        Arc::new(Semaphore::new(CONCURRENCY_DEFAULT as usize));
-}
-pub struct ConcurrencyGuard<'a>(SemaphorePermit<'a>);
 
 #[derive(Debug, PartialEq, Clone, Copy, Default)]
 pub enum EndpointVersion {
@@ -68,83 +60,6 @@ impl EndpointVersion {
             EndpointVersion::Initial => "",
             EndpointVersion::V1 => "/v1",
         }
-    }
-}
-
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for ConcurrencyGuard<'r> {
-    type Error = std::io::Error;
-
-    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-        async fn get_conc_permit(
-            concurrency_semaphore: &Semaphore,
-            patience: Duration,
-        ) -> std::result::Result<SemaphorePermit, crate::error::Error> {
-            match timeout(patience, concurrency_semaphore.acquire()).await {
-                Ok(Ok(permit)) => Ok(permit),
-                Ok(Err(e)) => Err(unexpected_err_code(
-                    e,
-                    EC::NodeUnknownError,
-                    Some("Error when trying to acquire permit from concurrency semaphore".into()),
-                )),
-                Err(e) => Err(unexpected_err_code(
-                    e,
-                    EC::NodeConcurrencyOverload,
-                    Some(
-                        "Timeout reached while waiting for a permit in the concurrency semaphore"
-                            .into(),
-                    ),
-                )),
-            }
-        }
-
-        let cfg = match request.guard::<&State<ReloadableLitConfig>>().await {
-            Outcome::Success(cfg) => cfg,
-            Outcome::Error(e) => {
-                return Outcome::Error((
-                    Status::InternalServerError,
-                    std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "reloadable lit config not present in rocket state",
-                    ),
-                ))
-            }
-            Outcome::Forward(_) => return Outcome::Error((
-                Status::InternalServerError,
-                std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "reloadable lit config was forwarded from the perspective of concurrency guard",
-                ),
-            )),
-        };
-
-        let patience = match cfg.load_full().http_client_patience() {
-            Ok(patience) => Duration::from_secs(patience),
-            Err(e) => {
-                return Outcome::Error((
-                    Status::InternalServerError,
-                    std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        e.add_detail("node.http_client_patience must be present in lit config"),
-                    ),
-                ))
-            }
-        };
-
-        let permit = match get_conc_permit(&CONCURRENCY_SEMAPHORE, patience).await {
-            Ok(permit) => permit,
-            Err(e) => {
-                return Outcome::Error((
-                    Status::TooManyRequests,
-                    std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        e.add_detail("ran out of patience while waiting in line to execute"),
-                    ),
-                ))
-            }
-        };
-
-        Outcome::Success(ConcurrencyGuard(permit))
     }
 }
 
@@ -189,7 +104,6 @@ pub async fn check_allowlist(
             *allowlist_entry_id,
             AllowlistEntry {
                 allowed: is_allowed,
-                last_retrieved_at: SystemTime::now(),
             },
         );
         drop(allowlist);
@@ -601,6 +515,14 @@ pub fn pubkey_to_eth_address_bytes(pubkey: &str) -> Result<[u8; 20]> {
 
 #[instrument]
 pub fn pubkey_bytes_to_eth_address_bytes(pubkey: Vec<u8>) -> Result<[u8; 20]> {
+    // check to make sure this is valid.
+    if pubkey.len() < 33 {
+        return Err(validation_err(
+            "Invalid pubkey length.  Expected generally 33 or 64 bytes.",
+            None,
+        ));
+    }
+
     // remove the first byte from the pubkey, which is the 04 prefix.
     let bytes = pubkey[1..].to_vec();
     let hashed = keccak256(bytes);
@@ -867,5 +789,37 @@ pub async fn get_bls_root_pubkey(tss_state: &TssState) -> Result<String> {
             EC::NodeBLSRootKeyNotFound,
             None,
         )),
+    }
+}
+
+// Generic helper function to enforce the timeout logic on any async route handler
+pub async fn with_timeout<F>(handler: F) -> Custom<Value>
+where
+    F: Future<Output = Custom<Value>> + Send,
+{
+    let timeout_duration =
+        2 * Duration::from_secs(CFG_KEY_HTTP_CLIENT_TIMEOUT.parse::<u64>().unwrap_or(30));
+    match timeout(timeout_duration, handler).await {
+        Ok(response) => response,
+        Err(_) => Custom(
+            Status::RequestTimeout,
+            json!({"message": "Request timed out", "errorCode": "request_timeout"}),
+        ),
+    }
+}
+
+// Helper wrapper function combining timeout and tracing
+pub async fn with_context_and_timeout<F>(tracing: Tracing, fut: F) -> Custom<Value>
+where
+    F: Future<Output = Custom<Value>> + Send,
+{
+    let timeout_duration =
+        2 * Duration::from_secs(CFG_KEY_HTTP_CLIENT_TIMEOUT.parse::<u64>().unwrap_or(30));
+    match timeout(timeout_duration, with_context(tracing.clone(), fut)).await {
+        Ok(response) => response,
+        Err(_) => Custom(
+            Status::RequestTimeout,
+            json!({"message": "Request timed out", "errorCode": "request_timeout"}),
+        ),
     }
 }

@@ -9,8 +9,7 @@ use temp_file::TempFile;
 use tokio_stream::StreamExt as _;
 use tonic::{Code, Request, Status};
 
-// This client is only used for testing. The real implementation is provided by
-// lit-node, which also includes more tests.
+// This client is only used for testing. The real implementation is provided by lit-node.
 #[derive(Debug)]
 struct TestClient {
     socket_file: TempFile,
@@ -55,37 +54,31 @@ impl TestClient {
         outbound_tx.send_async(request.into()).await?;
 
         // Handle responses from server
-        while let Some(resp) = stream.next().await {
-            match resp {
-                Ok(resp) => {
-                    match resp.union {
-                        // Return final result from server
-                        Some(UnionResponse::Result(res)) => {
-                            self.messages.put(res.clone());
-                            if !res.success {
-                                bail!(res.error);
-                            }
-                            return Ok(res);
-                        }
-                        // Handle op requests
-                        Some(op) => {
-                            let resp = if let Some(resp) = self.messages.try_take::<ErrorResponse>()
-                            {
-                                resp.into()
-                            } else {
-                                self.handle_op(op)
-                            };
-                            outbound_tx.send_async(resp).await?;
-                        }
-                        // Ignore empty responses
-                        None => {}
-                    };
+        while let Some(resp) = stream.try_next().await? {
+            match resp.union {
+                // Return final result from server
+                Some(UnionResponse::Result(res)) => {
+                    self.messages.put(res.clone());
+                    if !res.success {
+                        bail!(res.error);
+                    }
+                    return Ok(res);
                 }
-                Err(status) => bail!(status),
-            }
+                // Handle op requests
+                Some(op) => {
+                    let resp = if let Some(resp) = self.messages.try_take::<ErrorResponse>() {
+                        resp.into()
+                    } else {
+                        self.handle_op(op)
+                    };
+                    outbound_tx.send_async(resp).await?;
+                }
+                // Ignore empty responses
+                None => {}
+            };
         }
 
-        unreachable!()
+        bail!("Server unexpectedly closed connection")
     }
 
     fn handle_op(&mut self, op: UnionResponse) -> ExecuteJsRequest {
@@ -212,6 +205,8 @@ impl TestClient {
 fn init() {
     // Set RUST_LOG to get logs during testing
     pretty_env_logger::init();
+
+    lit_core::utils::unix::raise_fd_limit();
 
     init_v8();
 }
@@ -1005,8 +1000,6 @@ async fn reference_error(mut client: TestClient) {
         res.unwrap_err().to_string(),
         indoc! {r#"
             Uncaught ReferenceError: nonexisting_function is not defined
-            nonexisting_function()
-            ^
                 at <user_provided_script>:1:1
         "#}
         .trim()
@@ -1027,8 +1020,6 @@ async fn throw_error(mut client: TestClient) {
             res.unwrap_err().to_string(),
             indoc! {r#"
                 Uncaught Error: boom
-                throw new Error("boom")
-                      ^
                     at <user_provided_script>:1:7
             "#}
             .trim(),
@@ -1048,8 +1039,6 @@ async fn throw_error(mut client: TestClient) {
             res.unwrap_err().to_string(),
             indoc! {r#"
                 Uncaught (in promise) Error: boom
-                    throw new Error("boom")
-                          ^
                     at <user_provided_script>:2:11
                     at <user_provided_script>:3:3
             "#}
@@ -1243,5 +1232,43 @@ async fn broadcast_and_collect(mut client: TestClient) {
         client.received::<SetResponseRequest>().response,
         "[\"some-response\"]"
     );
+    assert!(client.received::<ExecutionResult>().success);
+}
+
+#[rstest]
+#[tokio::test]
+async fn wasm(mut client: TestClient) {
+    // A simple add function in WebAssembly text format compiled using:
+    // wat2wasm add.wat --output=- | xxd -i
+    //
+    // (module
+    //   (func (export "add") (param $a i32) (param $b i32) (result i32)
+    //     local.get $a
+    //     local.get $b
+    //     i32.add
+    //   )
+    // )
+    //
+    // Source: https://docs.deno.com/runtime/reference/wasm/
+    let code = indoc! {r#"
+        const wasmCode = new Uint8Array([
+            0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x07, 0x01, 0x60,
+            0x02, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x02, 0x01, 0x00, 0x07, 0x07, 0x01,
+            0x03, 0x61, 0x64, 0x64, 0x00, 0x00, 0x0a, 0x09, 0x01, 0x07, 0x00, 0x20,
+            0x00, 0x20, 0x01, 0x6a, 0x0b
+        ]);
+        const wasmModule = new WebAssembly.Module(wasmCode);
+        const wasmInstance = new WebAssembly.Instance(wasmModule);
+        const { add } = wasmInstance.exports;
+        console.log(add(123, 456));
+    "#};
+
+    client
+        .respond_with(PrintResponse {})
+        .execute_js(code)
+        .await
+        .unwrap();
+
+    assert_eq!(client.received::<PrintRequest>().message, "579\n");
     assert!(client.received::<ExecutionResult>().success);
 }

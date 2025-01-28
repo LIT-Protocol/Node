@@ -248,8 +248,6 @@ pub fn launch(
                     info!("Stopped: lit_actions server");
                 };
 
-                lit_actions_server::init_v8();
-
                 if let Err(e) = lit_actions_server::start_server_with_shutdown(socket, signal).await
                 {
                     error!("Error starting lit_actions server: {e:#}");

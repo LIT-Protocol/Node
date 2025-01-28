@@ -1,5 +1,5 @@
 use std::backtrace::Backtrace;
-use std::panic::PanicInfo;
+use std::panic::PanicHookInfo;
 
 pub fn backtrace_to_vec(backtrace: &Backtrace) -> Vec<String> {
     let backtrace_str = format!("{backtrace}");
@@ -9,7 +9,7 @@ pub fn backtrace_to_vec(backtrace: &Backtrace) -> Vec<String> {
     backtrace
 }
 
-pub fn extract_panic_msg(info: &PanicInfo) -> String {
+pub fn extract_panic_msg(info: &PanicHookInfo) -> String {
     if let Some(s) = info.payload().downcast_ref::<&str>() {
         s.to_string()
     } else if let Some(s) = info.payload().downcast_ref::<String>() {

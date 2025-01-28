@@ -1,10 +1,7 @@
 (async () => {
-  const accessControlConditions = [access_control_conditions];
-
   const resp = await Lit.Actions.checkConditions({
-    conditions: [accessControlConditions],
-    authSig: null,
+    conditions: accessControlConditions,
     chain: 'ethereum',
   });
-  Lit.Actions.setResponse({ response: JSON.stringify(resp) });
+  Lit.Actions.setResponse({ response: JSON.stringify(resp.toString()) });
 })();

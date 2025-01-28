@@ -16,6 +16,7 @@ contract ContractResolver is AccessControl {
 
     bytes32 public constant RELEASE_REGISTER_CONTRACT =
         keccak256("RELEASE_REGISTER"); // 0x3a68dbfd8bbb64015c42bc131c388dea7965e28c1004d09b39f59500c3a763ec
+    bytes32 public constant CLONE_NET_CONTRACT = keccak256("CLONE_NET"); // 0x74eb03cf63075004abbf0673b796de723c9eb4e7ca32a80585790e134bb99f8c
     bytes32 public constant STAKING_CONTRACT = keccak256("STAKING"); // 0x080909c18c958ce5a2d36481697824e477319323d03154ceba3b78f28a61887b
     bytes32 public constant STAKING_BALANCES_CONTRACT =
         keccak256("STAKING_BALANCES"); // 0xaa06d108dbd7bf976b16b7bf5adb29d2d0ef2c385ca8b9d833cc802f33942d72
@@ -41,6 +42,7 @@ contract ContractResolver is AccessControl {
         keccak256("BACKUP_RECOVERY");
     bytes32 public constant PAYMENT_DELEGATION_CONTRACT =
         keccak256("PAYMENT_DELEGATION"); // 0xc6674f98ba35c01c130e08195dd26c70466037473a068c5aaa470a783d99c16c
+    bytes32 public constant HOST_COMMANDS_CONTRACT = keccak256("HOST_COMMANDS"); // 0xa2c73732de657ad0f36e0ddbb2710f4b13e8dde46421386bb92d1e179dae4d4d
 
     enum Env {
         Dev,

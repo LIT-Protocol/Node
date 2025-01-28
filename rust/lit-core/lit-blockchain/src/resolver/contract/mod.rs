@@ -21,6 +21,7 @@ use crate::config::LitBlockchainConfig;
 use crate::contracts::allowlist::Allowlist;
 use crate::contracts::backup_recovery::BackupRecovery;
 use crate::contracts::contract_resolver::ContractResolver as ContractResolverContract;
+use crate::contracts::host_commands::HostCommands;
 use crate::contracts::lit_token::LITToken;
 use crate::contracts::multisender::Multisender;
 use crate::contracts::payment_delegation::PaymentDelegation;
@@ -33,11 +34,11 @@ use crate::contracts::rate_limit_nft::RateLimitNFT;
 use crate::contracts::staking::Staking;
 use crate::contracts::staking_balances::StakingBalances;
 use crate::contracts::{
-    ALLOWLIST_CONTRACT, BACKUP_RECOVERY_CONTRACT, CONTRACT_RESOLVER_CONTRACT, LIT_TOKEN_CONTRACT,
-    MULTI_SENDER_CONTRACT, PAYMENT_DELEGATION_CONTRACT, PKP_HELPER_CONTRACT, PKP_NFT_CONTRACT,
-    PKP_NFT_METADATA_CONTRACT, PKP_PERMISSIONS_CONTRACT, PUB_KEY_ROUTER_CONTRACT,
-    RATE_LIMIT_NFT_CONTRACT, RELEASE_REGISTER_CONTRACT, STAKING_BALANCES_CONTRACT,
-    STAKING_CONTRACT,
+    ALLOWLIST_CONTRACT, BACKUP_RECOVERY_CONTRACT, CONTRACT_RESOLVER_CONTRACT,
+    HOST_COMMANDS_CONTRACT, LIT_TOKEN_CONTRACT, MULTI_SENDER_CONTRACT, PAYMENT_DELEGATION_CONTRACT,
+    PKP_HELPER_CONTRACT, PKP_NFT_CONTRACT, PKP_NFT_METADATA_CONTRACT, PKP_PERMISSIONS_CONTRACT,
+    PUB_KEY_ROUTER_CONTRACT, RATE_LIMIT_NFT_CONTRACT, RELEASE_REGISTER_CONTRACT,
+    STAKING_BALANCES_CONTRACT, STAKING_CONTRACT,
 };
 use crate::error::{blockchain_err, conversion_err, lock_err, Result};
 use crate::resolver::contract::config::SubnetConfig;
@@ -505,6 +506,13 @@ impl ContractResolver {
             *self.resolve(cfg, PAYMENT_DELEGATION_CONTRACT).await?.address(),
             self.wallet_key_as_str(),
         )
+    }
+
+    // HostCommands
+    pub async fn host_commands_contract(
+        &self, cfg: &LitConfig,
+    ) -> Result<HostCommands<Provider<Http>>> {
+        HostCommands::load(cfg, *self.resolve(cfg, HOST_COMMANDS_CONTRACT).await?.address())
     }
 
     // Flush functions

@@ -14,8 +14,8 @@ const { ethers } = hre;
 
 export async function deployDiamond(
   diamondName: string,
-  contractResolver: string,
-  env: number,
+  contractResolver: string | null,
+  env: number | null,
   {
     additionalFacets = [],
     useErc165Loupe = false,

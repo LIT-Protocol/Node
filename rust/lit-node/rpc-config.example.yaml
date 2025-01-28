@@ -8,7 +8,7 @@ chains:
   arbitrum:
     - url: https://arb1.arbitrum.io/rpc
   arbitrumSepolia:
-    - url: https://arbitrum-sepolia.blockpi.network/v1/rpc/public
+    - url: https://arb-sepolia.g.alchemy.com/v2/JGOfPAk9LNgNrhNyTFZ7WqvKksir3anN
   aurora:
     - url: https://mainnet.aurora.dev
   avalanche:
@@ -52,6 +52,8 @@ chains:
     - url: https://rpcapi.fantom.network
   filecoin:
     - url: https://api.node.glif.io/rpc/v1
+  filecoinCalibrationTestnet:
+    - url: https://api.calibration.node.glif.io/rpc/v1
   hyperspace:
     - url: https://api.hyperspace.node.glif.io/rpc/v1
   fuji:
@@ -103,8 +105,8 @@ chains:
     - url: https://ropsten.infura.io/v3/96dffb3d8c084dec952c61bd6230af34
   sepolia:
     - url: https://sepolia.infura.io/v3/96dffb3d8c084dec952c61bd6230af34
-  scrollAlphaTestnet:
-    - url: https://alpha-rpc.scroll.io/l2
+  scrollSepolia:
+    - url: https://sepolia-rpc.scroll.io
   scroll:
     - url: https://rpc.scroll.io
   solana:
@@ -159,15 +161,33 @@ chains:
     - url: https://mainnet.skalenodes.com/v1/green-giddy-denebola
   skaleCalypso:
     - url: https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague
+  skaleCalypsoTestnet:
+    - url: https://testnet.skalenodes.com/v1/giant-half-dual-testnet
+  skaleEuropa:
+    - url: https://mainnet.skalenodes.com/v1/elated-tan-skat
+  skaleEuropaTestnet:
+    - url: https://testnet.skalenodes.com/v1/juicy-low-small-testnet
+  skaleTitan:
+    - url: https://mainnet.skalenodes.com/v1/parallel-stormy-spica
+  skaleTitanTestnet:
+    - url: https://testnet.skalenodes.com/v1/aware-fake-trim-testnet
   fhenixHelium:
     - url: https://api.helium.fhenix.zone
   hederaTestnet:
     - url: https://testnet.hashio.io/api
   bitTorrentTestnet:
     - url: https://test-rpc.bittorrentchain.io
-  storyIlaid:
-    - url: https://testnet.storyrpc.io
+  storyOdyssey:
+    - url: https://rpc.odyssey.storyrpc.io
   campTestnet:
     - url: https://rpc.camp-network-testnet.gelato.digital
   hushedNorthstar:
     - url: https://rpc.buildbear.io/yielddev
+  matchain:
+    - url: https://rpc.matchain.io
+  coreDao:
+    - url: https://rpc.coredao.org
+  zkCandySepoliaTestnet:
+    - url: https://sepolia.rpc.zkcandy.io
+  vana:
+    - url: https://rpc.vana.org

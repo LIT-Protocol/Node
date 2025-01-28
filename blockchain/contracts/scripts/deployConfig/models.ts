@@ -70,6 +70,7 @@ export interface ParsedDomainWalletContracts {
 export interface ParsedNodeContracts extends ParsedDomainWalletContracts {
   stakingBalancesContractAddress: string;
   stakingContractAddress: string;
+  cloneNetContractAddress: string;
   multisenderContractAddress: string;
   litTokenContractAddress: string;
   pubkeyRouterContractAddress: string;

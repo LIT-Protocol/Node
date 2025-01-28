@@ -24,7 +24,7 @@ use crate::guest::common::print_describe_string;
 use crate::guest::instance::helper::{GuestInstanceHelper, GuestInstanceItemHelper};
 
 pub(crate) mod common;
-pub(crate) mod helper;
+pub mod helper;
 pub(crate) mod oneshot;
 pub(crate) mod release;
 

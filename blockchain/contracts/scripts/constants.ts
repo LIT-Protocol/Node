@@ -1,5 +1,6 @@
 export const CONTRACT_NAME_TO_JSON_CONTRACT_ADDRESS_KEY = {
   Staking: 'stakingContractAddress',
+  CloneNet: 'cloneNetContractAddress',
   Multisender: 'multisenderContractAddress',
   LITToken: 'litTokenContractAddress',
   AccessControlConditions: 'accessControlConditionsContractAddress',

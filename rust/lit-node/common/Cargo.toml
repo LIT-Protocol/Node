@@ -8,7 +8,4 @@ members = [
 # Prevent panic "Custom error class must have a builder registered: Uncaught null" that
 # happens when lit-node disconnects (e.g. op_sign_ecdsa: receiving on a closed channel)
 # Upstream PR: https://github.com/denoland/deno_core/pull/730
-deno_core = { git = "https://github.com/Lit-Protocol/deno_core", branch = "fix/deno-1444-op-panic" }
-# Hotfix for yanked wgpu crate versions, see https://github.com/gfx-rs/wgpu/issues/5837
-wgpu-core = { git = "https://github.com/gfx-rs/wgpu", tag = "v0.20.0" }
-wgpu-types = { git = "https://github.com/gfx-rs/wgpu", tag = "v0.20.0" }
+deno_core = { git = "https://github.com/Lit-Protocol/deno_core", branch = "fix/deno-1462-op-panic" }

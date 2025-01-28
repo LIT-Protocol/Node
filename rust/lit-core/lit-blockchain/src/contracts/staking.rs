@@ -112,6 +112,37 @@ pub mod staking {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("adminStakeForValidator"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "adminStakeForValidator",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("staker"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("amount"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
+                                        256usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("uint256"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("advanceEpoch"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -376,6 +407,54 @@ pub mod staking {
                                     kind: ::ethers::core::abi::ethabi::ParamType::Bytes,
                                     internal_type: ::core::option::Option::Some(
                                         ::std::borrow::ToOwned::to_owned("bytes"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("emitClearOfflinePhaseData"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "emitClearOfflinePhaseData",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("dataType"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
+                                        256usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("uint256"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("emitCountOfflinePhaseData"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "emitCountOfflinePhaseData",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("dataType"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
+                                        256usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("uint256"),
                                     ),
                                 },
                             ],
@@ -1657,6 +1736,26 @@ pub mod staking {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("setDevopsAdmin"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("setDevopsAdmin"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("newDevopsAdmin"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("setEpochEndTime"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -2183,6 +2282,26 @@ pub mod staking {
             ]),
             events: ::core::convert::From::from([
                 (
+                    ::std::borrow::ToOwned::to_owned("ClearOfflinePhaseData"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "ClearOfflinePhaseData",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("dataType"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
+                                        256usize,
+                                    ),
+                                    indexed: false,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("ComplaintConfigSet"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Event {
@@ -2290,6 +2409,42 @@ pub mod staking {
                                         "newRpcHealthcheckEnabled",
                                     ),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Bool,
+                                    indexed: false,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("CountOfflinePhaseData"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "CountOfflinePhaseData",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("dataType"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
+                                        256usize,
+                                    ),
+                                    indexed: false,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("DevopsAdminSet"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned("DevopsAdminSet"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("newDevopsAdmin"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
                                     indexed: false,
                                 },
                             ],
@@ -2724,6 +2879,17 @@ pub mod staking {
                     ::std::vec![
                         ::ethers::core::abi::ethabi::AbiError {
                             name: ::std::borrow::ToOwned::to_owned("CallerNotOwner"),
+                            inputs: ::std::vec![],
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("CallerNotOwnerOrDevopsAdmin"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::AbiError {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "CallerNotOwnerOrDevopsAdmin",
+                            ),
                             inputs: ::std::vec![],
                         },
                     ],
@@ -3674,6 +3840,16 @@ pub mod staking {
                 )
                 .expect("method not found (this should never happen)")
         }
+        ///Calls the contract's `adminStakeForValidator` (0x2f9f2964) function
+        pub fn admin_stake_for_validator(
+            &self,
+            staker: ::ethers::core::types::Address,
+            amount: ::ethers::core::types::U256,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([47, 159, 41, 100], (staker, amount))
+                .expect("method not found (this should never happen)")
+        }
         ///Calls the contract's `advanceEpoch` (0x3cf80e6c) function
         pub fn advance_epoch(
             &self,
@@ -3750,6 +3926,24 @@ pub mod staking {
         ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
                 .method_hash([31, 147, 28, 28], (diamond_cut, init, calldata))
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `emitClearOfflinePhaseData` (0x00a52713) function
+        pub fn emit_clear_offline_phase_data(
+            &self,
+            data_type: ::ethers::core::types::U256,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([0, 165, 39, 19], data_type)
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `emitCountOfflinePhaseData` (0x9a74745d) function
+        pub fn emit_count_offline_phase_data(
+            &self,
+            data_type: ::ethers::core::types::U256,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([154, 116, 116, 93], data_type)
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `epoch` (0x900cf0cf) function
@@ -4158,6 +4352,15 @@ pub mod staking {
                 .method_hash([249, 93, 113, 177], new_resolver_address)
                 .expect("method not found (this should never happen)")
         }
+        ///Calls the contract's `setDevopsAdmin` (0xcf7d1e87) function
+        pub fn set_devops_admin(
+            &self,
+            new_devops_admin: ::ethers::core::types::Address,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([207, 125, 30, 135], new_devops_admin)
+                .expect("method not found (this should never happen)")
+        }
         ///Calls the contract's `setEpochEndTime` (0x4a6e51f5) function
         pub fn set_epoch_end_time(
             &self,
@@ -4334,6 +4537,16 @@ pub mod staking {
                 .method_hash([46, 26, 125, 77], amount)
                 .expect("method not found (this should never happen)")
         }
+        ///Gets the contract's `ClearOfflinePhaseData` event
+        pub fn clear_offline_phase_data_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            ClearOfflinePhaseDataFilter,
+        > {
+            self.0.event()
+        }
         ///Gets the contract's `ComplaintConfigSet` event
         pub fn complaint_config_set_filter(
             &self,
@@ -4351,6 +4564,26 @@ pub mod staking {
             ::std::sync::Arc<M>,
             M,
             ConfigSetFilter,
+        > {
+            self.0.event()
+        }
+        ///Gets the contract's `CountOfflinePhaseData` event
+        pub fn count_offline_phase_data_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            CountOfflinePhaseDataFilter,
+        > {
+            self.0.event()
+        }
+        ///Gets the contract's `DevopsAdminSet` event
+        pub fn devops_admin_set_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            DevopsAdminSetFilter,
         > {
             self.0.event()
         }
@@ -4580,6 +4813,24 @@ pub mod staking {
     )]
     #[etherror(name = "CallerNotOwner", abi = "CallerNotOwner()")]
     pub struct CallerNotOwner;
+    ///Custom Error type `CallerNotOwnerOrDevopsAdmin` with signature `CallerNotOwnerOrDevopsAdmin()` and selector `0xedbb9143`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthError,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[etherror(
+        name = "CallerNotOwnerOrDevopsAdmin",
+        abi = "CallerNotOwnerOrDevopsAdmin()"
+    )]
+    pub struct CallerNotOwnerOrDevopsAdmin;
     ///Custom Error type `CannotAddFunctionToDiamondThatAlreadyExists` with signature `CannotAddFunctionToDiamondThatAlreadyExists(bytes4)` and selector `0xebbf5d07`
     #[derive(
         Clone,
@@ -5303,6 +5554,7 @@ pub mod staking {
     pub enum StakingErrors {
         ActiveValidatorsCannotLeave(ActiveValidatorsCannotLeave),
         CallerNotOwner(CallerNotOwner),
+        CallerNotOwnerOrDevopsAdmin(CallerNotOwnerOrDevopsAdmin),
         CannotAddFunctionToDiamondThatAlreadyExists(
             CannotAddFunctionToDiamondThatAlreadyExists,
         ),
@@ -5362,234 +5614,214 @@ pub mod staking {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RevertString(decoded));
             }
-            if let Ok(decoded)
-                = <ActiveValidatorsCannotLeave as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <ActiveValidatorsCannotLeave as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ActiveValidatorsCannotLeave(decoded));
             }
-            if let Ok(decoded)
-                = <CallerNotOwner as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CallerNotOwner as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CallerNotOwner(decoded));
             }
-            if let Ok(decoded)
-                = <CannotAddFunctionToDiamondThatAlreadyExists as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CallerNotOwnerOrDevopsAdmin as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::CallerNotOwnerOrDevopsAdmin(decoded));
+            }
+            if let Ok(decoded) = <CannotAddFunctionToDiamondThatAlreadyExists as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotAddFunctionToDiamondThatAlreadyExists(decoded));
             }
-            if let Ok(decoded)
-                = <CannotAddSelectorsToZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotAddSelectorsToZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotAddSelectorsToZeroAddress(decoded));
             }
-            if let Ok(decoded)
-                = <CannotKickBelowCurrentValidatorThreshold as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotKickBelowCurrentValidatorThreshold as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotKickBelowCurrentValidatorThreshold(decoded));
             }
-            if let Ok(decoded)
-                = <CannotRejoinUntilNextEpochBecauseKicked as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotRejoinUntilNextEpochBecauseKicked as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotRejoinUntilNextEpochBecauseKicked(decoded));
             }
-            if let Ok(decoded)
-                = <CannotRemoveFunctionThatDoesNotExist as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotRemoveFunctionThatDoesNotExist as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotRemoveFunctionThatDoesNotExist(decoded));
             }
-            if let Ok(decoded)
-                = <CannotRemoveImmutableFunction as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotRemoveImmutableFunction as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotRemoveImmutableFunction(decoded));
             }
-            if let Ok(decoded)
-                = <CannotReplaceFunctionThatDoesNotExists as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotReplaceFunctionThatDoesNotExists as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotReplaceFunctionThatDoesNotExists(decoded));
             }
-            if let Ok(decoded)
-                = <CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(
                     Self::CannotReplaceFunctionWithTheSameFunctionFromTheSameFacet(
                         decoded,
                     ),
                 );
             }
-            if let Ok(decoded)
-                = <CannotReplaceFunctionsFromFacetWithZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotReplaceFunctionsFromFacetWithZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotReplaceFunctionsFromFacetWithZeroAddress(decoded));
             }
-            if let Ok(decoded)
-                = <CannotReplaceImmutableFunction as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotReplaceImmutableFunction as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotReplaceImmutableFunction(decoded));
             }
-            if let Ok(decoded)
-                = <CannotReuseCommsKeys as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CannotReuseCommsKeys as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotReuseCommsKeys(decoded));
             }
-            if let Ok(decoded)
-                = <CannotStakeZero as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CannotStakeZero as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotStakeZero(decoded));
             }
-            if let Ok(decoded)
-                = <CannotVoteTwice as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CannotVoteTwice as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotVoteTwice(decoded));
             }
-            if let Ok(decoded)
-                = <CannotWithdrawZero as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CannotWithdrawZero as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CannotWithdrawZero(decoded));
             }
-            if let Ok(decoded)
-                = <CouldNotMapNodeAddressToStakerAddress as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CouldNotMapNodeAddressToStakerAddress as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CouldNotMapNodeAddressToStakerAddress(decoded));
             }
-            if let Ok(decoded)
-                = <IncorrectFacetCutAction as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <IncorrectFacetCutAction as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::IncorrectFacetCutAction(decoded));
             }
-            if let Ok(decoded)
-                = <InitializationFunctionReverted as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <InitializationFunctionReverted as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::InitializationFunctionReverted(decoded));
             }
-            if let Ok(decoded)
-                = <MustBeInActiveOrUnlockedOrPausedState as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <MustBeInActiveOrUnlockedOrPausedState as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::MustBeInActiveOrUnlockedOrPausedState(decoded));
             }
-            if let Ok(decoded)
-                = <MustBeInActiveOrUnlockedState as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <MustBeInActiveOrUnlockedState as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::MustBeInActiveOrUnlockedState(decoded));
             }
-            if let Ok(decoded)
-                = <MustBeInNextValidatorSetLockedOrReadyForNextEpochOrRestoreState as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <MustBeInNextValidatorSetLockedOrReadyForNextEpochOrRestoreState as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(
                     Self::MustBeInNextValidatorSetLockedOrReadyForNextEpochOrRestoreState(
                         decoded,
                     ),
                 );
             }
-            if let Ok(decoded)
-                = <MustBeInNextValidatorSetLockedOrReadyForNextEpochState as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <MustBeInNextValidatorSetLockedOrReadyForNextEpochState as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(
                     Self::MustBeInNextValidatorSetLockedOrReadyForNextEpochState(decoded),
                 );
             }
-            if let Ok(decoded)
-                = <MustBeInNextValidatorSetLockedState as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <MustBeInNextValidatorSetLockedState as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::MustBeInNextValidatorSetLockedState(decoded));
             }
-            if let Ok(decoded)
-                = <MustBeInReadyForNextEpochState as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <MustBeInReadyForNextEpochState as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::MustBeInReadyForNextEpochState(decoded));
             }
-            if let Ok(decoded)
-                = <MustBeValidatorInNextEpochToKick as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <MustBeValidatorInNextEpochToKick as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::MustBeValidatorInNextEpochToKick(decoded));
             }
-            if let Ok(decoded)
-                = <NoBytecodeAtAddress as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <NoBytecodeAtAddress as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NoBytecodeAtAddress(decoded));
             }
-            if let Ok(decoded)
-                = <NoSelectorsProvidedForFacetForCut as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <NoSelectorsProvidedForFacetForCut as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NoSelectorsProvidedForFacetForCut(decoded));
             }
-            if let Ok(decoded)
-                = <NotContractOwner as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <NotContractOwner as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NotContractOwner(decoded));
             }
-            if let Ok(decoded)
-                = <NotEnoughTimeElapsedForTimeoutSinceLastEpoch as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <NotEnoughTimeElapsedForTimeoutSinceLastEpoch as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NotEnoughTimeElapsedForTimeoutSinceLastEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <NotEnoughTimeElapsedSinceLastEpoch as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <NotEnoughTimeElapsedSinceLastEpoch as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NotEnoughTimeElapsedSinceLastEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <NotEnoughValidatorsInNextEpoch as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <NotEnoughValidatorsInNextEpoch as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NotEnoughValidatorsInNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <NotEnoughValidatorsReadyForNextEpoch as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <NotEnoughValidatorsReadyForNextEpoch as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NotEnoughValidatorsReadyForNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <RemoveFacetAddressMustBeZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <RemoveFacetAddressMustBeZeroAddress as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RemoveFacetAddressMustBeZeroAddress(decoded));
             }
-            if let Ok(decoded)
-                = <SignaledReadyForWrongEpochNumber as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SignaledReadyForWrongEpochNumber as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SignaledReadyForWrongEpochNumber(decoded));
             }
-            if let Ok(decoded)
-                = <StakerNotPermitted as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <StakerNotPermitted as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::StakerNotPermitted(decoded));
             }
-            if let Ok(decoded)
-                = <TryingToWithdrawMoreThanStaked as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <TryingToWithdrawMoreThanStaked as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TryingToWithdrawMoreThanStaked(decoded));
             }
-            if let Ok(decoded)
-                = <ValidatorIsNotInNextEpoch as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <ValidatorIsNotInNextEpoch as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ValidatorIsNotInNextEpoch(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -5602,6 +5834,9 @@ pub mod staking {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::CallerNotOwner(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::CallerNotOwnerOrDevopsAdmin(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::CannotAddFunctionToDiamondThatAlreadyExists(element) => {
@@ -5726,6 +5961,10 @@ pub mod staking {
                 }
                 _ if selector
                     == <CallerNotOwner as ::ethers::contract::EthError>::selector() => {
+                    true
+                }
+                _ if selector
+                    == <CallerNotOwnerOrDevopsAdmin as ::ethers::contract::EthError>::selector() => {
                     true
                 }
                 _ if selector
@@ -5883,6 +6122,9 @@ pub mod staking {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::CallerNotOwner(element) => ::core::fmt::Display::fmt(element, f),
+                Self::CallerNotOwnerOrDevopsAdmin(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::CannotAddFunctionToDiamondThatAlreadyExists(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
@@ -6002,6 +6244,11 @@ pub mod staking {
     impl ::core::convert::From<CallerNotOwner> for StakingErrors {
         fn from(value: CallerNotOwner) -> Self {
             Self::CallerNotOwner(value)
+        }
+    }
+    impl ::core::convert::From<CallerNotOwnerOrDevopsAdmin> for StakingErrors {
+        fn from(value: CallerNotOwnerOrDevopsAdmin) -> Self {
+            Self::CallerNotOwnerOrDevopsAdmin(value)
         }
     }
     impl ::core::convert::From<CannotAddFunctionToDiamondThatAlreadyExists>
@@ -6210,6 +6457,22 @@ pub mod staking {
         Eq,
         Hash
     )]
+    #[ethevent(name = "ClearOfflinePhaseData", abi = "ClearOfflinePhaseData(uint256)")]
+    pub struct ClearOfflinePhaseDataFilter {
+        pub data_type: ::ethers::core::types::U256,
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
     #[ethevent(
         name = "ComplaintConfigSet",
         abi = "ComplaintConfigSet(uint256,(uint256,uint256,uint256))"
@@ -6244,6 +6507,38 @@ pub mod staking {
         pub new_peer_checking_interval_secs: ::ethers::core::types::U256,
         pub new_max_triple_concurrency: ::ethers::core::types::U256,
         pub new_rpc_healthcheck_enabled: bool,
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethevent(name = "CountOfflinePhaseData", abi = "CountOfflinePhaseData(uint256)")]
+    pub struct CountOfflinePhaseDataFilter {
+        pub data_type: ::ethers::core::types::U256,
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethevent(name = "DevopsAdminSet", abi = "DevopsAdminSet(address)")]
+    pub struct DevopsAdminSetFilter {
+        pub new_devops_admin: ::ethers::core::types::Address,
     }
     #[derive(
         Clone,
@@ -6589,8 +6884,11 @@ pub mod staking {
         Hash
     )]
     pub enum StakingEvents {
+        ClearOfflinePhaseDataFilter(ClearOfflinePhaseDataFilter),
         ComplaintConfigSetFilter(ComplaintConfigSetFilter),
         ConfigSetFilter(ConfigSetFilter),
+        CountOfflinePhaseDataFilter(CountOfflinePhaseDataFilter),
+        DevopsAdminSetFilter(DevopsAdminSetFilter),
         DiamondCutFilter(DiamondCutFilter),
         EpochEndTimeSetFilter(EpochEndTimeSetFilter),
         EpochLengthSetFilter(EpochLengthSetFilter),
@@ -6614,11 +6912,20 @@ pub mod staking {
         fn decode_log(
             log: &::ethers::core::abi::RawLog,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::Error> {
+            if let Ok(decoded) = ClearOfflinePhaseDataFilter::decode_log(log) {
+                return Ok(StakingEvents::ClearOfflinePhaseDataFilter(decoded));
+            }
             if let Ok(decoded) = ComplaintConfigSetFilter::decode_log(log) {
                 return Ok(StakingEvents::ComplaintConfigSetFilter(decoded));
             }
             if let Ok(decoded) = ConfigSetFilter::decode_log(log) {
                 return Ok(StakingEvents::ConfigSetFilter(decoded));
+            }
+            if let Ok(decoded) = CountOfflinePhaseDataFilter::decode_log(log) {
+                return Ok(StakingEvents::CountOfflinePhaseDataFilter(decoded));
+            }
+            if let Ok(decoded) = DevopsAdminSetFilter::decode_log(log) {
+                return Ok(StakingEvents::DevopsAdminSetFilter(decoded));
             }
             if let Ok(decoded) = DiamondCutFilter::decode_log(log) {
                 return Ok(StakingEvents::DiamondCutFilter(decoded));
@@ -6680,10 +6987,19 @@ pub mod staking {
     impl ::core::fmt::Display for StakingEvents {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
+                Self::ClearOfflinePhaseDataFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::ComplaintConfigSetFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::ConfigSetFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::CountOfflinePhaseDataFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+                Self::DevopsAdminSetFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::DiamondCutFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::EpochEndTimeSetFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
@@ -6737,6 +7053,11 @@ pub mod staking {
             }
         }
     }
+    impl ::core::convert::From<ClearOfflinePhaseDataFilter> for StakingEvents {
+        fn from(value: ClearOfflinePhaseDataFilter) -> Self {
+            Self::ClearOfflinePhaseDataFilter(value)
+        }
+    }
     impl ::core::convert::From<ComplaintConfigSetFilter> for StakingEvents {
         fn from(value: ComplaintConfigSetFilter) -> Self {
             Self::ComplaintConfigSetFilter(value)
@@ -6745,6 +7066,16 @@ pub mod staking {
     impl ::core::convert::From<ConfigSetFilter> for StakingEvents {
         fn from(value: ConfigSetFilter) -> Self {
             Self::ConfigSetFilter(value)
+        }
+    }
+    impl ::core::convert::From<CountOfflinePhaseDataFilter> for StakingEvents {
+        fn from(value: CountOfflinePhaseDataFilter) -> Self {
+            Self::CountOfflinePhaseDataFilter(value)
+        }
+    }
+    impl ::core::convert::From<DevopsAdminSetFilter> for StakingEvents {
+        fn from(value: DevopsAdminSetFilter) -> Self {
+            Self::DevopsAdminSetFilter(value)
         }
     }
     impl ::core::convert::From<DiamondCutFilter> for StakingEvents {
@@ -6910,6 +7241,27 @@ pub mod staking {
         pub validator_staker_address: ::ethers::core::types::Address,
         pub amount_to_penalize: ::ethers::core::types::U256,
     }
+    ///Container type for all input parameters for the `adminStakeForValidator` function with signature `adminStakeForValidator(address,uint256)` and selector `0x2f9f2964`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(
+        name = "adminStakeForValidator",
+        abi = "adminStakeForValidator(address,uint256)"
+    )]
+    pub struct AdminStakeForValidatorCall {
+        pub staker: ::ethers::core::types::Address,
+        pub amount: ::ethers::core::types::U256,
+    }
     ///Container type for all input parameters for the `advanceEpoch` function with signature `advanceEpoch()` and selector `0x3cf80e6c`
     #[derive(
         Clone,
@@ -7064,6 +7416,46 @@ pub mod staking {
         pub diamond_cut: ::std::vec::Vec<FacetCut>,
         pub init: ::ethers::core::types::Address,
         pub calldata: ::ethers::core::types::Bytes,
+    }
+    ///Container type for all input parameters for the `emitClearOfflinePhaseData` function with signature `emitClearOfflinePhaseData(uint256)` and selector `0x00a52713`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(
+        name = "emitClearOfflinePhaseData",
+        abi = "emitClearOfflinePhaseData(uint256)"
+    )]
+    pub struct EmitClearOfflinePhaseDataCall {
+        pub data_type: ::ethers::core::types::U256,
+    }
+    ///Container type for all input parameters for the `emitCountOfflinePhaseData` function with signature `emitCountOfflinePhaseData(uint256)` and selector `0x9a74745d`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(
+        name = "emitCountOfflinePhaseData",
+        abi = "emitCountOfflinePhaseData(uint256)"
+    )]
+    pub struct EmitCountOfflinePhaseDataCall {
+        pub data_type: ::ethers::core::types::U256,
     }
     ///Container type for all input parameters for the `epoch` function with signature `epoch()` and selector `0x900cf0cf`
     #[derive(
@@ -7786,6 +8178,23 @@ pub mod staking {
     pub struct SetContractResolverCall {
         pub new_resolver_address: ::ethers::core::types::Address,
     }
+    ///Container type for all input parameters for the `setDevopsAdmin` function with signature `setDevopsAdmin(address)` and selector `0xcf7d1e87`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "setDevopsAdmin", abi = "setDevopsAdmin(address)")]
+    pub struct SetDevopsAdminCall {
+        pub new_devops_admin: ::ethers::core::types::Address,
+    }
     ///Container type for all input parameters for the `setEpochEndTime` function with signature `setEpochEndTime(uint256)` and selector `0x4a6e51f5`
     #[derive(
         Clone,
@@ -8113,6 +8522,7 @@ pub mod staking {
         AdminRejoinValidator(AdminRejoinValidatorCall),
         AdminResetEpoch(AdminResetEpochCall),
         AdminSlashValidator(AdminSlashValidatorCall),
+        AdminStakeForValidator(AdminStakeForValidatorCall),
         AdvanceEpoch(AdvanceEpochCall),
         CheckVersion(CheckVersionCall),
         ComplaintConfig(ComplaintConfigCall),
@@ -8126,6 +8536,8 @@ pub mod staking {
         ),
         CurrentValidatorCountForConsensus(CurrentValidatorCountForConsensusCall),
         DiamondCut(DiamondCutCall),
+        EmitClearOfflinePhaseData(EmitClearOfflinePhaseDataCall),
+        EmitCountOfflinePhaseData(EmitCountOfflinePhaseDataCall),
         Epoch(EpochCall),
         Exit(ExitCall),
         FacetAddress(FacetAddressCall),
@@ -8170,6 +8582,7 @@ pub mod staking {
         SetComplaintConfig(SetComplaintConfigCall),
         SetConfig(SetConfigCall),
         SetContractResolver(SetContractResolverCall),
+        SetDevopsAdmin(SetDevopsAdminCall),
         SetEpochEndTime(SetEpochEndTimeCall),
         SetEpochLength(SetEpochLengthCall),
         SetEpochState(SetEpochStateCall),
@@ -8195,374 +8608,384 @@ pub mod staking {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <AdminKickValidatorInNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <AdminKickValidatorInNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AdminKickValidatorInNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <AdminRejoinValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <AdminRejoinValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AdminRejoinValidator(decoded));
             }
-            if let Ok(decoded)
-                = <AdminResetEpochCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <AdminResetEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AdminResetEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <AdminSlashValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <AdminSlashValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AdminSlashValidator(decoded));
             }
-            if let Ok(decoded)
-                = <AdvanceEpochCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <AdminStakeForValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::AdminStakeForValidator(decoded));
+            }
+            if let Ok(decoded) = <AdvanceEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::AdvanceEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <CheckVersionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CheckVersionCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CheckVersion(decoded));
             }
-            if let Ok(decoded)
-                = <ComplaintConfigCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ComplaintConfigCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ComplaintConfig(decoded));
             }
-            if let Ok(decoded)
-                = <ConfigCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ConfigCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Config(decoded));
             }
-            if let Ok(decoded)
-                = <ContractResolverCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <ContractResolverCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ContractResolver(decoded));
             }
-            if let Ok(decoded)
-                = <CountOfCurrentValidatorsReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CountOfCurrentValidatorsReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CountOfCurrentValidatorsReadyForNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <CountOfNextValidatorsReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CountOfNextValidatorsReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CountOfNextValidatorsReadyForNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <CurrentValidatorCountForConsensusCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <CurrentValidatorCountForConsensusCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::CurrentValidatorCountForConsensus(decoded));
             }
-            if let Ok(decoded)
-                = <DiamondCutCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <DiamondCutCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::DiamondCut(decoded));
             }
-            if let Ok(decoded)
-                = <EpochCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <EmitClearOfflinePhaseDataCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::EmitClearOfflinePhaseData(decoded));
+            }
+            if let Ok(decoded) = <EmitCountOfflinePhaseDataCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::EmitCountOfflinePhaseData(decoded));
+            }
+            if let Ok(decoded) = <EpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Epoch(decoded));
             }
-            if let Ok(decoded)
-                = <ExitCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ExitCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Exit(decoded));
             }
-            if let Ok(decoded)
-                = <FacetAddressCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FacetAddressCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FacetAddress(decoded));
             }
-            if let Ok(decoded)
-                = <FacetAddressesCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FacetAddressesCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FacetAddresses(decoded));
             }
-            if let Ok(decoded)
-                = <FacetFunctionSelectorsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <FacetFunctionSelectorsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::FacetFunctionSelectors(decoded));
             }
-            if let Ok(decoded)
-                = <FacetsCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FacetsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Facets(decoded));
             }
-            if let Ok(decoded)
-                = <GetActiveUnkickedValidatorStructsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetActiveUnkickedValidatorStructsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetActiveUnkickedValidatorStructs(decoded));
             }
-            if let Ok(decoded)
-                = <GetActiveUnkickedValidatorStructsAndCountsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetActiveUnkickedValidatorStructsAndCountsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetActiveUnkickedValidatorStructsAndCounts(decoded));
             }
-            if let Ok(decoded)
-                = <GetActiveUnkickedValidatorsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetActiveUnkickedValidatorsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetActiveUnkickedValidators(decoded));
             }
-            if let Ok(decoded)
-                = <GetKeyTypesCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetKeyTypesCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetKeyTypes(decoded));
             }
-            if let Ok(decoded)
-                = <GetKickedValidatorsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetKickedValidatorsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetKickedValidators(decoded));
             }
-            if let Ok(decoded)
-                = <GetMaxVersionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetMaxVersionCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetMaxVersion(decoded));
             }
-            if let Ok(decoded)
-                = <GetMaxVersionStringCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetMaxVersionStringCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetMaxVersionString(decoded));
             }
-            if let Ok(decoded)
-                = <GetMinVersionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetMinVersionCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetMinVersion(decoded));
             }
-            if let Ok(decoded)
-                = <GetMinVersionStringCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetMinVersionStringCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetMinVersionString(decoded));
             }
-            if let Ok(decoded)
-                = <GetNodeStakerAddressMappingsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetNodeStakerAddressMappingsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetNodeStakerAddressMappings(decoded));
             }
-            if let Ok(decoded)
-                = <GetRewardCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetRewardCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetReward(decoded));
             }
-            if let Ok(decoded)
-                = <GetStakingBalancesAddressCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetStakingBalancesAddressCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetStakingBalancesAddress(decoded));
             }
-            if let Ok(decoded)
-                = <GetTokenAddressCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetTokenAddressCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetTokenAddress(decoded));
             }
-            if let Ok(decoded)
-                = <GetValidatorsInCurrentEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetValidatorsInCurrentEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetValidatorsInCurrentEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <GetValidatorsInCurrentEpochLengthCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetValidatorsInCurrentEpochLengthCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetValidatorsInCurrentEpochLength(decoded));
             }
-            if let Ok(decoded)
-                = <GetValidatorsInNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetValidatorsInNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetValidatorsInNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <GetValidatorsStructsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetValidatorsStructsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetValidatorsStructs(decoded));
             }
-            if let Ok(decoded)
-                = <GetValidatorsStructsInCurrentEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetValidatorsStructsInCurrentEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetValidatorsStructsInCurrentEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <GetValidatorsStructsInNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetValidatorsStructsInNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetValidatorsStructsInNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <GetVotingStatusToKickValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <GetVotingStatusToKickValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::GetVotingStatusToKickValidator(decoded));
             }
-            if let Ok(decoded)
-                = <IsActiveValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <IsActiveValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::IsActiveValidator(decoded));
             }
-            if let Ok(decoded)
-                = <IsActiveValidatorByNodeAddressCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <IsActiveValidatorByNodeAddressCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::IsActiveValidatorByNodeAddress(decoded));
             }
-            if let Ok(decoded)
-                = <IsReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <IsReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::IsReadyForNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <KickPenaltyPercentByReasonCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <KickPenaltyPercentByReasonCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::KickPenaltyPercentByReason(decoded));
             }
-            if let Ok(decoded)
-                = <KickValidatorInNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <KickValidatorInNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::KickValidatorInNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <LockValidatorsForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <LockValidatorsForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::LockValidatorsForNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <NextValidatorCountForConsensusCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <NextValidatorCountForConsensusCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NextValidatorCountForConsensus(decoded));
             }
-            if let Ok(decoded)
-                = <NodeAddressToStakerAddressCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <NodeAddressToStakerAddressCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::NodeAddressToStakerAddress(decoded));
             }
-            if let Ok(decoded)
-                = <OwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <OwnerCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Owner(decoded));
             }
-            if let Ok(decoded)
-                = <ReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <ReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ReadyForNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <RequestToJoinCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <RequestToJoinCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RequestToJoin(decoded));
             }
-            if let Ok(decoded)
-                = <RequestToLeaveCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <RequestToLeaveCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RequestToLeave(decoded));
             }
-            if let Ok(decoded)
-                = <RequestToLeaveAsNodeCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <RequestToLeaveAsNodeCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::RequestToLeaveAsNode(decoded));
             }
-            if let Ok(decoded)
-                = <SetComplaintConfigCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetComplaintConfigCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetComplaintConfig(decoded));
             }
-            if let Ok(decoded)
-                = <SetConfigCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetConfigCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetConfig(decoded));
             }
-            if let Ok(decoded)
-                = <SetContractResolverCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetContractResolverCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetContractResolver(decoded));
             }
-            if let Ok(decoded)
-                = <SetEpochEndTimeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetDevopsAdminCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::SetDevopsAdmin(decoded));
+            }
+            if let Ok(decoded) = <SetEpochEndTimeCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetEpochEndTime(decoded));
             }
-            if let Ok(decoded)
-                = <SetEpochLengthCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetEpochLengthCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetEpochLength(decoded));
             }
-            if let Ok(decoded)
-                = <SetEpochStateCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetEpochStateCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetEpochState(decoded));
             }
-            if let Ok(decoded)
-                = <SetEpochTimeoutCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetEpochTimeoutCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetEpochTimeout(decoded));
             }
-            if let Ok(decoded)
-                = <SetIpPortNodeAddressAndCommunicationPubKeysCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetIpPortNodeAddressAndCommunicationPubKeysCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetIpPortNodeAddressAndCommunicationPubKeys(decoded));
             }
-            if let Ok(decoded)
-                = <SetKickPenaltyPercentCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SetKickPenaltyPercentCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetKickPenaltyPercent(decoded));
             }
-            if let Ok(decoded)
-                = <SetMaxVersionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetMaxVersionCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetMaxVersion(decoded));
             }
-            if let Ok(decoded)
-                = <SetMinVersionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetMinVersionCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SetMinVersion(decoded));
             }
-            if let Ok(decoded)
-                = <ShouldKickValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <ShouldKickValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::ShouldKickValidator(decoded));
             }
-            if let Ok(decoded)
-                = <SignalReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SignalReadyForNextEpochCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SignalReadyForNextEpoch(decoded));
             }
-            if let Ok(decoded)
-                = <StakeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <StakeCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Stake(decoded));
             }
-            if let Ok(decoded)
-                = <StakeAndJoinCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <StakeAndJoinCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::StakeAndJoin(decoded));
             }
-            if let Ok(decoded)
-                = <StateCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <StateCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::State(decoded));
             }
-            if let Ok(decoded)
-                = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::SupportsInterface(decoded));
             }
-            if let Ok(decoded)
-                = <TransferOwnershipCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) = <TransferOwnershipCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::TransferOwnership(decoded));
             }
-            if let Ok(decoded)
-                = <ValidatorsCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ValidatorsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Validators(decoded));
             }
-            if let Ok(decoded)
-                = <WithdrawCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <WithdrawCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
                 return Ok(Self::Withdraw(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -8581,6 +9004,9 @@ pub mod staking {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::AdminSlashValidator(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::AdminStakeForValidator(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::AdvanceEpoch(element) => {
@@ -8606,6 +9032,12 @@ pub mod staking {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::DiamondCut(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::EmitClearOfflinePhaseData(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::EmitCountOfflinePhaseData(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::Epoch(element) => ::ethers::core::abi::AbiEncode::encode(element),
@@ -8726,6 +9158,9 @@ pub mod staking {
                 Self::SetContractResolver(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
+                Self::SetDevopsAdmin(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
                 Self::SetEpochEndTime(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -8789,6 +9224,9 @@ pub mod staking {
                 Self::AdminSlashValidator(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
+                Self::AdminStakeForValidator(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::AdvanceEpoch(element) => ::core::fmt::Display::fmt(element, f),
                 Self::CheckVersion(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ComplaintConfig(element) => ::core::fmt::Display::fmt(element, f),
@@ -8804,6 +9242,12 @@ pub mod staking {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::DiamondCut(element) => ::core::fmt::Display::fmt(element, f),
+                Self::EmitClearOfflinePhaseData(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+                Self::EmitCountOfflinePhaseData(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::Epoch(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Exit(element) => ::core::fmt::Display::fmt(element, f),
                 Self::FacetAddress(element) => ::core::fmt::Display::fmt(element, f),
@@ -8898,6 +9342,7 @@ pub mod staking {
                 Self::SetContractResolver(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
+                Self::SetDevopsAdmin(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SetEpochEndTime(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SetEpochLength(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SetEpochState(element) => ::core::fmt::Display::fmt(element, f),
@@ -8946,6 +9391,11 @@ pub mod staking {
             Self::AdminSlashValidator(value)
         }
     }
+    impl ::core::convert::From<AdminStakeForValidatorCall> for StakingCalls {
+        fn from(value: AdminStakeForValidatorCall) -> Self {
+            Self::AdminStakeForValidator(value)
+        }
+    }
     impl ::core::convert::From<AdvanceEpochCall> for StakingCalls {
         fn from(value: AdvanceEpochCall) -> Self {
             Self::AdvanceEpoch(value)
@@ -8991,6 +9441,16 @@ pub mod staking {
     impl ::core::convert::From<DiamondCutCall> for StakingCalls {
         fn from(value: DiamondCutCall) -> Self {
             Self::DiamondCut(value)
+        }
+    }
+    impl ::core::convert::From<EmitClearOfflinePhaseDataCall> for StakingCalls {
+        fn from(value: EmitClearOfflinePhaseDataCall) -> Self {
+            Self::EmitClearOfflinePhaseData(value)
+        }
+    }
+    impl ::core::convert::From<EmitCountOfflinePhaseDataCall> for StakingCalls {
+        fn from(value: EmitCountOfflinePhaseDataCall) -> Self {
+            Self::EmitCountOfflinePhaseData(value)
         }
     }
     impl ::core::convert::From<EpochCall> for StakingCalls {
@@ -9202,6 +9662,11 @@ pub mod staking {
     impl ::core::convert::From<SetContractResolverCall> for StakingCalls {
         fn from(value: SetContractResolverCall) -> Self {
             Self::SetContractResolver(value)
+        }
+    }
+    impl ::core::convert::From<SetDevopsAdminCall> for StakingCalls {
+        fn from(value: SetDevopsAdminCall) -> Self {
+            Self::SetDevopsAdmin(value)
         }
     }
     impl ::core::convert::From<SetEpochEndTimeCall> for StakingCalls {

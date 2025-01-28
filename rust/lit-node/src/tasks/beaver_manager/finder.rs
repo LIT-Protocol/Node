@@ -7,7 +7,6 @@ use super::models::{
 use crate::config::beaver_triple_path;
 use crate::error::{unexpected_err, Result};
 use crate::peers::peer_state::models::{SimplePeer, SimplePeerExt};
-use crate::tasks::beaver_manager::listener::addr_is_leader;
 use crate::tss::common::storage::read_beaver_triple_from_disk_direct;
 use async_std::fs::{self, DirEntry};
 use async_std::io::Error;
@@ -151,7 +150,7 @@ impl BeaverManager {
                 .node_socket_addresses_from_peer_group_id(peer_group_id, peers)
                 .await;
 
-            if addr_is_leader(triple_storage_key, &triple_creation_peers, node_addr) {
+            if triple_creation_peers.address_is_leader(triple_storage_key, node_addr) {
                 triple_list.add_storage_key(peer_group_id, triple_storage_key);
             }
 

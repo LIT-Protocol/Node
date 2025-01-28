@@ -1,6 +1,5 @@
 (async () => {
   let utf8Encode = new TextEncoder();
-  const accessControlConditions = [access_control_conditions];
   const to_encrypt = utf8Encode.encode(
     'this is a secret that was encrypted with lit'
   );
@@ -32,3 +31,4 @@
 
   Lit.Actions.setResponse({ response: decrypted });
 })();
+

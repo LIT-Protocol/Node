@@ -385,7 +385,7 @@ pub async fn get_authorized_rate_limit_nfts_via_payer_db(
                     )
                 })?
                 .as_secs();
-            if restriction.period_seconds > U256::from(u64::max_value()) {
+            if restriction.period_seconds > U256::from(u64::MAX) {
                 return Err(unexpected_err_code(
                 format!("Period seconds is greater than u64 max value.  This should never happen.  You may have accidently set the period seconds in the restriction to a giant number.  The number is: {}", restriction.period_seconds),
                 EC::NodeBlockchainError,
@@ -411,7 +411,7 @@ pub async fn get_authorized_rate_limit_nfts_via_payer_db(
             // which means they set a restriction
             if !restriction.requests_per_period.is_zero() && !restriction.period_seconds.is_zero() {
                 // this payer has restrictions - check them
-                let max_uses = match restriction.requests_per_period < U256::from(u64::max_value()) {
+                let max_uses = match restriction.requests_per_period < U256::from(u64::MAX) {
                 true => restriction.requests_per_period.as_u64(),
                 false => {
                     return Err(unexpected_err_code(

@@ -20,13 +20,10 @@ coms_keys_receiver_privkey = "0xfb3a6bb884584f8c1d76b2f1d38d5236a29a3d6c8f2a18ba
 coms_keys_sender_privkey = "0xbfac351223a087cd679f4ec1f5f77bc949c57b9bf8e76a03bc9879990b4edeff"
 domain = "127.0.0.1"
 enable_actions_allowlist = "false"
-enable_ecdsa_dkg = "true"
 enable_epoch_transitions = "true"
 enable_rate_limiting = "false"
 rpc_url = "https://polygon-mumbai.g.alchemy.com/v2/onvoLvV97DDoLkAmdi0Cj7sxvfglKqDh"
 staker_address = "0x0000000000000000000000000000000000000000"
-enable_ecdsa_dkg_batch_sending = "true"
-ecdsa_batch_send_interval="100"
 
 ["node.http"]
 port = "7470"

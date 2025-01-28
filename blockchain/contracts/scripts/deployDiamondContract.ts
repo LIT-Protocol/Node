@@ -1,3 +1,5 @@
+// Full command: HARDHAT_NETWORK=<NETWORK> npx ts-node --files scripts/deployDiamondContract.ts --deployer-private-key <PRIVATE_KEY> --new-diamond-name <NEW_DIAMOND_NAME> --facets <FACETS> --contract-resolver <CONTRACT_RESOLVER> --env <ENV>
+
 import hre from 'hardhat';
 import yargs from 'yargs';
 

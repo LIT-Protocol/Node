@@ -362,7 +362,7 @@ pub async fn check_pkp_auth(
         let serialized_user_id = Bytes::from(serialized_user_id);
 
         debug!("Checking if permitted auth methods contains for auth_method_type: {:?}, serialized_user_id: {:?}, token_id: {:?}",
-        auth_method_type, encoding::bytes_to_hex(&serialized_user_id.clone()), token_id.encode_hex());
+        auth_method_type, encoding::bytes_to_hex(&serialized_user_id), token_id.encode_hex());
 
         let auth_method_is_permitted = permitted_auth_methods.iter().any(|permitted_auth_method| {
             permitted_auth_method.auth_method_type == auth_method_type

@@ -1,7 +1,7 @@
 import fsSync from 'fs';
 import TOML from '@iarna/toml';
 import { ChildProcess, spawn } from 'child_process';
-import { Contract, Signer, Wallet } from 'ethers';
+import { BaseContract, Contract, Signer, Wallet } from 'ethers';
 import { access, copyFile, readdir } from 'fs/promises';
 import path from 'path';
 import nacl from 'tweetnacl';
@@ -61,25 +61,18 @@ export function contractAddressAlreadyExists(
   return existingContracts && existingContracts[contractAddressKey];
 }
 
-export async function getContractInstance(
+export async function getContractInstance<T extends BaseContract>(
   ethers: any,
   contractName: string,
   contractAddress: string,
   signer: any,
-  isDiamondContract: boolean = false
-) {
-  if (!isDiamondContract) {
+  diamondFacetName?: string
+): Promise<T> {
+  if (!diamondFacetName) {
     return ethers.getContractAt(contractName, contractAddress, signer);
   }
 
-  // use combined diamond ABI for contract
-  const abiPath = path.resolve(
-    __dirname,
-    // @ts-ignore
-    CONTRACT_NAME_TO_DIAMOND_ABI_PATH[contractName]
-  );
-  const abi = JSON.parse(await fs.readFile(abiPath, 'utf8')).abi;
-  return new ethers.Contract(contractAddress, abi, signer);
+  return ethers.getContractAt(diamondFacetName, contractAddress, signer);
 }
 
 /**
@@ -442,7 +435,6 @@ function generateNodeRuntimeConfig(
       enable_rate_limiting: false,
       enable_actions_allowlist: false,
       enable_epoch_transitions: true,
-      enable_ecdsa_dkg: true,
       webauthn_allowed_origins: 'http://*/',
       chain_polling_interval: chainPollingInterval,
       staker_address: nodeOperatorCredential.stakerWallet.address,
@@ -509,7 +501,6 @@ interface NodeRuntimeConfig extends NodeRuntimeBaseConfig {
     enable_rate_limiting: boolean;
     enable_actions_allowlist: boolean;
     enable_epoch_transitions: boolean;
-    enable_ecdsa_dkg: boolean;
     webauthn_allowed_origins: string;
     chain_polling_interval?: string;
     staker_address: string;

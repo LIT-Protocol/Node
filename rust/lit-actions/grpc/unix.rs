@@ -1,11 +1,13 @@
 use std::os::unix::fs::PermissionsExt;
+use std::time::Duration;
 use std::{fs, path::PathBuf};
 
 use anyhow::{Context, Result};
+use hyper_util::rt::TokioIo;
 use tokio::net::{UnixListener, UnixStream};
 use tokio_stream::wrappers::UnixListenerStream;
 use tonic::body::BoxBody;
-use tonic::transport::{Body, Channel, Endpoint, Server, Uri};
+use tonic::transport::{Channel, Endpoint, Server, Uri};
 
 pub async fn connect_to_socket(socket_path: impl Into<PathBuf>) -> Result<Channel> {
     const IGNORED_URI: &str = "http://[::]:50051";
@@ -14,9 +16,12 @@ pub async fn connect_to_socket(socket_path: impl Into<PathBuf>) -> Result<Channe
     // closure can implement `FnMut`.
     let path = socket_path.into();
 
-    Endpoint::try_from(IGNORED_URI)?
+    // NB: .timeout() doesn't work here for some reason, which is why we use tokio::time::timeout in the client
+    Endpoint::from_static(IGNORED_URI)
+        .connect_timeout(Duration::from_secs(1))
         .connect_with_connector(tower::service_fn(move |_: Uri| {
-            UnixStream::connect(path.clone())
+            let path = path.clone();
+            async move { Ok::<_, std::io::Error>(TokioIo::new(UnixStream::connect(path).await?)) }
         }))
         .await
         .map_err(Into::into)
@@ -29,7 +34,7 @@ pub async fn start_server<S, P, F>(
 ) -> Result<()>
 where
     S: tower::Service<
-            http::Request<Body>,
+            http::Request<BoxBody>,
             Response = http::Response<BoxBody>,
             Error = std::convert::Infallible,
         > + tonic::server::NamedService
@@ -62,10 +67,9 @@ where
 
     let reflection = tonic_reflection::server::Builder::configure()
         .register_encoded_file_descriptor_set(crate::proto::FILE_DESCRIPTOR_SET)
-        .build()?;
+        .build_v1()?;
 
     let router = Server::builder()
-        .max_frame_size(16_777_215)
         .add_service(reflection)
         .add_service(service);
 

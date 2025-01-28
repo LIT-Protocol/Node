@@ -20,7 +20,7 @@ npx hardhat compile
 cd $SCRIPT_DIR/..
 mkdir -p abis
 
-declare -a NORMAL_CONTRACTS=("LITToken" "PKPNFT" "Allowlist" "HDKeyDeriver" "ContractResolver" "ReleaseRegister" "DomainWalletRegistry" "Multisender" "PKPNFTMetadata" "PKPHelper" "WLIT")
+declare -a NORMAL_CONTRACTS=("LITToken" "PKPNFT" "Allowlist" "HDKeyDeriver" "ContractResolver" "ReleaseRegister" "DomainWalletRegistry" "Multisender" "PKPNFTMetadata" "PKPHelper" "WLIT" "HostCommands")
 
 copy_just_abi_to_contracts_dir(){
   local contract_artifacts_path="$1"

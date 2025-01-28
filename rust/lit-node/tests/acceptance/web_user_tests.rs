@@ -601,9 +601,12 @@ pub async fn retrieve_decryption_key(
     .expect("Could not convert encryption_sign_request to string");
     info!("Sending payload {:?}", payload);
 
-    let get_encryption_key_resp =
-        hit_endpoints_with_json_body(actions, "web/encryption/sign".into(), payload.to_string())
-            .await;
+    let get_encryption_key_resp = hit_endpoints_with_json_body(
+        actions,
+        "web/encryption/sign/v1".into(),
+        payload.to_string(),
+    )
+    .await;
     info!("get_encryption_key_resp: {:?}", get_encryption_key_resp);
 
     get_encryption_key_resp

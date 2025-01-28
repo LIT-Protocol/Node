@@ -27,11 +27,20 @@ use tracing::{error, info};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct ActionReturn {
-    success: bool,
-    signed_data: HashMap<String, SignedData>,
-    response: String,
-    logs: String,
+pub struct ActionReturn {
+    pub success: bool,
+    #[serde(default = "default_empty_hash_map")]
+    pub signed_data: HashMap<String, SignedData>,
+    #[serde(default = "String::new")]
+    pub response: String,
+    #[serde(default = "String::new")]
+    pub error: String,
+    #[serde(default = "String::new")]
+    pub logs: String,
+}
+
+pub fn default_empty_hash_map() -> HashMap<String, SignedData> {
+    HashMap::new()
 }
 
 pub const HELLO_WORLD_LIT_ACTION_CODE: &str = "const go = async () => {

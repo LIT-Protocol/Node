@@ -20,10 +20,10 @@ use lit_node::{
     peers::{
         peer_item::{PeerData, PeerItem},
         peer_reviewer::PeerComplaint,
-        peer_state::models::{PeerValidatorStatus, SimplePeer},
+        peer_state::models::{PeerValidatorStatus, SimplePeer, SimplePeerExt},
         PeerState,
     },
-    tasks::{beaver_manager::models::BeaverMessage, utils::generate_hash},
+    tasks::beaver_manager::models::BeaverMessage,
     tss::{
         common::{
             models::{NodeTransmissionDetails, RoundData},
@@ -207,7 +207,7 @@ impl VirtualNodeCollection {
     async fn add_node_internal(&mut self, port: u16, staker_address: H160) -> bool {
         let node_id = self.nodes.iter().map(|n| n.node_id).max().unwrap_or(0) + 1;
 
-        let key_hash = generate_hash(staker_address);
+        let key_hash = Vec::<SimplePeer>::generate_hash(staker_address);
         let (tss_state, rx_round_data, rx_node_transmission_details) =
             load_virtual_node_defaults(port, &self.testnet, staker_address).await;
         let addr = tss_state.peer_state.addr.clone();

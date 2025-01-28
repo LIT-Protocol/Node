@@ -92,6 +92,7 @@ describe('PKPHelper', function () {
           'StakingFacet',
           'StakingViewsFacet',
           'StakingVersionFacet',
+          'StakingAdminFacet',
         ],
         verifyContracts: false,
         waitForDeployment: false,
@@ -101,6 +102,11 @@ describe('PKPHelper', function () {
       'StakingFacet',
       await stakingDiamond.getAddress()
     );
+    const stakingAdminFacet = await ethers.getContractAt(
+      'StakingAdminFacet',
+      await stakingDiamond.getAddress()
+    );
+
     const { diamond: stakingBalancesDiamond } = await deployDiamond(
       'StakingBalances',
       await contractResolver.getAddress(),
@@ -132,6 +138,7 @@ describe('PKPHelper', function () {
     const stakingAccounts = await setupStakingWithValidatorsAndAdvance(
       ethers,
       stakingContract,
+      stakingAdminFacet,
       stakingBalancesContract,
       tokenContract,
       deployer,

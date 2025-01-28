@@ -55,6 +55,42 @@ impl From<ErrorResponse> for ExecuteJsRequest {
     }
 }
 
+// A wrapper for ExecutionRequest with a custom Debug impl
+pub struct DebugExecutionRequest<'a>(&'a ExecutionRequest);
+
+impl<'a> From<&'a ExecutionRequest> for DebugExecutionRequest<'a> {
+    fn from(req: &'a ExecutionRequest) -> Self {
+        Self(req)
+    }
+}
+
+impl<'a> std::fmt::Debug for DebugExecutionRequest<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        const MAX_CODE_LEN: usize = 500;
+
+        let Self(req) = self;
+
+        let truncated_code = if req.code.len() > MAX_CODE_LEN {
+            &format!(
+                "{}... (truncated, {} bytes total)",
+                &req.code[..MAX_CODE_LEN],
+                req.code.len()
+            )
+        } else {
+            req.code.as_str()
+        };
+
+        f.debug_struct("ExecutionRequest")
+            .field("code", &truncated_code)
+            .field("js_params", &req.js_params)
+            .field("auth_context", &req.auth_context)
+            .field("timeout", &req.timeout)
+            .field("memory_limit", &req.memory_limit)
+            .field("http_headers", &req.http_headers)
+            .finish()
+    }
+}
+
 // Declare op request/response types
 // For example, decl_op!(Print) will declare PrintRequest and PrintResponse
 // as well as conversions to and from ExecuteJsRequest and ExecuteJsResponse

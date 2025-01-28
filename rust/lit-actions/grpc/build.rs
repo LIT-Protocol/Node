@@ -11,6 +11,6 @@ fn main() {
         .file_descriptor_set_path(descriptor_path)
         .protoc_arg("--experimental_allow_proto3_optional")
         .btree_map(["ExecutionRequest.http_headers"])
-        .compile(&["schema/lit_actions.proto"], &["schema/"])
+        .compile_protos(&["schema/lit_actions.proto"], &["schema/"])
         .unwrap();
 }

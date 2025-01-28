@@ -7,6 +7,7 @@ import { ContractResolver } from "../../lit-core/ContractResolver.sol";
 import { LibDiamond } from "../../libraries/LibDiamond.sol";
 import { StakingViewsFacet } from "./StakingViewsFacet.sol";
 import { StakingBalancesFacet } from "../StakingBalances/StakingBalancesFacet.sol";
+import { StakingUtilsLib } from "./StakingUtilsLib.sol";
 
 import { LibStakingStorage } from "./LibStakingStorage.sol";
 
@@ -23,13 +24,6 @@ contract StakingFacet {
     error MustBeInNextValidatorSetLockedState(LibStakingStorage.States state);
     error MustBeInReadyForNextEpochState(LibStakingStorage.States state);
     error MustBeInActiveOrUnlockedOrPausedState(LibStakingStorage.States state);
-    error MustBeInNextValidatorSetLockedOrReadyForNextEpochState(
-        LibStakingStorage.States state
-    );
-    error NotEnoughValidatorsInNextEpoch(
-        uint256 validatorCount,
-        uint256 minimumValidatorCount
-    );
     error ValidatorIsNotInNextEpoch(
         address validator,
         address[] validatorsInNextEpoch
@@ -66,14 +60,6 @@ contract StakingFacet {
         uint256 currentEpochNumber,
         uint256 receivedEpochNumber
     );
-    error CallerNotOwner();
-
-    /* ========== Modifiers ========== */
-
-    modifier onlyOwner() {
-        if (msg.sender != LibDiamond.contractOwner()) revert CallerNotOwner();
-        _;
-    }
 
     /* ========== VIEWS ========== */
     function s()
@@ -120,15 +106,8 @@ contract StakingFacet {
         ) {
             revert MustBeInActiveOrUnlockedState(s().state);
         }
-        if (
-            s().validatorsInNextEpoch.length() <
-            mutableConfig().minimumValidatorCount
-        ) {
-            revert NotEnoughValidatorsInNextEpoch(
-                s().validatorsInNextEpoch.length(),
-                mutableConfig().minimumValidatorCount
-            );
-        }
+
+        StakingUtilsLib.checkNextSetAboveThreshold(s());
 
         s().state = LibStakingStorage.States.NextValidatorSetLocked;
         emit StateChanged(s().state);
@@ -350,16 +329,13 @@ contract StakingFacet {
         ) {
             revert MustBeInActiveOrUnlockedOrPausedState(s().state);
         }
-        if (
-            s().validatorsInNextEpoch.length() - 1 <
-            mutableConfig().minimumValidatorCount
-        ) {
-            revert NotEnoughValidatorsInNextEpoch(
-                s().validatorsInNextEpoch.length(),
-                mutableConfig().minimumValidatorCount
-            );
-        }
-        removeValidatorFromNextEpoch(staker);
+        StakingUtilsLib.removeValidatorFromNextEpoch(s(), staker);
+
+        // ensure this won't drop us below the minimum validator count.
+        // technically, if we would drop below the threshold in the next set due to this node leaving,
+        // it should be okay, since this node is "gracefully" leaving and participating in the Reshare.
+        // but we still need to prevent it from dropping below the threshold due to kicks.
+        StakingUtilsLib.checkNextSetAboveThreshold(s());
         emit RequestToLeave(staker);
     }
 
@@ -418,9 +394,9 @@ contract StakingFacet {
         );
         if (
             views().epoch().number > 1 &&
-            s().currentValidatorsKickedFromNextEpoch.length() >=
             (views().getValidatorsInCurrentEpoch().length -
-                views().currentValidatorCountForConsensus())
+                s().currentValidatorsKickedFromNextEpoch.length()) <
+            views().currentValidatorCountForConsensus()
         ) {
             revert CannotKickBelowCurrentValidatorThreshold();
         }
@@ -440,7 +416,10 @@ contract StakingFacet {
             views().shouldKickValidator(validatorStakerAddress)
         ) {
             // remove them from the validator set
-            removeValidatorFromNextEpoch(validatorStakerAddress);
+            StakingUtilsLib.removeValidatorFromNextEpoch(
+                s(),
+                validatorStakerAddress
+            );
             // block them from rejoining the next epoch
             s().validatorsKickedFromNextEpoch.add(validatorStakerAddress);
             // mark them if they are in the current validator set
@@ -478,10 +457,15 @@ contract StakingFacet {
                 s().state == LibStakingStorage.States.NextValidatorSetLocked ||
                 s().state == LibStakingStorage.States.ReadyForNextEpoch
             ) {
-                unlockEpoch();
+                StakingUtilsLib.unlockEpoch(s());
             } else if (s().state == LibStakingStorage.States.Active) {
                 // if we're in the active state, then we need to lock, because we kicked a node
                 // we want to kick off the next epoch transition to remove this node from the set
+
+                // check that it's safe to move to locked
+                StakingUtilsLib.checkNextSetAboveThreshold(s());
+
+                // move to locked
                 s().state = LibStakingStorage.States.NextValidatorSetLocked;
                 emit StateChanged(s().state);
                 // change the epoch end time to now
@@ -531,209 +515,6 @@ contract StakingFacet {
         }
     }
 
-    function setEpochLength(uint256 newEpochLength) external onlyOwner {
-        mutableEpoch().epochLength = newEpochLength;
-        emit EpochLengthSet(newEpochLength);
-    }
-
-    function setEpochTimeout(uint256 newEpochTimeout) external onlyOwner {
-        mutableEpoch().timeout = newEpochTimeout;
-        emit EpochTimeoutSet(newEpochTimeout);
-    }
-
-    function setEpochEndTime(uint256 newEpochEndTime) external onlyOwner {
-        mutableEpoch().endTime = newEpochEndTime;
-        emit EpochEndTimeSet(newEpochEndTime);
-    }
-
-    function setContractResolver(
-        address newResolverAddress
-    ) external onlyOwner {
-        s().contractResolver = ContractResolver(newResolverAddress);
-        emit ResolverContractAddressSet(newResolverAddress);
-    }
-
-    function setKickPenaltyPercent(
-        uint256 reason,
-        uint256 newKickPenaltyPercent
-    ) external onlyOwner {
-        s()
-            .complaintReasonToConfig[reason]
-            .kickPenaltyPercent = newKickPenaltyPercent;
-        emit KickPenaltyPercentSet(reason, newKickPenaltyPercent);
-    }
-
-    function setEpochState(
-        LibStakingStorage.States newState
-    ) external onlyOwner {
-        s().state = newState;
-        emit StateChanged(newState);
-    }
-
-    function adminKickValidatorInNextEpoch(
-        address validatorStakerAddress
-    ) external onlyOwner {
-        // block them from rejoining the next epoch
-        s().validatorsKickedFromNextEpoch.add(validatorStakerAddress);
-
-        // remove from the validator set
-        removeValidatorFromNextEpoch(validatorStakerAddress);
-
-        // if they're in the current set, we need to mark them as kicked from the current set too
-        bool isValidatorInCurrentSet = s().validatorsInCurrentEpoch.contains(
-            validatorStakerAddress
-        );
-        if (isValidatorInCurrentSet) {
-            s().currentValidatorsKickedFromNextEpoch.add(
-                validatorStakerAddress
-            );
-        }
-        emit ValidatorKickedFromNextEpoch(validatorStakerAddress, 0);
-
-        // // if we're in the locked state, then we need to unlock, because we kicked a node
-        if (
-            s().state == LibStakingStorage.States.NextValidatorSetLocked ||
-            s().state == LibStakingStorage.States.ReadyForNextEpoch
-        ) {
-            unlockEpoch();
-        }
-    }
-
-    function adminSlashValidator(
-        address validatorStakerAddress,
-        uint256 amountToPenalize
-    ) external onlyOwner {
-        StakingBalancesFacet stakingBalances = StakingBalancesFacet(
-            views().getStakingBalancesAddress()
-        );
-        stakingBalances.penalizeTokens(
-            amountToPenalize,
-            validatorStakerAddress
-        );
-    }
-
-    function removeValidatorFromNextEpoch(address staker) internal {
-        if (s().validatorsInNextEpoch.contains(staker)) {
-            // remove them
-            s().validatorsInNextEpoch.remove(staker);
-        }
-        LibStakingStorage.Validator memory validator = s().validators[staker];
-        bytes32 commsKeysHash = keccak256(
-            abi.encodePacked(validator.senderPubKey, validator.receiverPubKey)
-        );
-        s().usedCommsKeys[commsKeysHash] = false;
-    }
-
-    function adminRejoinValidator(address staker) external onlyOwner {
-        if (
-            !(s().state == LibStakingStorage.States.Active ||
-                s().state == LibStakingStorage.States.Unlocked ||
-                s().state == LibStakingStorage.States.Paused)
-        ) {
-            revert MustBeInActiveOrUnlockedOrPausedState(s().state);
-        }
-
-        // remove from next validator kicked list
-        s().validatorsKickedFromNextEpoch.remove(staker);
-        // remove from current validator kicked list
-        s().currentValidatorsKickedFromNextEpoch.remove(staker);
-        // add to next validator set
-        s().validatorsInNextEpoch.add(staker);
-        emit ValidatorRejoinedNextEpoch(staker);
-    }
-
-    function setConfig(
-        LibStakingStorage.Config memory newConfig
-    ) external onlyOwner {
-        require(
-            newConfig.minTripleCount <= newConfig.maxTripleCount,
-            "min triple count must be less than or equal to max triple count"
-        );
-
-        mutableConfig().tokenRewardPerTokenPerEpoch = newConfig
-            .tokenRewardPerTokenPerEpoch;
-        mutableConfig().keyTypes = newConfig.keyTypes;
-        mutableConfig().minimumValidatorCount = newConfig.minimumValidatorCount;
-        mutableConfig().maxConcurrentRequests = newConfig.maxConcurrentRequests;
-        mutableConfig().maxTripleCount = newConfig.maxTripleCount;
-        mutableConfig().minTripleCount = newConfig.minTripleCount;
-        mutableConfig().peerCheckingIntervalSecs = newConfig
-            .peerCheckingIntervalSecs;
-        mutableConfig().maxTripleConcurrency = newConfig.maxTripleConcurrency;
-        mutableConfig().rpcHealthcheckEnabled = newConfig.rpcHealthcheckEnabled;
-
-        emit ConfigSet(
-            newConfig.tokenRewardPerTokenPerEpoch,
-            newConfig.keyTypes,
-            newConfig.minimumValidatorCount,
-            newConfig.maxConcurrentRequests,
-            newConfig.maxTripleCount,
-            newConfig.minTripleCount,
-            newConfig.peerCheckingIntervalSecs,
-            newConfig.maxTripleConcurrency,
-            newConfig.rpcHealthcheckEnabled
-        );
-    }
-
-    function setComplaintConfig(
-        uint256 reason,
-        LibStakingStorage.ComplaintConfig memory config
-    ) external onlyOwner {
-        s().complaintReasonToConfig[reason] = config;
-    }
-
-    function adminResetEpoch() external onlyOwner {
-        require(s().env == ContractResolver.Env.Dev, "only for dev env");
-
-        // clear out validators in current epoch
-        clearEnumerableAddressSet(s().validatorsInCurrentEpoch);
-
-        // clear out validators in next epoch
-        clearEnumerableAddressSet(s().validatorsInNextEpoch);
-
-        // clear out the validators kicked from next epoch
-        clearEnumerableAddressSet(s().validatorsKickedFromNextEpoch);
-
-        // clear out the current validators kicked from next epoch
-        clearEnumerableAddressSet(s().currentValidatorsKickedFromNextEpoch);
-
-        // reset the epoch
-        mutableEpoch().number = 1;
-        mutableEpoch().endTime = block.timestamp + mutableEpoch().epochLength;
-        mutableEpoch().retries = 0;
-
-        // reset the state
-        s().state = LibStakingStorage.States.Paused;
-        emit StateChanged(s().state);
-    }
-
-    function unlockEpoch() internal {
-        // this should only be callable from the ReadyForNextEpoch state or the NextValidatorSetLocked state
-        if (
-            !(s().state == LibStakingStorage.States.ReadyForNextEpoch ||
-                s().state == LibStakingStorage.States.NextValidatorSetLocked)
-        ) {
-            revert MustBeInNextValidatorSetLockedOrReadyForNextEpochState(
-                s().state
-            );
-        }
-        // clear out readyForNextEpoch for current nodes
-        uint256 validatorLength = s().validatorsInCurrentEpoch.length();
-        for (uint256 i = 0; i < validatorLength; i++) {
-            s().readyForNextEpoch[s().validatorsInCurrentEpoch.at(i)] = false;
-        }
-
-        // clear out readyForNextEpoch for next nodes
-        validatorLength = s().validatorsInNextEpoch.length();
-        for (uint256 i = 0; i < validatorLength; i++) {
-            s().readyForNextEpoch[s().validatorsInNextEpoch.at(i)] = false;
-        }
-
-        s().state = LibStakingStorage.States.Unlocked;
-        s().epochs[0].retries++;
-        emit StateChanged(s().state);
-    }
-
     /* ========== EVENTS ========== */
 
     event RewardsDurationUpdated(uint256 newDuration);
@@ -752,28 +533,4 @@ contract StakingFacet {
         address indexed staker,
         uint256 amountBurned
     );
-
-    // onlyOwner events
-    event EpochLengthSet(uint256 newEpochLength);
-    event EpochTimeoutSet(uint256 newEpochTimeout);
-    event EpochEndTimeSet(uint256 newEpochEndTime);
-    event StakingTokenSet(address newStakingTokenAddress);
-    event KickPenaltyPercentSet(uint256 reason, uint256 newKickPenaltyPercent);
-    event ResolverContractAddressSet(address newResolverContractAddress);
-    event ConfigSet(
-        uint256 newTokenRewardPerTokenPerEpoch,
-        uint256[] newKeyTypes,
-        uint256 newMinimumValidatorCount,
-        uint256 newMaxConcurrentRequests,
-        uint256 newMaxTripleCount,
-        uint256 newMinTripleCount,
-        uint256 newPeerCheckingIntervalSecs,
-        uint256 newMaxTripleConcurrency,
-        bool newRpcHealthcheckEnabled
-    );
-    event ComplaintConfigSet(
-        uint256 reason,
-        LibStakingStorage.ComplaintConfig config
-    );
-    event ValidatorRejoinedNextEpoch(address staker);
 }
