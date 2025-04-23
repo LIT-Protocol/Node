@@ -257,22 +257,49 @@ function broadcastAndCollect({ name, value }) {
 
 /**
  * Decrypt and combine the provided
- * @param {string} accessControlConditions The access control conditions
- * @param {string} ciphertext The ciphertext to decrypt
- * @param {string} dataToEncryptHash The hash of the data to <encrypt />
- @ @param {string} authSig The auth signature
-  * @param {string} chain The chain
+ * @param {Object} params
+ * @param {Array<Object>=} params.accessControlConditions The access control conditions (optional)
+ * @param {Array<Object>=} params.evmContractConditions The EVM contract conditions (optional)
+ * @param {Array<Object>=} params.unifiedAccessControlConditions The unified access control conditions (optional)
+ * @param {string} params.ciphertext The ciphertext to decrypt
+ * @param {string} params.dataToEncryptHash The hash of the data to encrypt
+ * @param {Object|null} params.authSig The auth signature
+ * @param {string} params.chain The chain
  * @returns {string} The combined data
  */
 function decryptAndCombine({
   accessControlConditions,
+  evmContractConditions,
+  unifiedAccessControlConditions,
   ciphertext,
   dataToEncryptHash,
   authSig,
   chain,
 }) {
+  // Determine which type of conditions to use
+  let conditions;
+  if (accessControlConditions) {
+    conditions = accessControlConditions;
+  } else if (evmContractConditions) {
+    // Convert EVM contract conditions to unified format
+    conditions = evmContractConditions.map(condition => {
+      if (condition.operator) {
+        return condition; // Keep operator as is
+      }
+      return {
+        ...condition,
+        conditionType: "evmContract"
+      };
+    });
+  } else if (unifiedAccessControlConditions) {
+    conditions = unifiedAccessControlConditions;
+  } else {
+    throw new Error("No access control conditions provided");
+  }
+
+  // Call the Rust implementation with the appropriate conditions
   return ops.op_decrypt_and_combine(
-    accessControlConditions,
+    conditions,
     ciphertext,
     dataToEncryptHash,
     authSig,
