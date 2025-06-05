@@ -44,11 +44,7 @@ const mapEnvToEnum = (env) => {
 };
 
 function isArbitrumChain(chainName) {
-  return (
-    chainName === 'localchainArbitrum' ||
-    chainName === 'vesuvius' ||
-    chainName === 'yellowstone'
-  );
+  return chainName === 'localchainArbitrum' || chainName === 'yellowstone';
 }
 
 const getOrDeployContract = async (

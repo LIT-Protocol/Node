@@ -2,4 +2,4 @@
 
 sudo systemctl start lit-node@{0..2}
 
-sudo systemctl start lit-actions
+sudo systemctl start lit-actions@{0..2}

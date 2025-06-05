@@ -31,6 +31,7 @@ im = "15.1.0"
 futures = "0.3.30"
 tracing = "0.1.40"
 isahc = "1.7.2"
+moka = { version = "0.12.10", features = ["sync"] }
 
 
 [dev-dependencies]

@@ -1,13 +1,5 @@
-use std::env;
-use std::path::PathBuf;
-
 fn main() {
-    let target = env::var("TARGET").unwrap();
-    let profile = env::var("PROFILE").unwrap();
-    let out_dir = PathBuf::from(env::var_os("OUT_DIR").unwrap());
-
-    println!("cargo:rustc-env=TARGET={target}");
-    println!("cargo:rustc-env=PROFILE={profile}");
+    let out_dir = std::path::PathBuf::from(std::env::var_os("OUT_DIR").unwrap());
 
     // Create V8 snapshot from Deno runtime + Lit Actions extension
     lit_actions_snapshot::create_snapshot(

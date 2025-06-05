@@ -1,68 +1,17 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use anyhow::{anyhow, Context, Result};
-use deno_core::{error::custom_error, extension, op2, OpState};
-use ethabi::ethereum_types::Address;
+use deno_core::{extension, op2, OpState};
+use deno_error::JsErrorBox;
 use lit_actions_grpc::proto::*;
 use serde_json::json;
 use tracing::instrument;
 
-use crate::validation::*;
-
-// Macro to simplify implementing synchronous ops over gRPC.
-macro_rules! remote_op {
-    ($name:ident, $state:ident, $send:expr, $match:pat => $res:expr) => {{
-        let _: &mut OpState = $state;
-        let (tx, rx) = {
-            let tx = $state
-                .borrow::<flume::Sender<tonic::Result<ExecuteJsResponse>>>()
-                .clone();
-            let rx = $state.borrow::<flume::Receiver<ExecuteJsRequest>>().clone();
-            (tx, rx)
-        };
-
-        let op_name = stringify!($name);
-        tx.send(Ok($send.into())).context(op_name)?;
-
-        let resp = rx.recv().context(op_name)?;
-        match resp.union {
-            Some($match) => $res,
-            Some(UnionRequest::ReportError(ErrorResponse { error })) => Err(anyhow!(error)),
-            other => Err(anyhow!("unexpected response: {other:?}").context(op_name)),
-        }
-    }};
-}
-
-// Macro to simplify implementing asynchronous ops over gRPC.
-macro_rules! remote_op_async {
-    ($name:ident, $state:ident, $send:expr, $match:pat => $res:expr) => {{
-        let _: Rc<RefCell<OpState>> = $state;
-        let (tx, rx) = {
-            let state = $state.borrow();
-            let tx = state
-                .borrow::<flume::Sender<tonic::Result<ExecuteJsResponse>>>()
-                .clone();
-            let rx = state.borrow::<flume::Receiver<ExecuteJsRequest>>().clone();
-            (tx, rx)
-        };
-
-        let op_name = stringify!($name);
-        tx.send_async(Ok($send.into())).await.context(op_name)?;
-
-        // Must be blocking to preserve ops order
-        let resp = rx.recv().context(op_name)?;
-        match resp.union {
-            Some($match) => $res,
-            Some(UnionRequest::ReportError(ErrorResponse { error })) => Err(anyhow!(error)),
-            other => Err(anyhow!("unexpected response: {other:?}").context(op_name)),
-        }
-    }};
-}
+use crate::macros::*;
 
 #[instrument(skip_all, ret)]
 #[op2(fast)]
-fn op_print(state: &mut OpState, #[string] msg: &str, is_err: bool) -> Result<()> {
+fn op_print(state: &mut OpState, #[string] msg: &str, is_err: bool) -> Result<(), JsErrorBox> {
     use std::io::{stderr, stdout, Write};
 
     lazy_static::lazy_static! {
@@ -74,17 +23,17 @@ fn op_print(state: &mut OpState, #[string] msg: &str, is_err: bool) -> Result<()
     if is_err && *IS_ATTY_STDERR {
         stderr()
             .write_all(prepended.as_bytes())
-            .context("op_print: failed to write to stderr")?;
-        stderr()
-            .flush()
-            .context("op_print: failed to flush stderr")?;
+            .and_then(|_| stderr().flush())
+            .map_err(|e| {
+                JsErrorBox::generic(format!("op_print: failed to write to stderr: {e}"))
+            })?;
     } else if *IS_ATTY_STDOUT {
         stdout()
             .write_all(prepended.as_bytes())
-            .context("op_print: failed to write to stdout")?;
-        stdout()
-            .flush()
-            .context("op_print: failed to flush stdout")?;
+            .and_then(|_| stdout().flush())
+            .map_err(|e| {
+                JsErrorBox::generic(format!("op_print: failed to write to stdout: {e}"))
+            })?;
     }
 
     // Ignore Deno logs enabled by WorkerLogLevel::Debug
@@ -109,8 +58,8 @@ fn op_print(state: &mut OpState, #[string] msg: &str, is_err: bool) -> Result<()
 // }
 #[instrument(skip_all, ret)]
 #[op2(fast)]
-fn op_exit(_state: &mut OpState) -> Result<()> {
-    Err(custom_error(
+fn op_exit(_state: &mut OpState) -> Result<(), JsErrorBox> {
+    Err(JsErrorBox::new(
         "PermissionDenied",
         "'Deno.exit' is not allowed in this context.",
     ))
@@ -118,7 +67,7 @@ fn op_exit(_state: &mut OpState) -> Result<()> {
 
 #[instrument(skip_all, ret)]
 #[op2(fast)]
-fn op_set_response(state: &mut OpState, #[string] response: String) -> Result<()> {
+fn op_set_response(state: &mut OpState, #[string] response: String) -> Result<(), JsErrorBox> {
     remote_op!(op_set_response,
         state,
         SetResponseRequest { response }, // may be empty
@@ -128,7 +77,7 @@ fn op_set_response(state: &mut OpState, #[string] response: String) -> Result<()
 
 #[instrument(skip_all, ret)]
 #[op2(async, reentrant)]
-async fn op_increment_fetch_count(state: Rc<RefCell<OpState>>) -> Result<u32> {
+async fn op_increment_fetch_count(state: Rc<RefCell<OpState>>) -> Result<u32, JsErrorBox> {
     remote_op_async!(op_increment_fetch_count,
         state,
         IncrementFetchCountRequest {},
@@ -143,7 +92,7 @@ async fn op_pkp_permissions_get_permitted(
     state: Rc<RefCell<OpState>>,
     #[string] method: String,
     #[string] token_id: String,
-) -> Result<Vec<serde_json::Value>> {
+) -> Result<Vec<serde_json::Value>, JsErrorBox> {
     ensure_one_of!(
         method,
         [
@@ -157,7 +106,7 @@ async fn op_pkp_permissions_get_permitted(
     remote_op_async!(op_pkp_permissions_get_permitted,
         state,
         PkpPermissionsGetPermittedRequest { method, token_id },
-        UnionRequest::PkpPermissionsGetPermitted(resp) => serde_json::from_slice(&resp.resources).map_err(Into::into)
+        UnionRequest::PkpPermissionsGetPermitted(resp) => serde_json::from_slice(&resp.resources).map_err(JsErrorBox::from_err)
     )
 }
 
@@ -170,7 +119,7 @@ async fn op_pkp_permissions_get_permitted_auth_method_scopes(
     #[string] method: String,
     #[buffer(copy)] user_id: Vec<u8>,
     #[bigint] max_scope_id: u64,
-) -> Result<Vec<bool>> {
+) -> Result<Vec<bool>, JsErrorBox> {
     ensure_u256!(&token_id, "tokenId");
     ensure_u256!(&method, "authMethodType");
     ensure_not_empty!(user_id, "userId");
@@ -194,7 +143,7 @@ async fn op_pkp_permissions_is_permitted(
     #[string] method: String,
     #[string] token_id: String,
     #[serde] params: Vec<serde_json::Value>,
-) -> Result<bool> {
+) -> Result<bool, JsErrorBox> {
     ensure_one_of!(method, ["isPermittedAction", "isPermittedAddress"]);
     ensure_u256!(&token_id, "tokenId");
     ensure_not_empty!(params);
@@ -204,7 +153,7 @@ async fn op_pkp_permissions_is_permitted(
         PkpPermissionsIsPermittedRequest {
             method,
             token_id,
-            params: serde_json::to_vec(&params)?,
+            params: serde_json::to_vec(&params).map_err(JsErrorBox::from_err)?,
         },
         UnionRequest::PkpPermissionsIsPermitted(resp) => Ok(resp.is_permitted)
     )
@@ -217,7 +166,7 @@ async fn op_pkp_permissions_is_permitted_auth_method(
     #[string] token_id: String,
     #[string] method: String,
     #[buffer(copy)] user_id: Vec<u8>,
-) -> Result<bool> {
+) -> Result<bool, JsErrorBox> {
     ensure_u256!(&token_id, "tokenId");
     ensure_u256!(&method, "authMethodType");
     ensure_not_empty!(user_id, "userId");
@@ -240,7 +189,7 @@ async fn op_check_conditions(
     #[serde] conditions: Vec<serde_json::Value>, // Vec<UnifiedAccessControlConditionItem>
     #[serde] auth_sig: Option<serde_json::Value>, // AuthSigItem
     #[string] chain: Option<String>,
-) -> Result<bool> {
+) -> Result<bool, JsErrorBox> {
     ensure_not_empty!(conditions);
     if let Some(chain) = &chain {
         ensure_not_blank!(chain);
@@ -249,8 +198,8 @@ async fn op_check_conditions(
     remote_op_async!(op_check_conditions,
         state,
         CheckConditionsRequest {
-            conditions: serde_json::to_vec(&conditions)?,
-            auth_sig: auth_sig.as_ref().map(serde_json::to_vec).transpose()?,
+            conditions: serde_json::to_vec(&conditions).map_err(JsErrorBox::from_err)?,
+            auth_sig: auth_sig.as_ref().map(serde_json::to_vec).transpose().map_err(JsErrorBox::from_err)?,
             chain,
         },
         UnionRequest::CheckConditions(resp) => Ok(resp.success)
@@ -260,7 +209,10 @@ async fn op_check_conditions(
 #[instrument(skip_all, ret)]
 #[op2]
 #[string]
-fn op_pubkey_to_token_id(state: &mut OpState, #[string] public_key: String) -> Result<String> {
+fn op_pubkey_to_token_id(
+    state: &mut OpState,
+    #[string] public_key: String,
+) -> Result<String, JsErrorBox> {
     ensure_not_blank!(public_key, "publicKey");
 
     remote_op!(op_pubkey_to_token_id,
@@ -278,7 +230,7 @@ async fn op_sign_ecdsa(
     #[buffer(copy)] to_sign: Vec<u8>,
     #[string] public_key: String,
     #[string] sig_name: String,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     ensure_not_empty!(to_sign, "toSign");
     ensure_not_blank!(public_key, "publicKey");
     ensure_not_blank!(sig_name, "sigName");
@@ -303,7 +255,7 @@ async fn op_sign_ecdsa_eth_personal_sign_message(
     #[buffer(copy)] to_sign: Vec<u8>,
     #[string] public_key: String,
     #[string] sig_name: String,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     ensure_not_empty!(to_sign, "toSign");
     ensure_not_blank!(public_key, "publicKey");
     ensure_not_blank!(sig_name, "sigName");
@@ -327,7 +279,7 @@ async fn op_aes_decrypt(
     state: Rc<RefCell<OpState>>,
     #[buffer(copy)] symmetric_key: Vec<u8>,
     #[buffer(copy)] ciphertext: Vec<u8>,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     ensure_not_empty!(symmetric_key, "symmetricKey");
     ensure_not_empty!(ciphertext);
 
@@ -343,9 +295,9 @@ async fn op_aes_decrypt(
 #[string]
 async fn op_get_latest_nonce(
     state: Rc<RefCell<OpState>>,
-    #[serde] address: Address,
+    #[serde] address: ethabi::ethereum_types::Address,
     #[string] chain: String,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     ensure_not_blank!(chain);
 
     remote_op_async!(op_get_latest_nonce,
@@ -364,7 +316,7 @@ async fn op_get_latest_nonce(
 async fn op_claim_key_identifier(
     state: Rc<RefCell<OpState>>,
     #[string] key_id: String,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     ensure_not_blank!(key_id, "keyId");
 
     remote_op_async!(op_claim_key_identifier,
@@ -381,7 +333,7 @@ async fn op_call_contract(
     state: Rc<RefCell<OpState>>,
     #[string] chain: String,
     #[string] txn: String,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     ensure_not_blank!(chain); // ensure_one_of not feasible as there are too many supported blockchains
     ensure_not_blank!(txn);
 
@@ -399,14 +351,14 @@ async fn op_call_child(
     state: Rc<RefCell<OpState>>,
     #[string] ipfs_id: String,
     #[serde] params: Option<serde_json::Value>,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     ensure_not_blank!(ipfs_id, "ipfsId");
 
     remote_op_async!(op_call_child,
         state,
         CallChildRequest {
             ipfs_id,
-            params: params.as_ref().map(serde_json::to_vec).transpose()?,
+            params: params.as_ref().map(serde_json::to_vec).transpose().map_err(JsErrorBox::from_err)?,
         },
         UnionRequest::CallChild(resp) => Ok(resp.response)
     )
@@ -419,7 +371,7 @@ async fn op_broadcast_and_collect(
     state: Rc<RefCell<OpState>>,
     #[string] name: String,
     #[string] value: String,
-) -> Result<Vec<String>> {
+) -> Result<Vec<String>, JsErrorBox> {
     remote_op_async!(op_broadcast_and_collect,
         state,
         BroadcastAndCollectRequest { name, value },
@@ -437,14 +389,14 @@ async fn op_decrypt_and_combine(
     #[string] data_to_encrypt_hash: String,
     #[serde] auth_sig: Option<serde_json::Value>, // AuthSigItem
     #[string] chain: String,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     remote_op_async!(op_decrypt_and_combine,
         state,
         DecryptAndCombineRequest {
-            access_control_conditions: serde_json::to_vec(&access_control_conditions)?,
+            access_control_conditions: serde_json::to_vec(&access_control_conditions).map_err(JsErrorBox::from_err)?,
             ciphertext,
             data_to_encrypt_hash,
-            auth_sig: auth_sig.as_ref().map(serde_json::to_vec).transpose()?,
+            auth_sig: auth_sig.as_ref().map(serde_json::to_vec).transpose().map_err(JsErrorBox::from_err)?,
             chain,
         },
         UnionRequest::DecryptAndCombine(resp) => Ok(resp.result)
@@ -459,7 +411,7 @@ async fn op_sign_and_combine_ecdsa(
     #[buffer(copy)] to_sign: Vec<u8>,
     #[string] public_key: String,
     #[string] sig_name: String,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     remote_op_async!(op_sign_and_combine_ecdsa,
         state,
         SignAndCombineEcdsaRequest { to_sign, public_key, sig_name },
@@ -470,7 +422,10 @@ async fn op_sign_and_combine_ecdsa(
 #[instrument(skip_all, ret)]
 #[op2(async, reentrant)]
 #[string]
-async fn op_get_rpc_url(state: Rc<RefCell<OpState>>, #[string] chain: String) -> Result<String> {
+async fn op_get_rpc_url(
+    state: Rc<RefCell<OpState>>,
+    #[string] chain: String,
+) -> Result<String, JsErrorBox> {
     remote_op_async!(op_get_rpc_url,
         state,
         GetRpcUrlRequest { chain },
@@ -484,7 +439,7 @@ async fn op_p2p_broadcast(
     state: Rc<RefCell<OpState>>,
     #[string] name: String,
     #[string] value: String,
-) -> Result<bool> {
+) -> Result<bool, JsErrorBox> {
     remote_op_async!(op_p2p_broadcast,
         state,
         P2pBroadcastRequest { name, value },
@@ -498,7 +453,7 @@ async fn op_p2p_broadcast(
 async fn op_p2p_collect_from_leader(
     state: Rc<RefCell<OpState>>,
     #[string] name: String,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     remote_op_async!(op_p2p_collect_from_leader,
         state,
         P2pCollectFromLeaderRequest { name  },
@@ -508,7 +463,7 @@ async fn op_p2p_collect_from_leader(
 
 #[instrument(skip_all, ret)]
 #[op2(async, reentrant)]
-async fn op_is_leader(state: Rc<RefCell<OpState>>) -> Result<bool> {
+async fn op_is_leader(state: Rc<RefCell<OpState>>) -> Result<bool, JsErrorBox> {
     remote_op_async!(op_is_leader,
         state,
         IsLeaderRequest { },
@@ -523,10 +478,13 @@ async fn op_encrypt_bls(
     state: Rc<RefCell<OpState>>,
     #[serde] access_control_conditions: Vec<serde_json::Value>, // Vec<UnifiedAccessControlConditionItem>
     #[buffer(copy)] to_encrypt: Vec<u8>,
-) -> Result<serde_json::Value> {
+) -> Result<serde_json::Value, JsErrorBox> {
     remote_op_async!(op_encrypt_bls,
         state,
-        EncryptBlsRequest { access_control_conditions: serde_json::to_vec(&access_control_conditions)?, to_encrypt},
+        EncryptBlsRequest {
+            access_control_conditions: serde_json::to_vec(&access_control_conditions).map_err(JsErrorBox::from_err)?,
+            to_encrypt,
+        },
         UnionRequest::EncryptBls(resp) => Ok(json!({"ciphertext": resp.ciphertext, "dataToEncryptHash": resp.data_to_encrypt_hash}))
     )
 }
@@ -541,14 +499,20 @@ async fn op_decrypt_to_single_node(
     #[string] data_to_encrypt_hash: String,
     #[serde] auth_sig: Option<serde_json::Value>, // AuthSigItem
     #[string] chain: String,
-) -> Result<String> {
+) -> Result<String, JsErrorBox> {
     let auth_sig = match auth_sig {
-        Some(auth_sig) => Some(serde_json::to_vec(&auth_sig)?),
+        Some(auth_sig) => Some(serde_json::to_vec(&auth_sig).map_err(JsErrorBox::from_err)?),
         None => None,
     };
     remote_op_async!(op_decrypt_to_single_node,
         state,
-        DecryptToSingleNodeRequest { access_control_conditions: serde_json::to_vec(&access_control_conditions)?, ciphertext, data_to_encrypt_hash, auth_sig, chain },
+        DecryptToSingleNodeRequest {
+            access_control_conditions: serde_json::to_vec(&access_control_conditions).map_err(JsErrorBox::from_err)?,
+            ciphertext,
+            data_to_encrypt_hash,
+            auth_sig,
+            chain,
+        },
         UnionRequest::DecryptToSingleNode(resp) => Ok(resp.result)
     )
 }

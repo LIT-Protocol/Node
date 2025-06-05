@@ -32,14 +32,6 @@ contract PubkeyRouterFacet {
     error CallerNotOwner();
 
     /* ========== Modifiers ========== */
-    modifier onlyPKPOwner(uint256 tokenId) {
-        // check that user is allowed to set this
-        PKPNFTFacet pkpNFT = PKPNFTFacet(getPkpNftAddress());
-        address nftOwner = pkpNFT.ownerOf(tokenId);
-        require(msg.sender == nftOwner, "Not PKP NFT owner");
-        _;
-    }
-
     modifier onlyOwner() {
         if (msg.sender != LibDiamond.contractOwner()) revert CallerNotOwner();
         _;

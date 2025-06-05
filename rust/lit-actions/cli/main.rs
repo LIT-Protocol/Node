@@ -28,7 +28,7 @@ async fn main() -> Result<()> {
     raise_fd_limit();
 
     let args = Args::parse();
-    debug!(?args);
+    debug!("Lit Actions Launching with args: {:?}", args);
 
     let cfg = lit_config(args.env)?;
     init_logging(&cfg)?;
@@ -36,7 +36,10 @@ async fn main() -> Result<()> {
     lit_actions_server::init_v8();
 
     info!("Listening on {:?}", args.socket);
-    lit_actions_server::start_server(args.socket).await
+    let signal = async {
+        let _ = tokio::signal::ctrl_c().await;
+    };
+    lit_actions_server::start_server(args.socket, Some(signal)).await
 }
 
 fn lit_config(env: LitEnv) -> Result<LitConfig> {

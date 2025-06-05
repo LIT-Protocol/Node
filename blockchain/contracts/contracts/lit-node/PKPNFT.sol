@@ -24,7 +24,7 @@ error FunctionNotFound(bytes4 _functionSelector);
 // This is used in diamond constructor
 // more arguments are added to this struct
 // this avoids stack too deep errors
-struct StakingArgs {
+struct PKPNFTArgs {
     address owner;
     address init;
     bytes initCalldata;
@@ -35,7 +35,7 @@ struct StakingArgs {
 contract PKPNFT {
     constructor(
         IDiamondCut.FacetCut[] memory _diamondCut,
-        StakingArgs memory _args
+        PKPNFTArgs memory _args
     ) payable {
         LibDiamond.setContractOwner(_args.owner);
         LibDiamond.diamondCut(_diamondCut, _args.init, _args.initCalldata);

@@ -79,6 +79,10 @@ describe('PKPPermissions', function () {
       await pkpPermissionsDiamond.getAddress()
     );
 
+    // deploy forwarder and set on PKPPermissions
+    const forwarder = await ethers.deployContract('Forwarder');
+    await pkpPermissions.setTrustedForwarder(await forwarder.getAddress());
+
     tokenContract = await ethers.deployContract('LITToken', [
       ethers.parseUnits('1000000000', 18), // 1b tokens
     ]);
@@ -160,9 +164,10 @@ describe('PKPPermissions', function () {
       async function () {
         let tester;
         let creator;
+        let randomAccountWithGas;
 
         before(async () => {
-          [creator, tester, ...signers] = signers;
+          [creator, tester, randomAccountWithGas, ...signers] = signers;
 
           router = await router.connect(deployer);
 
@@ -190,6 +195,93 @@ describe('PKPPermissions', function () {
 
           const owner = await pkpContract.ownerOf(tokenId);
           expect(owner).equal(tester.address);
+        });
+
+        it('grants permission to an eth address using EIP2771 txns', async () => {
+          const addressToPermit = '0x75EdCdfb5A678290A8654979703bdb75C683B3dD';
+          const testerAddress = await tester.getAddress();
+
+          pkpContract = await pkpContract.connect(tester);
+
+          // validate that the address is not permitted
+          let permitted = await pkpPermissions.isPermittedAddress(
+            tokenId,
+            addressToPermit
+          );
+          expect(permitted).equal(false);
+
+          // craft the txn data etc
+          pkpPermissions = await pkpPermissions.connect(tester);
+          const txData =
+            await pkpPermissions.addPermittedAddress.populateTransaction(
+              tokenId,
+              addressToPermit,
+              []
+            );
+
+          // get nonce from forwarder
+          const forwarderAddress = await pkpPermissions.getTrustedForwarder();
+          const forwarderContract = (
+            await ethers.getContractAt('Forwarder', forwarderAddress)
+          ).connect(randomAccountWithGas);
+
+          const nonce = await forwarderContract.getNonce(testerAddress);
+          const gasLimit = await ethers.provider.estimateGas({
+            ...txData,
+            from: testerAddress,
+          });
+
+          // construct the EIP-2771 request
+          const request = {
+            from: testerAddress,
+            to: await pkpPermissions.getAddress(),
+            value: '0',
+            gas: gasLimit.toString(),
+            nonce: nonce.toString(),
+            data: txData.data,
+          };
+
+          // create domain for EIP-712 signing, which needs to match the forwarder contract
+          const domain = {
+            name: 'GSNv2 Forwarder',
+            version: '0.0.1',
+            chainId: await ethers.provider
+              .getNetwork()
+              .then((network) => network.chainId),
+            verifyingContract: forwarderAddress,
+          };
+
+          const types = {
+            ForwardRequest: [
+              { name: 'from', type: 'address' },
+              { name: 'to', type: 'address' },
+              { name: 'value', type: 'uint256' },
+              { name: 'gas', type: 'uint256' },
+              { name: 'nonce', type: 'uint256' },
+              { name: 'data', type: 'bytes' },
+            ],
+          };
+
+          // Sign the typed data
+          const signature = await tester.signTypedData(domain, types, request);
+
+          // execute the txn
+          const tx = await forwarderContract.execute(request, signature);
+          console.log('tx', tx);
+
+          permitted = await pkpPermissions.isPermittedAddress(
+            tokenId,
+            addressToPermit
+          );
+          expect(permitted).equal(true);
+
+          // revoke
+          await pkpPermissions.removePermittedAddress(tokenId, addressToPermit);
+          permitted = await pkpPermissions.isPermittedAddress(
+            tokenId,
+            addressToPermit
+          );
+          expect(permitted).equal(false);
         });
 
         it('grants permission to an eth address and then revokes it', async () => {

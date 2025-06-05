@@ -22,7 +22,7 @@ tracing = { version = "0.1.40", optional = true }
 env_logger = { git = "https://github.com/LIT-Protocol/env_logger.git", optional = true }
 base64 = { version = "0.20.0-alpha.1" }
 sha2 = { version = "0.10.6" }
-async-std = { version = "1.12.0" }
+async-std = { version = "1.13.1" }
 clap = { version = "4.1.13", features = ["derive"] }
 config = { version = "0.13.2" }
 once_cell = { version = "1.16.0" }

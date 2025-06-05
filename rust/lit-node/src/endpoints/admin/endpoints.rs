@@ -3,7 +3,7 @@ use crate::endpoints::admin::utils::get_test_recovery_party;
 use crate::endpoints::admin::utils::{
     check_admin_auth_sig, encrypt_and_tar_backup_keys, purge_precomputes, untar_keys_stream,
 };
-use crate::error::{parser_err, validation_err, validation_err_code, EC};
+use crate::error::{parser_err, validation_err_code, EC};
 use crate::models;
 #[cfg(not(feature = "testing"))]
 use crate::tss::common::backup::get_recovery_party;
@@ -78,10 +78,11 @@ pub async fn admin_set(
             Some(new_rpc_entries) => new_rpc_entries,
             None => {
                 return validation_err_code(
-                    "Missing RPC config entry for chain",
-                    EC::NodeAdminUnauthorized,
+                    "Missing RPC config entry for mandatory chain",
+                    EC::NodeRpcConfigForbidden,
                     None,
                 )
+                .add_msg_to_details()
                 .handle();
             }
         };
@@ -90,10 +91,12 @@ pub async fn admin_set(
         let existing_rpc_entries = match existing_rpc_resolver.resolve(chain) {
             Ok(existing_rpc_entries) => existing_rpc_entries,
             Err(e) => {
-                return validation_err(
+                return validation_err_code(
                     e,
+                    EC::NodeRpcConfigForbidden,
                     Some("Cannot resolve chain in existing RPC config".into()),
                 )
+                .add_msg_to_details()
                 .handle();
             }
         };
@@ -102,7 +105,7 @@ pub async fn admin_set(
         if *existing_rpc_entries != *new_rpc_entries {
             return validation_err_code(
                 "Unauthorized to edit protected chain values",
-                EC::NodeAdminUnauthorized,
+                EC::NodeRpcConfigForbidden,
                 None,
             )
             .handle();

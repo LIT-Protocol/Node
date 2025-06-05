@@ -148,8 +148,7 @@ function startQueue() {
     // if the queue is idle, exit
     // @ts-ignore
     await globalThis.queue.onEmpty();
-    console.log('Done deploying');
-    process.exit(0);
+    console.log('Done verifying');
   };
   // @ts-ignore
   globalThis.queue = new PQueue({ concurrency: 10 });

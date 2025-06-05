@@ -277,6 +277,7 @@ pub async fn get_auth_context(
         None => {
             let auth_context = models::AuthContext {
                 action_ipfs_ids: vec![],
+                action_ipfs_id_stack: vec![],
                 auth_sig_address: verified_wallet_address,
                 auth_method_contexts: vec![],
                 resources: vec![],
@@ -345,11 +346,17 @@ pub async fn get_auth_context(
     }
 
     let mut action_ipfs_ids = vec![];
+    let mut action_ipfs_id_stack = vec![];
     if let Some(action_ipfs_id) = action_ipfs_id.clone() {
-        action_ipfs_ids.push(action_ipfs_id);
+        // This vec is broken, and only contains the current IPFS CID of the running action.
+        // We are retaining this for backwards compatibility in case existing apps depend on it.
+        action_ipfs_ids = vec![action_ipfs_id.clone()];
+        // This vec is fixed, which contains the full stack of IPFS CIDs of the running actions.
+        action_ipfs_id_stack.push(action_ipfs_id);
     }
     let auth_context = models::AuthContext {
         action_ipfs_ids,
+        action_ipfs_id_stack,
         auth_sig_address: verified_wallet_address,
         auth_method_contexts,
         resources: recap_message,

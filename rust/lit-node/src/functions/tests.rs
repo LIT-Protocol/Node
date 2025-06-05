@@ -157,7 +157,7 @@ async fn auth_context(server: TestServer) {
 
     assert_eq!(
         res.response,
-        r#"{"actionIpfsIds":["some-ipfs-id"],"authSigAddress":null,"authMethodContexts":[],"resources":[],"customAuthResource":""}"#
+        r#"{"actionIpfsIds":["some-ipfs-id"],"actionIpfsIdStack":["some-ipfs-id"],"authSigAddress":null,"authMethodContexts":[],"resources":[],"customAuthResource":""}"#
     );
     assert_eq!(res.logs, "[ \"some-ipfs-id\" ]\n");
 }
@@ -271,20 +271,27 @@ async fn fetch_invocation_limit(server: TestServer) {
 
 #[rstest]
 #[tokio::test]
+// note about this test: the actionIpfsIds is broken, and only contains the current IPFS CID of the running action.
+// We are retaining this for backwards compatibility in case existing apps depend on it.
+// The actionIpfsIdStack is fixed, which contains the full stack of IPFS CIDs of the running actions.
+// This test is used to verify that both the actionIpfsIds and actionIpfsIdStack is correctly populated.
 async fn call_child(server: TestServer) {
-    // Note: When updating the child code below, run this test again to get
-    // the new IPFS hash from the error message.
-    let ipfs_id = "QmQiwSfnXdvTZ5WwGpirq22JMb8UuKcgVFwm8keNSegYqQ";
-    let child_code = indoc! {r#"
+    // Note: When updating any child code below, run this test again to get the new IPFS hash from the error message.
+    let child1_ipfs_id = "QmTKj5hVSPx6RFWQMFVUwxinQ2QMurrikFtNciJCsxx8Tg";
+    let child1_code = indoc! {r#"
         (async () => {
+            console.log("child action #1, actionIpfsIds:", LitAuth.actionIpfsIds.join(","), ", actionIpfsIdStack:", LitAuth.actionIpfsIdStack.join(","))
             if (typeof ipfsId === "string") {
-                console.log("child action #1")
                 await LitActions.call({ipfsId, params: {Link}})
-            } else {
-                console.log("child action #2")
-                LitActions.setResponse({response: "child"})
-                await fetch(Link)
             }
+        })()
+    "#};
+    let child2_ipfs_id = "QmRz81aWn9ctxdUxeqMPm7dg5s8wMrwwLK8pTD92793dzV";
+    let child2_code = indoc! {r#"
+        (async () => {
+            console.log("child action #2, actionIpfsIds:", LitAuth.actionIpfsIds.join(","), ", actionIpfsIdStack:", LitAuth.actionIpfsIdStack.join(","))
+            LitActions.setResponse({response: "child"})
+            await fetch(Link)
         })()
     "#};
 
@@ -293,8 +300,13 @@ async fn call_child(server: TestServer) {
     // Start fake IPFS server returning child code
     let mock_server = MockServer::start().await;
     Mock::given(method("GET"))
-        .and(path(format!("/ipfs/{ipfs_id}")))
-        .respond_with(ResponseTemplate::new(200).set_body_string(child_code))
+        .and(path(format!("/ipfs/{child1_ipfs_id}")))
+        .respond_with(ResponseTemplate::new(200).set_body_string(child1_code))
+        .mount(&mock_server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path(format!("/ipfs/{child2_ipfs_id}")))
+        .respond_with(ResponseTemplate::new(200).set_body_string(child2_code))
         .mount(&mock_server)
         .await;
 
@@ -323,12 +335,16 @@ async fn call_child(server: TestServer) {
             await fetch("{uri}")
             console.log("start")
             await LitActions.call({{
-                ipfsId: "{ipfs_id}",
+                ipfsId: "{child2_ipfs_id}",
                 params: {{ Link: "{uri}" }}
             }})
             await LitActions.call({{
-                ipfsId: "{ipfs_id}",
-                params: {{ Link: "{uri}", ipfsId: "{ipfs_id}" }}
+                ipfsId: "{child1_ipfs_id}",
+                params: {{ Link: "{uri}", ipfsId: "{child2_ipfs_id}" }}
+            }})
+           await LitActions.call({{
+                ipfsId: "{child1_ipfs_id}",
+                params: {{ Link: "{uri}", ipfsId: "{child1_ipfs_id}" }}
             }})
             console.log("end")
         }})()
@@ -344,15 +360,20 @@ async fn call_child(server: TestServer) {
             response: "child".to_string(),
             logs: [
                 "start",
-                "child action #2",
-                "child action #1",
-                "child action #2",
+                // Call #2
+                &format!("child action #2, actionIpfsIds: {child2_ipfs_id} , actionIpfsIdStack: {child2_ipfs_id}"),
+                // Call #1, which calls #2
+                &format!("child action #1, actionIpfsIds: {child1_ipfs_id} , actionIpfsIdStack: {child1_ipfs_id}"),
+                &format!("child action #2, actionIpfsIds: {child2_ipfs_id} , actionIpfsIdStack: {child1_ipfs_id},{child2_ipfs_id}"),
+                // Call #1, which calls itself
+                &format!("child action #1, actionIpfsIds: {child1_ipfs_id} , actionIpfsIdStack: {child1_ipfs_id}"),
+                &format!("child action #1, actionIpfsIds: {child1_ipfs_id} , actionIpfsIdStack: {child1_ipfs_id},{child1_ipfs_id}"),
                 "end",
             ]
             .join("\n")
                 + "\n",
             fetch_count: 3,
-            ops_count: 14,
+            ops_count: 18,
             ..Default::default()
         }
     );
@@ -373,33 +394,6 @@ async fn call_child(server: TestServer) {
             "unexpected error: Uncaught (in promise) Error: Uncaught (in promise) Error: The recursion limit of a child action is 1 and you have attempted to exceed that limit."
         );
     }
-}
-
-#[rstest]
-#[tokio::test]
-async fn get_latest_nonce(server: TestServer) {
-    let mut client = Client::new(server.socket_path());
-
-    let code = indoc! {r#"
-        (async () => {
-            const response = await LitActions.getLatestNonce({address, chain})
-            LitActions.setResponse({response})
-        })()
-    "#};
-
-    let res = client
-        .execute_js(ExecutionOptions {
-            code: Arc::new(code.to_string()),
-            globals: Some(json!({
-                "address": "0xb794f5ea0ba39494ce839613fffba74279579268",
-                "chain": "ethereum",
-            })),
-            ..Default::default()
-        })
-        .await
-        .unwrap();
-
-    assert_eq!(res.response, "0xd3");
 }
 
 #[rstest]

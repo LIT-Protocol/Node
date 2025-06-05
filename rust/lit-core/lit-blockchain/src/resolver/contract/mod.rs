@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::result::Result as StdResult;
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use arc_swap::ArcSwap;
 use ethers::abi::Detokenize;
@@ -11,6 +12,7 @@ use ethers::providers::Provider;
 use ethers::types::H160;
 use ethers::utils::keccak256;
 use log::{as_serde, warn};
+use moka::sync::Cache;
 use once_cell::sync::Lazy;
 
 #[allow(unused_imports)]
@@ -736,23 +738,30 @@ impl SubnetResolverCache {
 
 #[derive(Debug, Clone)]
 struct SubnetResolverCacheEntry {
-    contracts: HashMap<String, ResolvedContract>,
+    contracts: Cache<String, ResolvedContract>,
     address_map: HashMap<H160, String>,
 }
 
 impl SubnetResolverCacheEntry {
     fn new() -> Self {
-        Self { contracts: HashMap::new(), address_map: HashMap::new() }
+        // 60 min ttl, 1000 max capacity
+        Self {
+            contracts: Cache::builder()
+                .time_to_live(Duration::from_secs(60 * 60))
+                .max_capacity(1000)
+                .build(),
+            address_map: HashMap::new(),
+        }
     }
 
-    pub fn get<K>(&self, contract_key: K) -> Option<&ResolvedContract>
+    pub fn get<K>(&self, contract_key: K) -> Option<ResolvedContract>
     where
         K: AsRef<str>,
     {
         self.contracts.get(contract_key.as_ref())
     }
 
-    pub fn get_by_address(&self, address: &H160) -> Option<&ResolvedContract> {
+    pub fn get_by_address(&self, address: &H160) -> Option<ResolvedContract> {
         if let Some(key) = self.address_map.get(address) {
             self.get(key)
         } else {

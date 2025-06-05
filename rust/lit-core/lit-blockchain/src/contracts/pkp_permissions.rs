@@ -885,6 +885,28 @@ pub mod pkp_permissions {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("getTrustedForwarder"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "getTrustedForwarder",
+                            ),
+                            inputs: ::std::vec![],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("getUserPubkeyForAuthMethod"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -1340,6 +1362,28 @@ pub mod pkp_permissions {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("setTrustedForwarder"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "setTrustedForwarder",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("forwarder"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("supportsInterface"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -1777,6 +1821,26 @@ pub mod pkp_permissions {
                                     kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
                                         32usize,
                                     ),
+                                    indexed: false,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("TrustedForwarderSet"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "TrustedForwarderSet",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned(
+                                        "newTrustedForwarder",
+                                    ),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
                                     indexed: false,
                                 },
                             ],
@@ -2431,6 +2495,17 @@ pub mod pkp_permissions {
                 .method_hash([85, 33, 196, 82], (auth_method_type, id))
                 .expect("method not found (this should never happen)")
         }
+        ///Calls the contract's `getTrustedForwarder` (0xce1b815f) function
+        pub fn get_trusted_forwarder(
+            &self,
+        ) -> ::ethers::contract::builders::ContractCall<
+            M,
+            ::ethers::core::types::Address,
+        > {
+            self.0
+                .method_hash([206, 27, 129, 95], ())
+                .expect("method not found (this should never happen)")
+        }
         ///Calls the contract's `getUserPubkeyForAuthMethod` (0xa1afdc6f) function
         pub fn get_user_pubkey_for_auth_method(
             &self,
@@ -2567,6 +2642,15 @@ pub mod pkp_permissions {
                 .method_hash([103, 5, 198, 242], (token_id, group, root))
                 .expect("method not found (this should never happen)")
         }
+        ///Calls the contract's `setTrustedForwarder` (0xda742228) function
+        pub fn set_trusted_forwarder(
+            &self,
+            forwarder: ::ethers::core::types::Address,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([218, 116, 34, 40], forwarder)
+                .expect("method not found (this should never happen)")
+        }
         ///Calls the contract's `supportsInterface` (0x01ffc9a7) function
         pub fn supports_interface(
             &self,
@@ -2690,6 +2774,16 @@ pub mod pkp_permissions {
             ::std::sync::Arc<M>,
             M,
             RootHashUpdatedFilter,
+        > {
+            self.0.event()
+        }
+        ///Gets the contract's `TrustedForwarderSet` event
+        pub fn trusted_forwarder_set_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            TrustedForwarderSetFilter,
         > {
             self.0.event()
         }
@@ -3565,6 +3659,22 @@ pub mod pkp_permissions {
         pub group: ::ethers::core::types::U256,
         pub root: [u8; 32],
     }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethevent(name = "TrustedForwarderSet", abi = "TrustedForwarderSet(address)")]
+    pub struct TrustedForwarderSetFilter {
+        pub new_trusted_forwarder: ::ethers::core::types::Address,
+    }
     ///Container type for all of the contract's events
     #[derive(
         Clone,
@@ -3585,6 +3695,7 @@ pub mod pkp_permissions {
         PermittedAuthMethodScopeAddedFilter(PermittedAuthMethodScopeAddedFilter),
         PermittedAuthMethodScopeRemovedFilter(PermittedAuthMethodScopeRemovedFilter),
         RootHashUpdatedFilter(RootHashUpdatedFilter),
+        TrustedForwarderSetFilter(TrustedForwarderSetFilter),
     }
     impl ::ethers::contract::EthLogDecode for PKPPermissionsEvents {
         fn decode_log(
@@ -3622,6 +3733,9 @@ pub mod pkp_permissions {
             if let Ok(decoded) = RootHashUpdatedFilter::decode_log(log) {
                 return Ok(PKPPermissionsEvents::RootHashUpdatedFilter(decoded));
             }
+            if let Ok(decoded) = TrustedForwarderSetFilter::decode_log(log) {
+                return Ok(PKPPermissionsEvents::TrustedForwarderSetFilter(decoded));
+            }
             Err(::ethers::core::abi::Error::InvalidData)
         }
     }
@@ -3648,6 +3762,9 @@ pub mod pkp_permissions {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::RootHashUpdatedFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+                Self::TrustedForwarderSetFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
             }
@@ -3695,6 +3812,11 @@ pub mod pkp_permissions {
     impl ::core::convert::From<RootHashUpdatedFilter> for PKPPermissionsEvents {
         fn from(value: RootHashUpdatedFilter) -> Self {
             Self::RootHashUpdatedFilter(value)
+        }
+    }
+    impl ::core::convert::From<TrustedForwarderSetFilter> for PKPPermissionsEvents {
+        fn from(value: TrustedForwarderSetFilter) -> Self {
+            Self::TrustedForwarderSetFilter(value)
         }
     }
     ///Container type for all input parameters for the `addPermittedAction` function with signature `addPermittedAction(uint256,bytes,uint256[])` and selector `0x8a431578`
@@ -4111,6 +4233,21 @@ pub mod pkp_permissions {
         pub auth_method_type: ::ethers::core::types::U256,
         pub id: ::ethers::core::types::Bytes,
     }
+    ///Container type for all input parameters for the `getTrustedForwarder` function with signature `getTrustedForwarder()` and selector `0xce1b815f`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "getTrustedForwarder", abi = "getTrustedForwarder()")]
+    pub struct GetTrustedForwarderCall;
     ///Container type for all input parameters for the `getUserPubkeyForAuthMethod` function with signature `getUserPubkeyForAuthMethod(uint256,bytes)` and selector `0xa1afdc6f`
     #[derive(
         Clone,
@@ -4351,6 +4488,23 @@ pub mod pkp_permissions {
         pub group: ::ethers::core::types::U256,
         pub root: [u8; 32],
     }
+    ///Container type for all input parameters for the `setTrustedForwarder` function with signature `setTrustedForwarder(address)` and selector `0xda742228`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "setTrustedForwarder", abi = "setTrustedForwarder(address)")]
+    pub struct SetTrustedForwarderCall {
+        pub forwarder: ::ethers::core::types::Address,
+    }
     ///Container type for all input parameters for the `supportsInterface` function with signature `supportsInterface(bytes4)` and selector `0x01ffc9a7`
     #[derive(
         Clone,
@@ -4465,6 +4619,7 @@ pub mod pkp_permissions {
         GetPubkey(GetPubkeyCall),
         GetRouterAddress(GetRouterAddressCall),
         GetTokenIdsForAuthMethod(GetTokenIdsForAuthMethodCall),
+        GetTrustedForwarder(GetTrustedForwarderCall),
         GetUserPubkeyForAuthMethod(GetUserPubkeyForAuthMethodCall),
         IsPermittedAction(IsPermittedActionCall),
         IsPermittedAddress(IsPermittedAddressCall),
@@ -4477,6 +4632,7 @@ pub mod pkp_permissions {
         RemovePermittedAuthMethodScope(RemovePermittedAuthMethodScopeCall),
         SetContractResolver(SetContractResolverCall),
         SetRootHash(SetRootHashCall),
+        SetTrustedForwarder(SetTrustedForwarderCall),
         SupportsInterface(SupportsInterfaceCall),
         TransferOwnership(TransferOwnershipCall),
         VerifyState(VerifyStateCall),
@@ -4592,6 +4748,11 @@ pub mod pkp_permissions {
             ) {
                 return Ok(Self::GetTokenIdsForAuthMethod(decoded));
             }
+            if let Ok(decoded) = <GetTrustedForwarderCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::GetTrustedForwarder(decoded));
+            }
             if let Ok(decoded) = <GetUserPubkeyForAuthMethodCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
             ) {
@@ -4651,6 +4812,11 @@ pub mod pkp_permissions {
                 data,
             ) {
                 return Ok(Self::SetRootHash(decoded));
+            }
+            if let Ok(decoded) = <SetTrustedForwarderCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::SetTrustedForwarder(decoded));
             }
             if let Ok(decoded) = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
@@ -4739,6 +4905,9 @@ pub mod pkp_permissions {
                 Self::GetTokenIdsForAuthMethod(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
+                Self::GetTrustedForwarder(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
                 Self::GetUserPubkeyForAuthMethod(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -4771,6 +4940,9 @@ pub mod pkp_permissions {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::SetRootHash(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::SetTrustedForwarder(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::SupportsInterface(element) => {
@@ -4836,6 +5008,9 @@ pub mod pkp_permissions {
                 Self::GetTokenIdsForAuthMethod(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
+                Self::GetTrustedForwarder(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::GetUserPubkeyForAuthMethod(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
@@ -4866,6 +5041,9 @@ pub mod pkp_permissions {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::SetRootHash(element) => ::core::fmt::Display::fmt(element, f),
+                Self::SetTrustedForwarder(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::SupportsInterface(element) => ::core::fmt::Display::fmt(element, f),
                 Self::TransferOwnership(element) => ::core::fmt::Display::fmt(element, f),
                 Self::VerifyState(element) => ::core::fmt::Display::fmt(element, f),
@@ -4979,6 +5157,11 @@ pub mod pkp_permissions {
             Self::GetTokenIdsForAuthMethod(value)
         }
     }
+    impl ::core::convert::From<GetTrustedForwarderCall> for PKPPermissionsCalls {
+        fn from(value: GetTrustedForwarderCall) -> Self {
+            Self::GetTrustedForwarder(value)
+        }
+    }
     impl ::core::convert::From<GetUserPubkeyForAuthMethodCall> for PKPPermissionsCalls {
         fn from(value: GetUserPubkeyForAuthMethodCall) -> Self {
             Self::GetUserPubkeyForAuthMethod(value)
@@ -5039,6 +5222,11 @@ pub mod pkp_permissions {
     impl ::core::convert::From<SetRootHashCall> for PKPPermissionsCalls {
         fn from(value: SetRootHashCall) -> Self {
             Self::SetRootHash(value)
+        }
+    }
+    impl ::core::convert::From<SetTrustedForwarderCall> for PKPPermissionsCalls {
+        fn from(value: SetTrustedForwarderCall) -> Self {
+            Self::SetTrustedForwarder(value)
         }
     }
     impl ::core::convert::From<SupportsInterfaceCall> for PKPPermissionsCalls {
@@ -5287,6 +5475,20 @@ pub mod pkp_permissions {
     pub struct GetTokenIdsForAuthMethodReturn(
         pub ::std::vec::Vec<::ethers::core::types::U256>,
     );
+    ///Container type for all return fields from the `getTrustedForwarder` function with signature `getTrustedForwarder()` and selector `0xce1b815f`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct GetTrustedForwarderReturn(pub ::ethers::core::types::Address);
     ///Container type for all return fields from the `getUserPubkeyForAuthMethod` function with signature `getUserPubkeyForAuthMethod(uint256,bytes)` and selector `0xa1afdc6f`
     #[derive(
         Clone,

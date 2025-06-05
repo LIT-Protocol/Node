@@ -9,14 +9,14 @@ use lit_node_operator::get_instance_item;
 use lit_node_operator::host_commands_listener::HostCommandsListener;
 use nix::unistd::Uid;
 use tracing::{debug, error};
-use tracing_subscriber::prelude::*;
+use tracing_subscriber::{prelude::*, EnvFilter};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize logging
     match tracing_journald::layer() {
         Ok(layer) => {
-            tracing_subscriber::registry().with(layer).init();
+            tracing_subscriber::registry().with(EnvFilter::from_default_env()).with(layer).init();
         }
         Err(e) => {
             eprintln!("Failed to initialize journald logging: {}", e);
@@ -44,6 +44,9 @@ async fn main() -> Result<()> {
         .expect("Datil and later must have a HostCommands contract");
 
     let listener = HostCommandsListener::new(host_commands_contract, item)?;
-    listener.listen_for_events().await?;
+    if let Err(e) = listener.listen_for_events().await {
+        error!("{}", e);
+        std::process::exit(1);
+    }
     Ok(())
 }

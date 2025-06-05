@@ -1390,6 +1390,18 @@ describe('Staking', function () {
           10,
           10,
           true,
+          {
+            timeout_ms: 1000,
+            memory_limit_mb: 100,
+            max_code_length: 1000,
+            max_response_length: 1000,
+            max_fetch_count: 1000,
+            max_sign_count: 1000,
+            max_contract_call_count: 1000,
+            max_broadcast_and_collect_count: 1000,
+            max_call_depth: 1000,
+            max_retries: 1000,
+          },
         ])
       ).revertedWithCustomError(stakingUtilsLib, 'CallerNotOwner()');
 
@@ -1604,6 +1616,8 @@ async function updateMinimumValidatorCount(
     peerCheckingIntervalSecs: currentConfig.peerCheckingIntervalSecs,
     maxTripleConcurrency: currentConfig.maxTripleConcurrency,
     rpcHealthcheckEnabled: true,
+    litActionConfig: Object.values(currentConfig.litActionConfig),
+    heliosEnabled: true,
   });
 }
 

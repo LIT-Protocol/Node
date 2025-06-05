@@ -64,7 +64,7 @@ impl<'a> From<&'a ExecutionRequest> for DebugExecutionRequest<'a> {
     }
 }
 
-impl<'a> std::fmt::Debug for DebugExecutionRequest<'a> {
+impl std::fmt::Debug for DebugExecutionRequest<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         const MAX_CODE_LEN: usize = 500;
 

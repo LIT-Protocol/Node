@@ -2,8 +2,6 @@ use crate::error::{blockchain_err, blockchain_err_code, Result, EC};
 use crate::utils::contract::decode_revert;
 use ethers::types::{U256, U64};
 use std::time::Duration;
-#[cfg(not(feature = "testing"))]
-use std::time::SystemTime;
 use tracing::trace;
 
 use super::super::PeerState;

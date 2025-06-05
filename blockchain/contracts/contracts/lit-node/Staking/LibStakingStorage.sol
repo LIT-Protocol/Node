@@ -72,6 +72,19 @@ library LibStakingStorage {
         uint256 timeout; // timeout in seconds, where the nodes can be unlocked.
     }
 
+    struct LitActionConfig {
+        uint256 timeoutMs;
+        uint256 memoryLimitMb;
+        uint256 maxCodeLength;
+        uint256 maxResponseLength;
+        uint256 maxFetchCount;
+        uint256 maxSignCount;
+        uint256 maxContractCallCount;
+        uint256 maxBroadcastAndCollectCount;
+        uint256 maxCallDepth;
+        uint256 maxRetries;
+    }
+
     struct Config {
         uint256 tokenRewardPerTokenPerEpoch;
         /// @notice Use complaintReasonToConfig instead.
@@ -89,6 +102,10 @@ library LibStakingStorage {
         uint256 peerCheckingIntervalSecs;
         uint256 maxTripleConcurrency;
         bool rpcHealthcheckEnabled;
+        LitActionConfig litActionConfig;
+        // NOTE: heliosEnabled currently unused in node code,
+        // see:  https://github.com/LIT-Protocol/lit-assets/pull/1981
+        bool heliosEnabled;
     }
 
     struct ComplaintConfig {

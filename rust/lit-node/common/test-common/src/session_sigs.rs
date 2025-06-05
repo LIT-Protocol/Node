@@ -44,7 +44,7 @@ pub const VALID_PKP_SIGNING_LIT_ACTION_CODE: &str = r#"(async () => {
     console.log("Lit.Auth", Lit.Auth);
 
     // Signs only when the sessionSig was created by the below Custom Lit Action Authentication
-    if (Lit.Auth.actionIpfsIds.includes("QmNZQXmY2VijUPfNrkC6zWykBnEniDouAeUpFi9r6aaqNz")) {
+    if (Lit.Auth.actionIpfsIdStack.includes("QmNZQXmY2VijUPfNrkC6zWykBnEniDouAeUpFi9r6aaqNz")) {
         const sigShare = await LitActions.signEcdsa({ toSign, publicKey, sigName });
     }
 })();
@@ -58,7 +58,7 @@ pub const CUSTOM_AUTH_RESOURCE_VALID_PKP_SIGNING_LIT_ACTION_CODE: &str = r#"(asy
     console.log("isValidCustomAuthResource-", isValidCustomAuthResource);
 
     // Checks the custom auth resource returned in the SessionSigs
-    if (Lit.Auth.actionIpfsIds.includes("QmRxUzYX52zEko9nvvtkdA6k8jU36enwwTVgW9ZwbdsUHY") && isValidCustomAuthResource) {
+    if (Lit.Auth.actionIpfsIdStack.includes("QmRxUzYX52zEko9nvvtkdA6k8jU36enwwTVgW9ZwbdsUHY") && isValidCustomAuthResource) {
         console.log("Custom Authorization Successful!");
         const sigShare = await LitActions.signEcdsa({ toSign, publicKey, sigName });
     }
@@ -76,9 +76,16 @@ pub const NO_AUTH_METHOD_PKP_SIGNING_LIT_ACTION_CODE: &str = r#"(async () => {
     const toSign = utf8Encode.encode('This message is exactly 32 bytes');
     console.log("Lit.Auth", Lit.Auth);
     // Signs only when the sessionSig was created by the below Custom Lit Action Authentication
-    if (Lit.Auth.actionIpfsIds.includes("QmWLP9ojXrHJrFHnvMJv12HScFoz7R8kcYAECjtcpaJM2Y")) {
+    if (Lit.Auth.actionIpfsIdStack.includes("QmWLP9ojXrHJrFHnvMJv12HScFoz7R8kcYAECjtcpaJM2Y")) {
         const sigShare = await LitActions.signEcdsa({ toSign, publicKey, sigName });
     }
+})();
+"#;
+
+pub const SIGN_ECDSA_LIT_ACTION_CODE: &str = r#"(async () => {
+    let utf8Encode = new TextEncoder();
+    const toSign = utf8Encode.encode('This message is exactly 32 bytes');
+    const sigShare = await LitActions.signEcdsa({ toSign, publicKey, sigName });
 })();
 "#;
 

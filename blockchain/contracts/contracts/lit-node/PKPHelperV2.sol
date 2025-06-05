@@ -26,6 +26,7 @@ contract PKPHelperV2 is Ownable, IERC721Receiver {
         uint256[] pkpEthAddressScopes;
         bool sendPkpToItself;
         bool burnPkp;
+        address sendToAddressAfterMinting;
     }
 
     /* ========== STATE VARIABLES ========== */
@@ -144,6 +145,12 @@ contract PKPHelperV2 is Ownable, IERC721Receiver {
             );
         } else if (params.burnPkp) {
             PKPNFTFacet(getPkpNftAddress()).burn(tokenId);
+        } else if (params.sendToAddressAfterMinting != address(0)) {
+            PKPNFTFacet(getPkpNftAddress()).safeTransferFrom(
+                address(this),
+                params.sendToAddressAfterMinting,
+                tokenId
+            );
         } else {
             PKPNFTFacet(getPkpNftAddress()).safeTransferFrom(
                 address(this),

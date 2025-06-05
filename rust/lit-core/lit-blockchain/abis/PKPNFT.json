@@ -531,6 +531,19 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "address",
+          "name": "newTrustedForwarder",
+          "type": "address"
+        }
+      ],
+      "name": "TrustedForwarderSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
           "internalType": "uint256",
           "name": "amount",
           "type": "uint256"
@@ -784,6 +797,19 @@
     {
       "inputs": [],
       "name": "getStakingAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTrustedForwarder",
       "outputs": [
         {
           "internalType": "address",
@@ -1055,6 +1081,19 @@
         }
       ],
       "name": "setMintCost",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "forwarder",
+          "type": "address"
+        }
+      ],
+      "name": "setTrustedForwarder",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

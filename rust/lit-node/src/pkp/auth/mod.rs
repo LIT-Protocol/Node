@@ -17,6 +17,7 @@ use lit_blockchain::resolver::contract::ContractResolver;
 use lit_core::config::LitConfig;
 
 use lit_core::error::Unexpected;
+use lit_core::utils::ipfs::bytes_to_ipfs_cid;
 use tracing::instrument;
 
 mod apple;
@@ -52,6 +53,7 @@ pub enum AuthMethodScope {
     SignPersonalMessage = 2,
 }
 
+#[instrument(skip_all)]
 pub async fn verify_auth_method(
     auth_method: &models::AuthMethod,
     config: Arc<LitConfig>,
@@ -146,6 +148,7 @@ pub async fn verify_auth_method(
     Ok(auth_method_response)
 }
 
+#[instrument(skip_all)]
 pub async fn verify_auth_method_for_claim(
     auth_method: &models::AuthMethod,
     config: Arc<LitConfig>,
@@ -421,7 +424,7 @@ pub async fn check_pkp_auth(
     }
 
     // check if any of the Lit actions in AuthContext are valid
-    for ipfs_id in auth_context.action_ipfs_ids {
+    for ipfs_id in auth_context.action_ipfs_id_stack {
         let lit_action_auth_method_type = U256::from(2); // AuthMethodType::Action
         let ipfs_id_bytes = encoding::ipfs_cid_to_bytes(ipfs_id.clone())?;
 
@@ -589,6 +592,14 @@ async fn is_any_user_address_format_permitted(
 
     for auth_method in permitted_auth_methods {
         debug!("Checking auth method: {:?}", auth_method);
+        // if the auth method type is 2 aka an IPFS cid, print this too
+        if auth_method.auth_method_type == U256::from(2) {
+            // encode as a base58 ipfs cid
+            trace!(
+                "IPFS cid of auth method: {:?}",
+                bytes_to_ipfs_cid(auth_method.id.clone())
+            );
+        }
         let is_address_permitted_auth_method_type =
             auth_method.auth_method_type == address_auth_method_type;
         if !is_address_permitted_auth_method_type {

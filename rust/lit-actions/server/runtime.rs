@@ -8,15 +8,19 @@ use std::time::Duration;
 
 use anyhow::{anyhow, bail, Context, Result};
 use deno_core::{v8, JsRuntime, NoopModuleLoader};
+use deno_resolver::npm::{DenoInNpmPackageChecker, ManagedNpmResolver};
 use deno_runtime::{
     deno_fs::RealFs,
     deno_permissions::{Permissions, PermissionsContainer, PermissionsOptions},
     fmt_errors::format_js_error,
-    worker::{MainWorker, WorkerOptions},
+    permissions::RuntimePermissionDescriptorParser,
+    tokio_util::create_and_run_current_thread,
+    worker::{MainWorker, WorkerOptions, WorkerServiceOptions},
     BootstrapOptions, WorkerLogLevel,
 };
 use indoc::formatdoc;
 use lit_actions_grpc::proto::{ExecuteJsRequest, ExecuteJsResponse};
+use sys_traits::impls::RealSys;
 use tokio::sync::{mpsc, oneshot};
 use tonic::Status;
 use tracing::{debug, info_span, instrument};
@@ -41,10 +45,6 @@ fn deno_isolate_init() -> Option<&'static [u8]> {
     Some(RUNTIME_SNAPSHOT)
 }
 
-fn get_error_class_name(e: &anyhow::Error) -> &'static str {
-    deno_runtime::errors::get_error_class_name(e).unwrap_or("Error")
-}
-
 // using the worker built into deno
 #[instrument(skip_all, err)]
 fn build_main_worker_and_inject_sdk(
@@ -53,12 +53,6 @@ fn build_main_worker_and_inject_sdk(
     http_headers: BTreeMap<String, String>,
     memory_limit_mb: Option<usize>,
 ) -> Result<MainWorker> {
-    // Deny everything except for network access, e.g. via fetch()
-    let perms = Permissions::from_options(&PermissionsOptions {
-        allow_net: Some(vec![]),
-        ..Default::default()
-    })?;
-
     let options = WorkerOptions {
         bootstrap: BootstrapOptions {
             cpu_count: 1,
@@ -73,33 +67,52 @@ fn build_main_worker_and_inject_sdk(
         create_params: memory_limit_mb
             .map(|limit| v8::CreateParams::default().heap_limits(0, limit * 1024 * 1024)),
         unsafely_ignore_certificate_errors: None,
-        root_cert_store_provider: None,
         seed: None,
-        fs: Arc::new(RealFs),
-        module_loader: Rc::new(NoopModuleLoader), // avoid loading any modules
-        node_services: None,
-        create_web_worker_cb: Arc::new(|_| unimplemented!("web workers are not supported")),
+        create_web_worker_cb: Arc::new(|_| {
+            unreachable!("web workers are disabled in PatchDeno.js")
+        }),
         format_js_error_fn: Some(Arc::new(format_js_error)),
         maybe_inspector_server: None,
         should_break_on_first_statement: false,
         should_wait_for_inspector_session: false,
         strace_ops: None,
-        get_error_class_fn: Some(&get_error_class_name),
         cache_storage_dir: None,
         origin_storage_dir: None,
-        blob_store: Default::default(),
-        broadcast_channel: Default::default(),
-        shared_array_buffer_store: None,
-        compiled_wasm_module_store: None,
         stdio: Default::default(),
-        feature_checker: Default::default(),
-        v8_code_cache: None,
+        enable_stack_trace_arg_in_ops: false,
     };
+
+    // Deny everything except for network access, e.g. via fetch()
+    let desc_parser = Arc::new(RuntimePermissionDescriptorParser::new(RealSys));
+    let perms = Permissions::from_options(
+        desc_parser.as_ref(),
+        &PermissionsOptions {
+            allow_net: Some(vec![]),
+            ..Default::default()
+        },
+    )
+    .expect("valid permissions");
+
+    let services =
+        WorkerServiceOptions::<DenoInNpmPackageChecker, ManagedNpmResolver<RealSys>, RealSys> {
+            blob_store: Default::default(),
+            broadcast_channel: Default::default(),
+            feature_checker: Default::default(),
+            fs: Arc::new(RealFs),
+            module_loader: Rc::new(NoopModuleLoader),
+            node_services: Default::default(),
+            npm_process_state_provider: Default::default(),
+            permissions: PermissionsContainer::new(desc_parser, perms),
+            root_cert_store_provider: Default::default(),
+            fetch_dns_resolver: Default::default(),
+            shared_array_buffer_store: Default::default(),
+            compiled_wasm_module_store: Default::default(),
+            v8_code_cache: Default::default(),
+        };
 
     let main_module =
         deno_core::resolve_url_or_path("./$lit$actions.js", Path::new(env!("CARGO_MANIFEST_DIR")))?;
-    let mut worker =
-        MainWorker::bootstrap_from_options(main_module, PermissionsContainer::new(perms), options);
+    let mut worker = MainWorker::bootstrap_from_options(&main_module, services, options);
 
     {
         let _span = info_span!("LitNamespace.js").entered();
@@ -145,18 +158,19 @@ fn build_main_worker_and_inject_sdk(
     }
 
     {
-        let _span = info_span!("DenoNamespace.js").entered();
+        let _span = info_span!("PatchDeno.js").entered();
 
         let code = formatdoc! {r#"
             "use strict";
             delete Deno.build;
             delete Deno.permissions;
             delete Deno.version;
+            delete globalThis.Worker;
         "#};
 
         worker
-            .execute_script("DenoNamespace.js", code.into())
-            .context("Error patching Deno namespace")?;
+            .execute_script("PatchDeno.js", code.into())
+            .context("Error patching Deno runtime")?;
     }
 
     if let Some(params) = globals_to_inject {
@@ -214,6 +228,11 @@ pub(crate) async fn execute_js(
     outbound_tx: flume::Sender<tonic::Result<ExecuteJsResponse>>,
     inbound_rx: flume::Receiver<ExecuteJsRequest>,
 ) -> Result<()> {
+    // Fast path to do nothing, allowing us to benchmark with and without Deno involved
+    if code.is_empty() || code.bytes().all(|b| b.is_ascii_whitespace()) {
+        return Ok(());
+    }
+
     // Don't output ANSI escape sequences, e.g. when formatting JS errors
     static COLOR_INIT: Once = Once::new();
     COLOR_INIT.call_once(|| deno_runtime::colors::set_use_color(false));
@@ -305,12 +324,7 @@ fn start_controller_thread(
     let isolate_handle = js_runtime.v8_isolate().thread_safe_handle();
 
     thread::spawn(move || {
-        let runtime = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .expect("create tokio runtime for controller thread");
-
-        let res = runtime.block_on(async move {
+        let res = create_and_run_current_thread(async move {
             tokio::select! {
                 _ = tokio::time::sleep(Duration::from_millis(worker_timeout_ms)) => {
                     if isolate_handle.terminate_execution() {

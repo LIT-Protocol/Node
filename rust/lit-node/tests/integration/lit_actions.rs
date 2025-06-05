@@ -52,6 +52,7 @@ pub mod litactions {
     #[test_case("sign_hello_world", &valid_sign_no_combine, &standard_acc, true, "", None)]
     #[test_case("sign_child_lit_action", &valid_sign_no_combine, &standard_acc, true, "", None)]
     #[test_case("fail_sign_non_hashed_message", &action_failed_with_error, &standard_acc, true, "Message length to be signed is not 32 bytes", None)]
+    #[test_case("child_call_auth_context", &response_is_array_of_length_two, &standard_acc, true, "*", None)]
     #[tokio::test]
 
     pub async fn lit_action_from_file(
@@ -151,6 +152,30 @@ pub mod litactions {
     ) -> bool {
         let values = vec![value.to_string(); execute_resp.len()];
         count_matching_responses(execute_resp.len(), true, execute_resp, &values)
+    }
+
+    #[doc = "Checks that all the 'response' values match and that each response is an array of length 2 when parsed as a json object"]
+    fn response_is_array_of_length_two(
+        execute_resp: Vec<String>,
+        _params: serde_json::Map<String, Value>,
+        value: &str,
+    ) -> bool {
+        let values = vec![value.to_string(); execute_resp.len()];
+        assert!(
+            count_matching_responses(execute_resp.len(), true, execute_resp.clone(), &values),
+            "All responses should match"
+        );
+        for resp in execute_resp {
+            let json_object: HashMap<String, serde_json::Value> =
+                serde_json::from_str(&resp).unwrap();
+            let response = json_object.get("response").unwrap().as_str().unwrap();
+            let response_obj: Vec<String> = serde_json::from_str(response).unwrap();
+            assert!(
+                response_obj.len() == 2,
+                "Response should be an array of length 2"
+            );
+        }
+        true
     }
 
     #[doc = "Checks that the 'response' values of a single node  match incoming data and that each node provides a 'success' result that is true"]
@@ -525,7 +550,7 @@ pub mod litactions {
 
     #[tokio::test]
     #[ignore]
-    async fn test_pkp_is_permissions_is_permitted_action() {
+    async fn test_pkp_has_permission_for_permitted_action() {
         init_test_config();
         let num_nodes = 3;
 

@@ -191,6 +191,8 @@ contract StakingAdminFacet {
             .peerCheckingIntervalSecs;
         mutableConfig().maxTripleConcurrency = newConfig.maxTripleConcurrency;
         mutableConfig().rpcHealthcheckEnabled = newConfig.rpcHealthcheckEnabled;
+        mutableConfig().litActionConfig = newConfig.litActionConfig;
+        mutableConfig().heliosEnabled = newConfig.heliosEnabled;
 
         emit ConfigSet(
             newConfig.tokenRewardPerTokenPerEpoch,
@@ -201,7 +203,9 @@ contract StakingAdminFacet {
             newConfig.minTripleCount,
             newConfig.peerCheckingIntervalSecs,
             newConfig.maxTripleConcurrency,
-            newConfig.rpcHealthcheckEnabled
+            newConfig.rpcHealthcheckEnabled,
+            newConfig.litActionConfig,
+            newConfig.heliosEnabled
         );
     }
 
@@ -281,7 +285,9 @@ contract StakingAdminFacet {
         uint256 newMinTripleCount,
         uint256 newPeerCheckingIntervalSecs,
         uint256 newMaxTripleConcurrency,
-        bool newRpcHealthcheckEnabled
+        bool newRpcHealthcheckEnabled,
+        LibStakingStorage.LitActionConfig newLitActionConfig,
+        bool newHeliosEnabled
     );
     event ComplaintConfigSet(
         uint256 reason,

@@ -8,6 +8,7 @@ use libsecp256k1::{PublicKey, SecretKey};
 use lit_blockchain::{
     config::LitBlockchainConfig,
     contracts::{backup_recovery::BackupRecovery, staking::Staking},
+    resolver::contract::ContractResolver,
 };
 use lit_core::{config::LitConfig, utils::binary::bytes_to_hex};
 use lit_node::{
@@ -469,7 +470,8 @@ async fn new_peer_state(
     let backup_recovery_contract = BackupRecovery::<
         SignerMiddleware<Provider<Http>, Wallet<SigningKey>>,
     >::new(Address::zero(), provider.clone());
-
+    let resolver =
+        ContractResolver::try_from(cfg.as_ref()).expect("failed to create contract resolver");
     PeerState {
         data: ArcSwap::from(Arc::new(PeerData::new())),
         curr_data: ArcSwap::from(Arc::new(PeerData::new())),
@@ -479,7 +481,6 @@ async fn new_peer_state(
         public_key: *public_key,
         node_address,
         secret_key,
-        connecting: Mutex::new(false),
         staking_address: staking_contract.address(),
         staker_address,
         rpc_url: cfg.rpc_url().expect("failed to get rpc url"),
@@ -492,5 +493,6 @@ async fn new_peer_state(
         lit_config: cfg,
         http_client,
         bm_tx,
+        resolver,
     }
 }

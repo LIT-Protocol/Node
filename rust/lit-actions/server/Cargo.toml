@@ -13,6 +13,8 @@ doctest = false
 [dependencies]
 anyhow = { workspace = true }
 deno_core = { workspace = true }
+deno_lib = { workspace = true }
+deno_resolver = { workspace = true }
 deno_runtime = { workspace = true }
 flume = { workspace = true }
 indoc = { workspace = true }
@@ -20,6 +22,7 @@ lit-actions-ext = { workspace = true }
 lit-actions-grpc = { workspace = true }
 lit-api-core = { workspace = true }
 serde_json = { workspace = true }
+sys_traits = { workspace = true }
 temp-file = "0.1"
 tokio = { workspace = true }
 tokio-stream = { workspace = true }

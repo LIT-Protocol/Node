@@ -395,6 +395,10 @@ export async function setupStakingWithValidatorsAndAdvance(
     stakingAccounts.push(stakingAccount);
   }
 
+  // set next epoch end time to 10 seconds ago
+  await stakingAdminContract.setEpochEndTime(
+    Math.floor(Date.now() / 1000) - 10
+  );
   // unpause staking contract
   await stakingAdminContract.setEpochState(StakingState.Active);
 

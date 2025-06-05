@@ -18,6 +18,7 @@ use crate::cmd::os::status::{handle_cmd_os_status, Status};
 #[cfg(feature = "host-core")]
 use crate::cmd::os::update::{handle_cmd_os_update, Update};
 use crate::cmd::os::util::{handle_cmd_os_util, Util};
+use crate::cmd::os::version::{handle_cmd_os_version, Version};
 use crate::config::LitCliOsConfig;
 
 #[cfg(any(feature = "guest-instance", feature = "guest-build"))]
@@ -35,6 +36,7 @@ mod status;
 #[cfg(feature = "host-core")]
 mod update;
 mod util;
+mod version;
 
 #[derive(Debug, Args)]
 #[command(args_conflicts_with_subcommands = true)]
@@ -71,6 +73,8 @@ enum OsCommands {
     /// Utility commands
     #[command(arg_required_else_help = true)]
     Util(Util),
+    /// Display version and commit hash information
+    Version(Version),
 }
 
 pub async fn handle_cmd_os(
@@ -94,5 +98,6 @@ pub async fn handle_cmd_os(
         #[cfg(any(feature = "guest-instance", feature = "guest-build"))]
         OsCommands::DeleteAll(args) => handle_cmd_os_delete_all(cfg, opts, args).await,
         OsCommands::Util(args) => handle_cmd_os_util(cfg, opts, args).await,
+        OsCommands::Version(arg) => handle_cmd_os_version(cfg, opts, arg),
     }
 }

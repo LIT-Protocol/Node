@@ -19,13 +19,13 @@ On Linux:
 sudo apt install libudev-dev libsqlite3-dev
 ```
 
-## Running a local 3 node network on Vesuvius
+## Running a local 3 node network on Yellowstone
 
 1. Deploy the contracts. More docs are available [here](https://github.com/LIT-Protocol/lit-assets/blob/develop/blockchain/contracts/README.md#deploying)
    1. cd into the lit-assets/blockchain/contracts folder.
    2. Run `npm i`
    3. Run `npm i -g concurrently`
-   4. Get an API key from https://pinata.cloud, and a private key with tokens on Vesuvius. If you need tokens, ask someone at Lit.
+   4. Get an API key from https://pinata.cloud, and a private key with tokens on Yellowstone. If you need tokens, ask someone at Lit.
    5. Copy .env.example to .env and set the appropriate env vars based on the info you gathered above.
    6. Run the deploy script:
    ```shell

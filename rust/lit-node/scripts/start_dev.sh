@@ -16,7 +16,7 @@ do
   # else
   #   CMDS+=("RUST_LOG=warn,lit_node=trace LIT_CONFIG_FILE=./config/lit_config$c.toml cargo run --features lit-actions")
   # fi
-  CMDS+=("RUST_LOG=warn,lit_node=trace LIT_CONFIG_FILE=./config/lit_config$c.toml cargo run")
+  CMDS+=("RUST_LOG=warn,lit_node=trace,lit_blockchain=trace LIT_CONFIG_FILE=./config/lit_config$c.toml cargo run --features lit-actions-server")
 done
 
 concurrently --kill-others "${CMDS[@]}"   | grep "\[0\] "

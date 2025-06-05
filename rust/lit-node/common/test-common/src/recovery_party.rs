@@ -3,7 +3,7 @@ use bulletproofs::BulletproofCurveArithmetic as BCA;
 use ethers::types::{Address, H160};
 use k256::ecdsa::{RecoveryId, Signature, SigningKey, VerifyingKey};
 use sha3::{digest::Digest, Keccak256};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use ethers::middleware::SignerMiddleware;
 use ethers::prelude::{Http, LocalWallet, Signer};
@@ -166,7 +166,11 @@ pub fn get_contracts_for_recovery_member(
     BackupRecovery<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>,
     Staking<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>,
 ) {
-    let client = reqwest::Client::builder().use_rustls_tls().build().unwrap();
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(30))
+        .use_rustls_tls()
+        .build()
+        .unwrap();
     let url = Url::parse(rpc_url).unwrap();
     let provider = Provider::new(Http::new_with_client(url, client));
     let secret_key = get_recovery_member_signing_key();

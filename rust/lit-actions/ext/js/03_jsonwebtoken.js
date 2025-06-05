@@ -7053,7 +7053,7 @@ Use Chrome, Firefox or Internet Explorer 11`);
     globalThis.process && globalThis.process.browser
       ? (zo = 'utf-8')
       : globalThis.process && globalThis.process.version
-        ? ((Cp = parseInt(A.version.split('.')[0].slice(1), 10)),
+        ? ((Cp = parseInt(process.version.split('.')[0].slice(1), 10)),
           (zo = Cp >= 6 ? 'utf-8' : 'binary'))
         : (zo = 'utf-8');
     var Cp;

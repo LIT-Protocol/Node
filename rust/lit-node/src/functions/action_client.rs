@@ -221,13 +221,24 @@ impl Client {
         let opts = opts.into();
         let timeout = self.client_timeout();
 
+        let auth_context = {
+            let mut ctx = self.js_env.auth_context.clone();
+            if let Some(id) = &opts.action_ipfs_id {
+                ctx.action_ipfs_id_stack.push(id.clone());
+                // This vec is broken, and only contains the current IPFS CID of the running action.
+                // We are retaining this for backwards compatibility in case existing apps depend on it.
+                ctx.action_ipfs_ids = vec![id.clone()];
+            }
+            ctx
+        };
+
         // Hand-roll retry loop as crates like tokio-retry or again don't play well with &mut self
         let mut retry = 0;
         loop {
             let execution = Box::pin(self.execute_js_inner(
                 opts.code.clone(),
                 opts.globals.clone(),
-                opts.action_ipfs_id.clone(),
+                &auth_context,
                 0,
             ));
             let execution_result =
@@ -288,7 +299,7 @@ impl Client {
         &mut self,
         code: Arc<String>,
         globals: Option<serde_json::Value>,
-        action_ipfs_id: Option<String>,
+        auth_context: &models::AuthContext,
         call_depth: u32,
     ) -> Result<ExecutionState> {
         if code.len() > self.max_code_length {
@@ -314,15 +325,6 @@ impl Client {
             .await?
             .into_inner();
 
-        let auth_context = {
-            // Add current ipfs id to the end of the action_ipfs_ids vec
-            let mut ctx = self.js_env.auth_context.clone();
-            if let Some(id) = &action_ipfs_id {
-                ctx.action_ipfs_ids.push(id.clone());
-            }
-            ctx
-        };
-
         // Send initial execution request to server
         outbound_tx
             .send_async(
@@ -341,7 +343,7 @@ impl Client {
 
         // Handle responses from server
         while let Some(resp) = stream.try_next().await? {
-            debug!(?resp);
+            debug!("Action client received response: {:?}", resp);
             match resp.union {
                 // Return final result from server
                 Some(UnionResponse::Result(res)) => {
@@ -353,7 +355,7 @@ impl Client {
                 }
                 // Handle op requests
                 Some(op) => {
-                    let resp = match self.handle_op(op, action_ipfs_id.clone(), call_depth).await {
+                    let resp = match self.handle_op(op, auth_context, call_depth).await {
                         Ok(resp) => resp,
                         Err(e) => ErrorResponse {
                             error: e.to_string(),
@@ -377,10 +379,12 @@ impl Client {
     async fn handle_op(
         &mut self,
         op: UnionResponse,
-        action_ipfs_id: Option<String>,
+        auth_context: &models::AuthContext,
         mut call_depth: u32,
     ) -> Result<ExecuteJsRequest> {
         self.state.ops_count += 1;
+
+        let action_ipfs_id = auth_context.action_ipfs_id_stack.last().cloned();
 
         Ok(match op {
             UnionResponse::SetResponse(SetResponseRequest { response }) => {
@@ -668,8 +672,18 @@ impl Client {
                     .map(|params| serde_json::from_slice::<serde_json::Value>(&params))
                     .transpose()?;
 
+                let auth_context = {
+                    let mut ctx = auth_context.clone();
+                    // This vec is broken, and only contains the current IPFS CID of the running action.
+                    // We are retaining this for backwards compatibility in case existing apps depend on it.
+                    ctx.action_ipfs_ids = vec![ipfs_id.clone()];
+                    // This vec is fixed, which contains the full stack of IPFS CIDs of the running actions.
+                    ctx.action_ipfs_id_stack.push(ipfs_id.clone());
+                    ctx
+                };
+
                 // NB: Using execute_js_inner instead of execute_js to avoid resetting state
-                let res = Box::pin(self.execute_js_inner(code, globals, Some(ipfs_id), call_depth))
+                let res = Box::pin(self.execute_js_inner(code, globals, &auth_context, call_depth))
                     .await?;
 
                 CallChildResponse {

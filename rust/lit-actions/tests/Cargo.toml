@@ -19,6 +19,8 @@ harness = false
 anyhow = { workspace = true }
 criterion = { version = "0.5", features = ["async_tokio", "html_reports"] }
 ctor = "0.2"
+deno_resolver = { workspace = true }
+deno_runtime = { workspace = true }
 flume = { workspace = true }
 gotham_store = "1"
 indoc = { workspace = true }
@@ -27,8 +29,12 @@ lit-core = { workspace = true }
 pretty_assertions = "1"
 pretty_env_logger = "0.5"
 rstest = "0.19"
+sys_traits = { workspace = true }
 temp-file = "0.1"
 tokio = { workspace = true }
 tokio-stream = { workspace = true }
 tonic = { workspace = true }
 wiremock = "0.5"
+
+[build-dependencies]
+lit-actions-snapshot = { workspace = true }

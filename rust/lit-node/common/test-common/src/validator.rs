@@ -722,7 +722,7 @@ impl NodeBuilder {
             in_github_ci,
             log_mode: in_github_ci
                 .then(|| "_=warn,lit_node=trace,lit_actions=trace".to_string())
-                .unwrap_or("_=trace".to_string()),
+                .unwrap_or("_=warn,lit_node=trace".to_string()),
             //.unwrap_or("_=warn,test_common=trace,lit_node::tss=trace,lit_node::peers::peer_state::backup_recovery=debug,lit_node::pkp::utils=debug,lit_node::tasks::beaver_manager::listener=trace,lit_node::peers::peer_state=info,lit_node::peers::peer_reviewer=info,lit_node::tasks::fsm=trace,lit_node::tss::ecdsa_cait_sith=trace,lit_actions=trace,lit_node::p2p_comms::comms=debug,lit_actions=trace,lit_node::functions::action_client=trace".to_string()),
             extra_env_vars: is_perf_test
                 .then(|| vec![("LIT_LOGGING_JAEGER".to_string(), "1".to_string())])

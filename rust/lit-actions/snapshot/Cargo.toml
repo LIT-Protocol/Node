@@ -11,4 +11,4 @@ test = false
 doctest = false
 
 [dependencies]
-deno_runtime = { workspace = true }
+deno_runtime = { workspace = true, features = ["snapshot"] }

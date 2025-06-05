@@ -4,7 +4,7 @@ use ethers::middleware::Middleware;
 use ethers::providers::StreamExt;
 use lit_blockchain::contracts::host_commands::{HostCommands, HostCommandsEvents};
 use lit_cli_os::guest::instance::GuestInstanceItem;
-use tracing::{debug, error, info, trace};
+use tracing::{debug, error, info, trace, warn};
 pub struct HostCommandsListener {
     host_commands_contract: HostCommands<ethers::providers::Provider<ethers::providers::Http>>,
     current_instance_item: GuestInstanceItem,
@@ -77,7 +77,7 @@ impl HostCommandsListener {
                             }
                         }
                     } else {
-                        debug!("Stream yielded but no event found");
+                        warn!("Stream yielded but no event found");
                     }
                 }
             }

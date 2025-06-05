@@ -35,11 +35,11 @@ rand_chacha = { version = "0.3.1" }
 once_cell = { version = "1.18.0" }
 tokio = { version = "1.33.0", features = ["full"] }
 futures = { version = "0.3.28" }
-async-std = { version = "1.12.0" }
+async-std = { version = "1.13.1" }
 async-std-resolver = { version = "0.22.0" }
 surge-ping = { version = "0.7.3" }
 aleo-std-cpu = { version = "0.1.4" }
-sev-snp-utilities = { version = "1.4.9" }
+sev-snp-utilities = { version = "1.6.0" }
 ipnet = { version = "2.9.0" }
 serde = { version = "1.0.189", features = ["derive"] }
 serde_json = { version = "1.0.107" }

@@ -727,8 +727,63 @@ pub(crate) async fn execute_function(
 
     let cfg = cfg.load_full();
 
+    // get the derived IPFS ID so that we can auth the user against it
+    let before = std::time::Instant::now();
+    // determine if the user passed code or an ipfs hash
+    let derived_ipfs_id;
+    let code_to_run: Arc<String>;
+    if let Some(code) = &json_execution_request.code {
+        let decoded_bytes = match data_encoding::BASE64.decode(code.as_bytes()) {
+            Ok(decoded_bytes) => decoded_bytes,
+            Err(err) => {
+                return conversion_err(
+                    err,
+                    Some("Your Lit Action code could not be decoded from base64".into()),
+                )
+                .add_msg_to_details()
+                .handle();
+            }
+        };
+
+        match String::from_utf8(decoded_bytes) {
+            Ok(string_result) => code_to_run = Arc::new(string_result),
+            Err(err) => {
+                return conversion_err(err, Some("Error converting bytes to string".into()))
+                    .add_msg_to_details()
+                    .handle();
+            }
+        };
+
+        // hash the code to get the ipfs id
+        let ipfs_hasher = IpfsHasher::default();
+        let cid = ipfs_hasher.compute(code_to_run.as_bytes());
+        derived_ipfs_id = cid;
+    } else if let Some(ipfs_id) = &json_execution_request.ipfs_id {
+        // pull down the code from ipfs
+        match get_ipfs_file(
+            &ipfs_id.to_string(),
+            &cfg,
+            moka::future::Cache::clone(ipfs_cache),
+        )
+        .await
+        {
+            Ok(ipfs_result) => code_to_run = ipfs_result,
+            Err(err) => {
+                return err.handle();
+            }
+        };
+        derived_ipfs_id = ipfs_id.clone();
+    } else {
+        return validation_err_code("No code or ipfs hash provided", EC::NodeInvalidIPFSID, None)
+            .add_source_to_details()
+            .handle();
+    }
+    timing.insert("derived IPFS CID".to_string(), before.elapsed());
+
+    debug!("derived_ipfs_id: {}", derived_ipfs_id);
+
     let capability_protocol_prefix = &"litAction".to_string();
-    let lit_action_resource = LitActionResource::new("".to_string());
+    let lit_action_resource = LitActionResource::new(derived_ipfs_id.clone());
 
     let before = std::time::Instant::now();
     // Validate auth sig item
@@ -809,60 +864,6 @@ pub(crate) async fn execute_function(
     }
 
     let before = std::time::Instant::now();
-    // determine if the user passed code or an ipfs hash
-    let derived_ipfs_id;
-    let code_to_run: Arc<String>;
-    if let Some(code) = &json_execution_request.code {
-        let decoded_bytes = match data_encoding::BASE64.decode(code.as_bytes()) {
-            Ok(decoded_bytes) => decoded_bytes,
-            Err(err) => {
-                return conversion_err(
-                    err,
-                    Some("Your Lit Action code could not be decoded from base64".into()),
-                )
-                .add_msg_to_details()
-                .handle();
-            }
-        };
-
-        match String::from_utf8(decoded_bytes) {
-            Ok(string_result) => code_to_run = Arc::new(string_result),
-            Err(err) => {
-                return conversion_err(err, Some("Error converting bytes to string".into()))
-                    .add_msg_to_details()
-                    .handle();
-            }
-        };
-
-        // hash the code to get the ipfs id
-        let ipfs_hasher = IpfsHasher::default();
-        let cid = ipfs_hasher.compute(code_to_run.as_bytes());
-        derived_ipfs_id = cid;
-    } else if let Some(ipfs_id) = &json_execution_request.ipfs_id {
-        // pull down the code from ipfs
-        match get_ipfs_file(
-            &ipfs_id.to_string(),
-            &cfg,
-            moka::future::Cache::clone(ipfs_cache),
-        )
-        .await
-        {
-            Ok(ipfs_result) => code_to_run = ipfs_result,
-            Err(err) => {
-                return err.handle();
-            }
-        };
-        derived_ipfs_id = ipfs_id.clone();
-    } else {
-        return validation_err_code("No code or ipfs hash provided", EC::NodeInvalidIPFSID, None)
-            .add_source_to_details()
-            .handle();
-    }
-    timing.insert("derived IPFS CID".to_string(), before.elapsed());
-
-    debug!("derived_ipfs_id: {}", derived_ipfs_id);
-
-    let before = std::time::Instant::now();
     // check if the IPFS id is in the allowlist
     if matches!(cfg.enable_actions_allowlist(), Ok(true)) {
         let allowlist_entry_id = keccak256(format!("LIT_ACTION_{}", derived_ipfs_id).as_bytes());
@@ -897,6 +898,7 @@ pub(crate) async fn execute_function(
     };
 
     let before = std::time::Instant::now();
+    trace!("getting auth context");
 
     let auth_context = match endpoint_version {
         EndpointVersion::Initial => {
@@ -954,7 +956,7 @@ pub(crate) async fn execute_function(
                     let new_auth_context = get_auth_context(
                         Some(auth_sig.clone()),
                         None,
-                        json_execution_request.ipfs_id.clone(),
+                        Some(derived_ipfs_id.clone()),
                         None,
                         false,
                         cfg.clone(),
@@ -1004,12 +1006,30 @@ pub(crate) async fn execute_function(
         i => Some(i),
     };
 
+    let lit_action_config = tss_state
+        .peer_state
+        .chain_data_config_manager
+        .generic_config
+        .read()
+        .await
+        .lit_action_config
+        .clone();
     let before = std::time::Instant::now();
     let mut client = match action_client::ClientBuilder::default()
         .js_env(deno_execution_env)
         .auth_sig(Some(auth_sig.clone()))
         .request_id(tracing.clone().correlation_id().to_string())
         .http_headers(http_headers)
+        .timeout_ms(lit_action_config.timeout_ms)
+        .memory_limit_mb(lit_action_config.memory_limit_mb as u32)
+        .max_code_length(lit_action_config.max_code_length as usize)
+        .max_response_length(lit_action_config.max_response_length as usize)
+        .max_fetch_count(lit_action_config.max_fetch_count as u32)
+        .max_sign_count(lit_action_config.max_sign_count as u32)
+        .max_contract_call_count(lit_action_config.max_contract_call_count as u32)
+        .max_broadcast_and_collect_count(lit_action_config.max_broadcast_and_collect_count as u32)
+        .max_call_depth(lit_action_config.max_call_depth as u32)
+        .max_retries(lit_action_config.max_retries as u32)
         .epoch(epoch)
         .endpoint_version(endpoint_version)
         .build()
@@ -1475,7 +1495,9 @@ pub(crate) async fn sign_session_key(
                 match &derived_ipfs_id {
                     Some(derived_ipfs_id) => {
                         // Add to auth_context as we ran & verfied Lit Action auth
-                        auth_context.action_ipfs_ids.push(derived_ipfs_id.clone());
+                        auth_context
+                            .action_ipfs_id_stack
+                            .push(derived_ipfs_id.clone());
 
                         auth_context.custom_auth_resource = execution_state.response;
                     }

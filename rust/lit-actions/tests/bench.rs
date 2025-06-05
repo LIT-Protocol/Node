@@ -1,8 +1,24 @@
-use std::path::PathBuf;
+use std::{
+    path::{Path, PathBuf},
+    rc::Rc,
+    sync::Arc,
+};
 
 use anyhow::{bail, Result};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use deno_resolver::npm::{DenoInNpmPackageChecker, ManagedNpmResolver};
+use deno_runtime::{
+    deno_core::{resolve_url_or_path, ModuleCodeString, NoopModuleLoader},
+    deno_fs::RealFs,
+    deno_permissions::PermissionsContainer,
+    permissions::RuntimePermissionDescriptorParser,
+    tokio_util::create_basic_runtime,
+    worker::{MainWorker, WorkerOptions, WorkerServiceOptions},
+    BootstrapOptions,
+};
+use indoc::indoc;
 use lit_actions_server::{init_v8, proto::*, unix, TestServer};
+use sys_traits::impls::RealSys;
 use tokio_stream::StreamExt as _;
 use tonic::Request;
 
@@ -72,28 +88,116 @@ impl TestClient {
     }
 }
 
-fn bench(c: &mut Criterion) {
+static SNAPSHOT: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/BASE_SNAPSHOT.bin"));
+
+const ASYNC_CODE: &str = indoc! {r#"
+    (async () => {
+        const numbers = Array.from({ length: 100 }, (_, i) => i);
+        const doubled = numbers.map(n => n * 2);
+        const sum = doubled.reduce((acc, n) => acc + n, 0);
+        const result = await Promise.all([
+            Promise.resolve(sum),
+            Promise.resolve(doubled.length)
+        ]);
+        return result[0] / result[1];
+    })()
+"#};
+
+const OPS_CODE: &str = indoc! {r#"
+    const response = LitActions.pubkeyToTokenId({ publicKey: "0x1234" })
+    LitActions.setResponse({response})
+"#};
+
+fn lit_actions(c: &mut Criterion) {
     init_v8();
 
     let server = TestServer::start();
-    let runtime = tokio::runtime::Runtime::new().unwrap();
+    let runtime = create_basic_runtime();
+    let mut group = c.benchmark_group("Lit Actions");
 
-    let code = indoc::indoc! {r#"
-        (async () => {
-            const response = LitActions.pubkeyToTokenId({ publicKey: await "0x1234" })
-            LitActions.setResponse({response})
-        })()
-    "#};
-
-    c.bench_function("execute_js", |b| {
+    group.bench_function("Async code", |b| {
         b.to_async(&runtime).iter(|| async {
             TestClient::new(server.socket_path())
-                .execute_js(black_box(code))
+                .execute_js(black_box(ASYNC_CODE))
                 .await
                 .unwrap();
         })
     });
+
+    group.bench_function("Rust ops", |b| {
+        b.to_async(&runtime).iter(|| async {
+            TestClient::new(server.socket_path())
+                .execute_js(black_box(OPS_CODE))
+                .await
+                .unwrap();
+        })
+    });
+
+    group.bench_function("No code", |b| {
+        b.to_async(&runtime).iter(|| async {
+            TestClient::new(server.socket_path())
+                .execute_js(black_box(""))
+                .await
+                .unwrap();
+        })
+    });
+
+    group.finish();
 }
 
-criterion_group!(benches, bench);
+fn vanilla_deno(c: &mut Criterion) {
+    init_v8();
+
+    let runtime = create_basic_runtime();
+    let mut group = c.benchmark_group("Vanilla Deno");
+
+    group.bench_function("Async code", |b| {
+        b.to_async(&runtime).iter(|| async {
+            let permission_desc_parser = Arc::new(RuntimePermissionDescriptorParser::new(RealSys));
+            let services = WorkerServiceOptions::<
+                DenoInNpmPackageChecker,
+                ManagedNpmResolver<RealSys>,
+                RealSys,
+            > {
+                blob_store: Default::default(),
+                broadcast_channel: Default::default(),
+                feature_checker: Default::default(),
+                fs: Arc::new(RealFs),
+                module_loader: Rc::new(NoopModuleLoader),
+                node_services: Default::default(),
+                npm_process_state_provider: Default::default(),
+                permissions: PermissionsContainer::allow_all(permission_desc_parser),
+                root_cert_store_provider: Default::default(),
+                fetch_dns_resolver: Default::default(),
+                shared_array_buffer_store: Default::default(),
+                compiled_wasm_module_store: Default::default(),
+                v8_code_cache: Default::default(),
+            };
+            let options = WorkerOptions {
+                bootstrap: BootstrapOptions {
+                    cpu_count: 1,
+                    ..Default::default()
+                },
+                startup_snapshot: Some(SNAPSHOT),
+                ..Default::default()
+            };
+
+            let main_module =
+                resolve_url_or_path("./$bench.js", Path::new(env!("CARGO_MANIFEST_DIR"))).unwrap();
+            let mut worker = MainWorker::bootstrap_from_options(&main_module, services, options);
+
+            worker
+                .execute_script(
+                    "bench.js",
+                    black_box(ModuleCodeString::from_static(ASYNC_CODE)),
+                )
+                .unwrap();
+            worker.run_event_loop(false).await.unwrap();
+        })
+    });
+
+    group.finish();
+}
+
+criterion_group!(benches, lit_actions, vanilla_deno);
 criterion_main!(benches);

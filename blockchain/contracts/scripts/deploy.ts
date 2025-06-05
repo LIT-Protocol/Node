@@ -8,9 +8,6 @@ const SUPPORTED_NETWORKS = [
   'mumbai',
   'alfajores',
   'polygon',
-  'litTestnet',
-  'lit',
-  'vesuvius',
   'localchain',
   'etna',
   'yellowstone',
@@ -21,10 +18,7 @@ const networkToRequiredEnvVars: { [key: string]: string[] } = {
   mumbai: ['LIT_POLYGONSCAN_API_KEY,LIT_MUMBAI_DEPLOYER_PRIVATE_KEY'],
   alfajores: ['LIT_ALFAJORES_DEPLOYER_PRIVATE_KEY'],
   polygon: ['LIT_POLYGONSCAN_API_KEY,LIT_POLYGON_DEPLOYER_PRIVATE_KEY'],
-  litTestnet: ['LIT_ROLLUP_TESTNET_DEPLOYER_PRIVATE_KEY'],
-  lit: ['LIT_ROLLUP_MAINNET_DEPLOYER_PRIVATE_KEY'],
   etna: ['LIT_ROLLUP_MAINNET_DEPLOYER_PRIVATE_KEY'],
-  vesuvius: ['LIT_ROLLUP_MAINNET_DEPLOYER_PRIVATE_KEY'],
   yellowstone: ['LIT_ROLLUP_MAINNET_DEPLOYER_PRIVATE_KEY'],
 };
 

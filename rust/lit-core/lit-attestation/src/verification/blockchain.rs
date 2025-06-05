@@ -50,7 +50,7 @@ pub(crate) async fn get_release(
 ) -> Result<Release> {
     let cache_key = format!("rr:rel:{}:{}", subnet_id, bytes_to_hex(release_id));
 
-    if let Some(release) = CACHE.get(&cache_key) {
+    if let Some(release) = CACHE.get(&cache_key).await {
         if let Some(release) = release.as_release() {
             return Ok(release.clone());
         }
@@ -71,7 +71,7 @@ pub(crate) async fn release_has_allowed_admin_signing_public_key(
 ) -> Result<bool> {
     let cache_key = format!("rr:aspk:{}:{}", subnet_id, bytes_to_hex(&public_key));
 
-    if let Some(has) = CACHE.get(&cache_key) {
+    if let Some(has) = CACHE.get(&cache_key).await {
         if let Some(has) = has.as_bool() {
             return Ok(*has);
         }
@@ -103,7 +103,7 @@ pub(crate) async fn release_has_allowed_author_key_digest(
 ) -> Result<bool> {
     let cache_key = format!("rr:aakd:{}:{}", subnet_id, bytes_to_hex(&author_key_digest));
 
-    if let Some(has) = CACHE.get(&cache_key) {
+    if let Some(has) = CACHE.get(&cache_key).await {
         if let Some(has) = has.as_bool() {
             return Ok(*has);
         }
@@ -153,7 +153,7 @@ pub(crate) async fn staking_has_allowed_node_signing_public_key(
 ) -> Result<bool> {
     let cache_key = format!("s:anspk:{}:{}", subnet_id, bytes_to_hex(public_key));
 
-    if let Some(has) = CACHE.get(&cache_key) {
+    if let Some(has) = CACHE.get(&cache_key).await {
         if let Some(has) = has.as_bool() {
             return Ok(*has);
         }

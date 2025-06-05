@@ -12,10 +12,12 @@ import { PubkeyRouterFacet } from "../PubkeyRouter/PubkeyRouterFacet.sol";
 import { PKPNFTFacet } from "../PKPNFT/PKPNFTFacet.sol";
 
 import { LibPKPPermissionsStorage } from "./LibPKPPermissionsStorage.sol";
+import { LibERC2771 } from "../../libraries/LibERC2771.sol";
+import { ERC2771 } from "../../common/ERC2771.sol";
 
 import "hardhat/console.sol";
 
-contract PKPPermissionsFacet {
+contract PKPPermissionsFacet is ERC2771 {
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.Bytes32Set;
     using EnumerableSet for EnumerableSet.UintSet;
@@ -39,20 +41,12 @@ contract PKPPermissionsFacet {
         STYTCH_JWT_TOTP_FACTOR // 13
     }
 
-    /* ========== Errors ========== */
-    error CallerNotOwner();
-
     /* ========== Modifiers ========== */
     modifier onlyPKPOwner(uint256 tokenId) {
         // check that user is allowed to set this
         PKPNFTFacet pkpNFT = PKPNFTFacet(getPkpNftAddress());
         address nftOwner = pkpNFT.ownerOf(tokenId);
-        require(msg.sender == nftOwner, "Not PKP NFT owner");
-        _;
-    }
-
-    modifier onlyOwner() {
-        if (msg.sender != LibDiamond.contractOwner()) revert CallerNotOwner();
+        require(LibERC2771._msgSender() == nftOwner, "Not PKP NFT owner");
         _;
     }
 

@@ -3,8 +3,8 @@ use lit_blockchain::resolver::rpc::RpcHealthcheckPoller;
 use lit_core::{config::LitConfig, error::Unexpected};
 use moka::future::Cache;
 use siwe::Message;
-use std::env;
 use std::sync::Arc;
+use std::{env, time::Duration};
 use web3::{
     contract::{Contract, Options},
     types::{Address, Bytes, CallRequest, U256},
@@ -497,6 +497,7 @@ async fn get_poaps_for_user(
     );
     let client = reqwest::Client::builder()
         .use_rustls_tls()
+        .timeout(Duration::from_secs(30))
         .build()
         .map_err(|e| unexpected_err(e, None))?;
     let result = client

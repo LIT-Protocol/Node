@@ -594,6 +594,28 @@ pub mod pkpnft {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("getTrustedForwarder"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "getTrustedForwarder",
+                            ),
+                            inputs: ::std::vec![],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("initialize"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -1027,6 +1049,28 @@ pub mod pkpnft {
                                     ),
                                     internal_type: ::core::option::Option::Some(
                                         ::std::borrow::ToOwned::to_owned("uint256"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("setTrustedForwarder"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "setTrustedForwarder",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("forwarder"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
                                     ),
                                 },
                             ],
@@ -1513,6 +1557,26 @@ pub mod pkpnft {
                                         256usize,
                                     ),
                                     indexed: true,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("TrustedForwarderSet"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "TrustedForwarderSet",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned(
+                                        "newTrustedForwarder",
+                                    ),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    indexed: false,
                                 },
                             ],
                             anonymous: false,
@@ -2117,6 +2181,17 @@ pub mod pkpnft {
                 .method_hash([14, 158, 214, 139], ())
                 .expect("method not found (this should never happen)")
         }
+        ///Calls the contract's `getTrustedForwarder` (0xce1b815f) function
+        pub fn get_trusted_forwarder(
+            &self,
+        ) -> ::ethers::contract::builders::ContractCall<
+            M,
+            ::ethers::core::types::Address,
+        > {
+            self.0
+                .method_hash([206, 27, 129, 95], ())
+                .expect("method not found (this should never happen)")
+        }
         ///Calls the contract's `initialize` (0x8129fc1c) function
         pub fn initialize(&self) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
@@ -2267,6 +2342,15 @@ pub mod pkpnft {
         ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
                 .method_hash([133, 69, 244, 234], new_mint_cost)
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `setTrustedForwarder` (0xda742228) function
+        pub fn set_trusted_forwarder(
+            &self,
+            forwarder: ::ethers::core::types::Address,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([218, 116, 34, 40], forwarder)
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `supportsInterface` (0x01ffc9a7) function
@@ -2445,6 +2529,16 @@ pub mod pkpnft {
             ::std::sync::Arc<M>,
             M,
             TransferFilter,
+        > {
+            self.0.event()
+        }
+        ///Gets the contract's `TrustedForwarderSet` event
+        pub fn trusted_forwarder_set_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            TrustedForwarderSetFilter,
         > {
             self.0.event()
         }
@@ -3348,6 +3442,22 @@ pub mod pkpnft {
         Eq,
         Hash
     )]
+    #[ethevent(name = "TrustedForwarderSet", abi = "TrustedForwarderSet(address)")]
+    pub struct TrustedForwarderSetFilter {
+        pub new_trusted_forwarder: ::ethers::core::types::Address,
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
     #[ethevent(name = "Withdrew", abi = "Withdrew(uint256)")]
     pub struct WithdrewFilter {
         pub amount: ::ethers::core::types::U256,
@@ -3374,6 +3484,7 @@ pub mod pkpnft {
         OwnershipTransferredFilter(OwnershipTransferredFilter),
         PkpmintedFilter(PkpmintedFilter),
         TransferFilter(TransferFilter),
+        TrustedForwarderSetFilter(TrustedForwarderSetFilter),
         WithdrewFilter(WithdrewFilter),
     }
     impl ::ethers::contract::EthLogDecode for PKPNFTEvents {
@@ -3410,6 +3521,9 @@ pub mod pkpnft {
             if let Ok(decoded) = TransferFilter::decode_log(log) {
                 return Ok(PKPNFTEvents::TransferFilter(decoded));
             }
+            if let Ok(decoded) = TrustedForwarderSetFilter::decode_log(log) {
+                return Ok(PKPNFTEvents::TrustedForwarderSetFilter(decoded));
+            }
             if let Ok(decoded) = WithdrewFilter::decode_log(log) {
                 return Ok(PKPNFTEvents::WithdrewFilter(decoded));
             }
@@ -3437,6 +3551,9 @@ pub mod pkpnft {
                 }
                 Self::PkpmintedFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::TransferFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::TrustedForwarderSetFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::WithdrewFilter(element) => ::core::fmt::Display::fmt(element, f),
             }
         }
@@ -3489,6 +3606,11 @@ pub mod pkpnft {
     impl ::core::convert::From<TransferFilter> for PKPNFTEvents {
         fn from(value: TransferFilter) -> Self {
             Self::TransferFilter(value)
+        }
+    }
+    impl ::core::convert::From<TrustedForwarderSetFilter> for PKPNFTEvents {
+        fn from(value: TrustedForwarderSetFilter) -> Self {
+            Self::TrustedForwarderSetFilter(value)
         }
     }
     impl ::core::convert::From<WithdrewFilter> for PKPNFTEvents {
@@ -3815,6 +3937,21 @@ pub mod pkpnft {
     )]
     #[ethcall(name = "getStakingAddress", abi = "getStakingAddress()")]
     pub struct GetStakingAddressCall;
+    ///Container type for all input parameters for the `getTrustedForwarder` function with signature `getTrustedForwarder()` and selector `0xce1b815f`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "getTrustedForwarder", abi = "getTrustedForwarder()")]
+    pub struct GetTrustedForwarderCall;
     ///Container type for all input parameters for the `initialize` function with signature `initialize()` and selector `0x8129fc1c`
     #[derive(
         Clone,
@@ -4096,6 +4233,23 @@ pub mod pkpnft {
     pub struct SetMintCostCall {
         pub new_mint_cost: ::ethers::core::types::U256,
     }
+    ///Container type for all input parameters for the `setTrustedForwarder` function with signature `setTrustedForwarder(address)` and selector `0xda742228`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "setTrustedForwarder", abi = "setTrustedForwarder(address)")]
+    pub struct SetTrustedForwarderCall {
+        pub forwarder: ::ethers::core::types::Address,
+    }
     ///Container type for all input parameters for the `supportsInterface` function with signature `supportsInterface(bytes4)` and selector `0x01ffc9a7`
     #[derive(
         Clone,
@@ -4280,6 +4434,7 @@ pub mod pkpnft {
         GetPubkey(GetPubkeyCall),
         GetRouterAddress(GetRouterAddressCall),
         GetStakingAddress(GetStakingAddressCall),
+        GetTrustedForwarder(GetTrustedForwarderCall),
         Initialize(InitializeCall),
         IsApprovedForAll(IsApprovedForAllCall),
         MintCost(MintCostCall),
@@ -4296,6 +4451,7 @@ pub mod pkpnft {
         SetContractResolver(SetContractResolverCall),
         SetFreeMintSigner(SetFreeMintSignerCall),
         SetMintCost(SetMintCostCall),
+        SetTrustedForwarder(SetTrustedForwarderCall),
         SupportsInterface(SupportsInterfaceCall),
         Symbol(SymbolCall),
         TokenByIndex(TokenByIndexCall),
@@ -4406,6 +4562,11 @@ pub mod pkpnft {
             ) {
                 return Ok(Self::GetStakingAddress(decoded));
             }
+            if let Ok(decoded) = <GetTrustedForwarderCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::GetTrustedForwarder(decoded));
+            }
             if let Ok(decoded) = <InitializeCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
             ) {
@@ -4485,6 +4646,11 @@ pub mod pkpnft {
                 data,
             ) {
                 return Ok(Self::SetMintCost(decoded));
+            }
+            if let Ok(decoded) = <SetTrustedForwarderCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::SetTrustedForwarder(decoded));
             }
             if let Ok(decoded) = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
@@ -4586,6 +4752,9 @@ pub mod pkpnft {
                 Self::GetStakingAddress(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
+                Self::GetTrustedForwarder(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
                 Self::Initialize(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -4626,6 +4795,9 @@ pub mod pkpnft {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::SetMintCost(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::SetTrustedForwarder(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::SupportsInterface(element) => {
@@ -4686,6 +4858,9 @@ pub mod pkpnft {
                 Self::GetPubkey(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetRouterAddress(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetStakingAddress(element) => ::core::fmt::Display::fmt(element, f),
+                Self::GetTrustedForwarder(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::Initialize(element) => ::core::fmt::Display::fmt(element, f),
                 Self::IsApprovedForAll(element) => ::core::fmt::Display::fmt(element, f),
                 Self::MintCost(element) => ::core::fmt::Display::fmt(element, f),
@@ -4710,6 +4885,9 @@ pub mod pkpnft {
                 }
                 Self::SetFreeMintSigner(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SetMintCost(element) => ::core::fmt::Display::fmt(element, f),
+                Self::SetTrustedForwarder(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::SupportsInterface(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Symbol(element) => ::core::fmt::Display::fmt(element, f),
                 Self::TokenByIndex(element) => ::core::fmt::Display::fmt(element, f),
@@ -4819,6 +4997,11 @@ pub mod pkpnft {
             Self::GetStakingAddress(value)
         }
     }
+    impl ::core::convert::From<GetTrustedForwarderCall> for PKPNFTCalls {
+        fn from(value: GetTrustedForwarderCall) -> Self {
+            Self::GetTrustedForwarder(value)
+        }
+    }
     impl ::core::convert::From<InitializeCall> for PKPNFTCalls {
         fn from(value: InitializeCall) -> Self {
             Self::Initialize(value)
@@ -4898,6 +5081,11 @@ pub mod pkpnft {
     impl ::core::convert::From<SetMintCostCall> for PKPNFTCalls {
         fn from(value: SetMintCostCall) -> Self {
             Self::SetMintCost(value)
+        }
+    }
+    impl ::core::convert::From<SetTrustedForwarderCall> for PKPNFTCalls {
+        fn from(value: SetTrustedForwarderCall) -> Self {
+            Self::SetTrustedForwarder(value)
         }
     }
     impl ::core::convert::From<SupportsInterfaceCall> for PKPNFTCalls {
@@ -5177,6 +5365,20 @@ pub mod pkpnft {
         Hash
     )]
     pub struct GetStakingAddressReturn(pub ::ethers::core::types::Address);
+    ///Container type for all return fields from the `getTrustedForwarder` function with signature `getTrustedForwarder()` and selector `0xce1b815f`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct GetTrustedForwarderReturn(pub ::ethers::core::types::Address);
     ///Container type for all return fields from the `isApprovedForAll` function with signature `isApprovedForAll(address,address)` and selector `0xe985e9c5`
     #[derive(
         Clone,

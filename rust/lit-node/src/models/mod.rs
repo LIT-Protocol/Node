@@ -125,7 +125,11 @@ impl moka::Expiry<String, AuthMethodResponse> for AuthContextCacheExpiry {
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthContext {
+    // This vec is broken, and only contains the current IPFS CID of the running action.
+    // We are retaining this for backwards compatibility in case existing apps depend on it.
     pub action_ipfs_ids: Vec<String>,
+    // This vec is fixed, which contains the full stack of IPFS CIDs of the running actions.
+    pub action_ipfs_id_stack: Vec<String>,
     pub auth_sig_address: Option<String>,
     pub auth_method_contexts: Vec<AuthMethodResponse>,
     pub resources: Vec<RiString<UriSpec>>,

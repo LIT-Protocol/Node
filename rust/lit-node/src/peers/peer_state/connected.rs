@@ -12,10 +12,11 @@ use rand_core::RngCore;
 use tracing::warn;
 
 use crate::config::LitNodeConfig;
-use crate::error::{blockchain_err_code, http_client_err, lock_err, unexpected_err, Result, EC};
+use crate::error::{blockchain_err_code, http_client_err, unexpected_err, Result, EC};
 use crate::models::PeerValidator;
 use crate::utils::networking::get_web_addr_from_chain_info;
 use crate::version;
+use lit_blockchain::resolver::contract::ContractResolver;
 use lit_core::config::LitConfig;
 use lit_core::error::Unexpected;
 
@@ -51,14 +52,6 @@ impl PeerState {
         let mut futures = Vec::new();
         for peer in peers.iter() {
             futures.push(self.connect_to_node(peer));
-        }
-
-        {
-            *self
-                .connecting
-                .lock()
-                .map_err(|e| lock_err(e.to_string(), Some("Locked Connecting Flag".into())))? =
-                true;
         }
 
         // join_all is hanging.  removing for now.  this may mean these requests happen sequentially but that's better than this whole thing hanging.
@@ -104,15 +97,6 @@ impl PeerState {
             self.union_data.store(Arc::new(data.clone()));
         }
         self.data.store(Arc::new(data));
-
-        // unlock the connecting lock
-        {
-            *self
-                .connecting
-                .lock()
-                .map_err(|e| lock_err(e.to_string(), Some("Locked Connecting Flag".into())))? =
-                false
-        }
 
         Ok(())
     }
@@ -340,6 +324,7 @@ impl PeerState {
             peer_item_to_verify: &PeerItem,
             noonce: N,
             address_we_talked_to: &str,
+            resolver: &ContractResolver,
         ) -> Result<()> {
             let attestation = peer_item_to_verify.attestation.as_ref().ok_or_else(|| {
                 unexpected_err(
@@ -353,7 +338,7 @@ impl PeerState {
 
             let cfg = lit_config.as_ref();
             attestation
-                .verify_full(cfg, None, Some(Policy::NodeConnect))
+                .verify_full(cfg, Some(resolver), Some(Policy::NodeConnect))
                 .await
                 .map_err(|e| {
                     unexpected_err(
@@ -425,6 +410,7 @@ impl PeerState {
                 &peer_item_to_verify,
                 noonce,
                 address_we_talked_to,
+                &self.resolver,
             )
             .await?
         } else {
@@ -503,14 +489,6 @@ impl PeerState {
         Ok(addrs)
     }
 
-    pub fn is_connecting(&self) -> Result<bool> {
-        let is_connecting = self
-            .connecting
-            .lock()
-            .map_err(|e| lock_err(e.to_string(), Some("Locked Connecting Flag".into())))?;
-
-        Ok(*is_connecting)
-    }
     pub async fn get_peer_staker_address_for_complain(&self, addr: &str) -> Result<Address> {
         let peer_item = self.get_peer_item_from_addr(addr);
         if let Ok(peer_item) = peer_item {

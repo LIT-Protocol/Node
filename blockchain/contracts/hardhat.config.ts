@@ -95,39 +95,6 @@ const config: HardhatUserConfig = {
         accounts: [process.env['LIT_POLYGON_DEPLOYER_PRIVATE_KEY']],
       }),
     },
-    litTestnet: {
-      url: 'https://lit-test.calderachain.xyz/http',
-      ...(process.env['LIT_ROLLUP_TESTNET_DEPLOYER_PRIVATE_KEY'] && {
-        accounts: [process.env['LIT_ROLLUP_TESTNET_DEPLOYER_PRIVATE_KEY']],
-      }),
-      chainId: 987,
-    },
-    lit: {
-      url: 'https://lit-protocol.calderachain.xyz/http',
-      ...(process.env['LIT_ROLLUP_MAINNET_DEPLOYER_PRIVATE_KEY'] && {
-        accounts: [process.env['LIT_ROLLUP_MAINNET_DEPLOYER_PRIVATE_KEY']],
-      }),
-      chainId: 175177,
-      // @ts-ignore
-      wlitAddress: '0x53695556f8a1a064EdFf91767f15652BbfaFaD04',
-    },
-    vesuvius: {
-      url: 'https://vesuvius-rpc.litprotocol.com',
-      ...(process.env['LIT_ROLLUP_MAINNET_DEPLOYER_PRIVATE_KEY'] && {
-        accounts: [process.env['LIT_ROLLUP_MAINNET_DEPLOYER_PRIVATE_KEY']],
-      }),
-      chainId: 2311,
-      // @ts-ignore
-      stylusContractsForTests: {
-        p256:
-          process.env.LIT_STYLUS_P256_CONTRACT_ADDRESS ||
-          '0x8ea150155c63b3a2e34b61409fb65e19f1bd48e7',
-        k256:
-          process.env.LIT_STYLUS_K256_CONTRACT_ADDRESS ||
-          '0x28ca4b9b360ed4f918081c921b8a299fd491e96a',
-      },
-      wlitAddress: '0xA03EBF5f029DeAb13615E27E8f75D644698de46f',
-    },
     yellowstone: {
       url: 'https://yellowstone-rpc.litprotocol.com',
       ...(process.env['LIT_ROLLUP_MAINNET_DEPLOYER_PRIVATE_KEY'] && {
@@ -144,6 +111,7 @@ const config: HardhatUserConfig = {
           '0x28ca4b9b360ed4f918081c921b8a299fd491e96a',
       },
       wlitAddress: '0xd78089bAAe410f5d0eae31D0D56157c73a3Ff98B',
+      trustedForwarderAddress: '0x63F15BC77EA4C0b4361a879F6D16D7a5C635DB6C',
     },
     etna: {
       url: 'https://etna-testnet.rpc.caldera.xyz/http',
@@ -210,9 +178,6 @@ const config: HardhatUserConfig = {
       celo: process.env.LIT_CELOSCAN_API_KEY!,
       mumbai: process.env.LIT_POLYGONSCAN_API_KEY!,
       polygon: process.env.LIT_POLYGONSCAN_API_KEY!,
-      litTestnet: 'meow', // Blockscout does not require an API key but needs the string to be populated
-      lit: 'woof', // Blockscout does not require an API key but needs the string to be populated
-      vesuvius: 'woof', // Blockscout does not require an API key but needs the string to be populated
       yellowstone: 'woof', // Blockscout does not require an API key but needs the string to be populated
       sepolia: process.env.LIT_ETHERSCAN_API_KEY!,
     },
@@ -247,30 +212,6 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.polygonscan.com/api',
           browserURL: 'https://polygonscan.com',
-        },
-      },
-      {
-        network: 'litTestnet',
-        chainId: 987,
-        urls: {
-          apiURL: 'https://lit-test.calderaexplorer.xyz/api',
-          browserURL: 'https://lit-test.calderaexplorer.xyz',
-        },
-      },
-      {
-        network: 'lit',
-        chainId: 175177,
-        urls: {
-          apiURL: 'https://lit-protocol.calderaexplorer.xyz/api',
-          browserURL: 'https://lit-protocol.calderaexplorer.xyz',
-        },
-      },
-      {
-        network: 'vesuvius',
-        chainId: 2311,
-        urls: {
-          apiURL: 'https://vesuvius-explorer.litprotocol.com/api',
-          browserURL: 'https://vesuvius-explorer.litprotocol.com/',
         },
       },
       {

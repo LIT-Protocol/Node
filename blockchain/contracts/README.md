@@ -110,8 +110,7 @@ We have developed a tool that makes it convenient to deploy and configure our su
     - `mumbai`
     - `alfajores`
     - `polygon`
-    - `litTestnet`
-    - `lit`
+    - `yellowstone`
     - `localchain`
 - At a high-level, the tool consists of 2 main steps:
   1. An **interactive** step that determines the entire set of deployment configurations that will be used.

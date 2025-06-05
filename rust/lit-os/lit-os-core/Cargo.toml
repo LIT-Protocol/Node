@@ -13,7 +13,7 @@ serde = { version = "1.0.189", features = ["derive"] }
 serde_json = { version = "1.0.107" }
 serde_yaml = { version = "0.9.25" }
 serde_bytes_base64 = { version = "0.1.1" }
-sev-snp-utilities = { version = "1.4.9" }
+sev-snp-utilities = { version = "1.6.0" }
 config = { version = "0.13.3" }
 nix = { version = "0.26.2" }
 regex = { version = "1.10.2" }

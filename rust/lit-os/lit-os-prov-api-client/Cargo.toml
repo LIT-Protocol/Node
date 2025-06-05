@@ -12,7 +12,7 @@ trust-dns = ["reqwest/trust-dns"]
 
 [dependencies]
 log = { version = "0.4.20", features = ["kv_unstable"] }
-async-std = { version = "1.12.0" }
+async-std = { version = "1.13.1" }
 async-trait = { version = "0.1.74" }
 clap = { version = "4.4.7", features = ["derive"] }
 sha2 = { version = "0.10.8" }

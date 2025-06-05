@@ -119,6 +119,7 @@ impl Upgrade {
             unexpected_err("node type node must have an instance id".to_string(), None)
         })?;
         recreate_args.push(&instance_id);
+        trace!("Running recreate command: {:?}", recreate_args);
         // run it
         let output = Command::new("lit").args(recreate_args).output().map_err(|e| {
             unexpected_err(format!("Failed to run recreate command with error {}", e), None)
@@ -132,6 +133,7 @@ impl Upgrade {
             ));
         }
 
+        trace!("Matching release ID: {:?}", self.release_id);
         // Verify that the newly recreated node is on the correct release ID
         let cfg_builder = LitConfigBuilder::default();
         let cfg = LitConfig::from_builder(cfg_builder).expect("failed to load lit config");

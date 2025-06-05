@@ -74,10 +74,6 @@ chains:
     - url: https://rpc.goerli.linea.build
   lineaSepolia:
     - url: https://rpc.sepolia.linea.build
-  lit:
-    - url: https://lit-protocol.calderachain.xyz/replica-http
-  litTestnet:
-    - url: https://lit.calderachain.xyz/http
   localchain:
     - url: http://127.0.0.1:8545
   lukso:
@@ -173,6 +169,8 @@ chains:
     - url: https://testnet.skalenodes.com/v1/aware-fake-trim-testnet
   fhenixHelium:
     - url: https://api.helium.fhenix.zone
+  fhenixNitrogen:
+    - url: https://api.nitrogen.fhenix.zone
   hederaTestnet:
     - url: https://testnet.hashio.io/api
   bitTorrentTestnet:
@@ -191,3 +189,37 @@ chains:
     - url: https://sepolia.rpc.zkcandy.io
   vana:
     - url: https://rpc.vana.org
+  moksha:
+    - url: https://rpc.moksha.vana.org
+  rootstock:
+    - url: https://public-node.rsk.co
+  rootstockTestnet:
+    - url: https://public-node.testnet.rsk.co
+  merlin:
+    - url: https://endpoints.omniatech.io/v1/merlin/mainnet/public
+  merlinTestnet:
+    - url: https://testnet-rpc.merlinchain.io/
+  bsquared:
+    - url: https://rpc.bsquared.network
+  bsquaredTestnet:
+    - url: https://testnet-rpc.bsquared.network
+  monadTestnet:
+    - url: https://blue-fluent-meme.monad-testnet.quiknode.pro/68a06f10ae8383e6a7598b571b2c4f5936df8668/
+  bitlayer:
+    - url: https://rpc.bitlayer.org
+  bitlayerTestnet:
+    - url: https://testnet-rpc.bitlayer.org
+  bob:
+    - url: https://rpc.gobob.xyz
+  '5ire':
+    - url: https://rpc.5ire.network
+  hederaMainnet:
+    - url: https://mainnet.hashio.io/api
+  load:
+    - url: https://alphanet.load.network
+  '0gGalileoTestnet':
+    - url: https://evmrpc-testnet.0g.ai
+  peaqTestnet:
+    - url: https://peaq-agung.api.onfinality.io/public
+  peaqMainnet:
+    - url: https://quicknode.peaq.xyz/

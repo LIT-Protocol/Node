@@ -19,9 +19,13 @@ tonic-build = "0.12.3"
 tonic-reflection = "0.12.3"
 tracing = "0.1"
 
-# Deno v1.46.2
-deno_core = "0.307.0"
-deno_runtime = "0.176.0"
+# Deno v2.2.2
+deno_core = "=0.338.0"
+deno_error = "=0.5.5"
+deno_lib = "=0.9.0"
+deno_resolver = "=0.24.0"
+deno_runtime = "=0.201.0"
+sys_traits = "=0.1.8"
 
 lit-actions-ext = { path = "ext" }
 lit-actions-grpc = { path = "grpc" }
@@ -35,10 +39,13 @@ lit-logging = { path = "../lit-core/lit-logging" }
 # Prevent panic "Custom error class must have a builder registered: Uncaught null" that
 # happens when lit-node disconnects (e.g. op_sign_ecdsa: receiving on a closed channel)
 # Upstream PR: https://github.com/denoland/deno_core/pull/730
-deno_core = { git = "https://github.com/Lit-Protocol/deno_core", branch = "fix/deno-1462-op-panic" }
+deno_core = { git = "https://github.com/Lit-Protocol/deno_core", branch = "fix/deno-222-op-panic" }
+# Fix libffi build on macOS Sequoia (required by Deno)
+# Upstream issue: https://github.com/tov/libffi-rs/issues/109
+libffi-sys = { git = "https://github.com/integer32llc/libffi-rs", rev = "8df0df577317bdca2c2b5e9ae263ba0e98fa9076" }
 
 [workspace.metadata.cargo-machete]
-ignored = ["log", "prost"]
+ignored = ["prost"]
 
 # Please keep all profiles in sync with lit-node
 [profile.release]

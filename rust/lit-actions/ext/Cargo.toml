@@ -11,9 +11,9 @@ test = false
 doctest = false
 
 [dependencies]
-anyhow = { workspace = true }
 atty = "0.2"
 deno_core = { workspace = true }
+deno_error = { workspace = true }
 ethabi = { version = "18", default-features = false, features = ["serde"] }
 flume = { workspace = true }
 lazy_static = "1"

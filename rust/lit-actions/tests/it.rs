@@ -230,7 +230,6 @@ async fn nop(mut client: TestClient) {
 
     assert_eq!(res.error, "");
     assert_eq!(res.success, true);
-    assert_eq!(res.request_id, "");
 
     assert_eq!(client.received::<ExecutionResult>(), res);
 }
@@ -951,6 +950,22 @@ async fn localstorage_shouldnt_panic(mut client: TestClient) {
 
 #[rstest]
 #[tokio::test]
+async fn web_worker_shouldnt_panic(mut client: TestClient) {
+    let code = indoc! {r#"
+        new Worker("file:///path/to/worker.js", {type: "module"});
+    "#};
+
+    let res = client.execute_js(code).await;
+
+    assert_eq!(
+        res.unwrap_err().to_string().lines().next().unwrap(),
+        "Uncaught ReferenceError: Worker is not defined"
+    );
+    assert_eq!(client.received::<ExecutionResult>().success, false);
+}
+
+#[rstest]
+#[tokio::test]
 async fn async_await(mut client: TestClient) {
     let code = indoc! {r#"
         (async () => {
@@ -1127,28 +1142,27 @@ async fn deno_permissions(mut client: TestClient) {
     let tests = BTreeMap::from([
         (
             r#"Deno.readFileSync("test.txt")"#,
-            r#"Uncaught PermissionDenied: Requires read access to "test.txt", run again with the --allow-read flag"#,
+            r#"Uncaught NotCapable: Requires read access to "test.txt", run again with the --allow-read flag"#,
         ),
         (
             r#"Deno.makeTempDirSync()"#,
-            r#"Uncaught PermissionDenied: Requires write access to <TMP>, run again with the --allow-write flag"#,
+            r#"Uncaught NotCapable: Requires write access to <TMP>, run again with the --allow-write flag"#,
         ),
         (
             r#"Deno.env.get("SHELL")"#,
-            r#"Uncaught PermissionDenied: Requires env access to "SHELL", run again with the --allow-env flag"#,
+            r#"Uncaught NotCapable: Requires env access to "SHELL", run again with the --allow-env flag"#,
         ),
         (
             r#"Deno.hostname()"#,
-            r#"Uncaught PermissionDenied: Requires sys access to "hostname", run again with the --allow-sys flag"#,
+            r#"Uncaught NotCapable: Requires sys access to "hostname", run again with the --allow-sys flag"#,
         ),
         (
             r#"Deno.kill(1234)"#,
-            r#"Uncaught PermissionDenied: Requires run access, run again with the --allow-run flag"#,
+            r#"Uncaught NotCapable: Requires run access, run again with the --allow-run flag"#,
         ),
         (
-            // FFI is only available with --allow-ffi and --unstable, but we removed it from js_libs/ anyway
-            r#"Deno.dlopen("test.dll")"#,
-            r#"Uncaught TypeError: Deno.dlopen is not a function"#,
+            r#"Deno.dlopen("test.dll", {})"#,
+            r#"Uncaught NotCapable: Requires ffi access to "test.dll", run again with the --allow-ffi flag"#,
         ),
     ]);
 
@@ -1159,15 +1173,6 @@ async fn deno_permissions(mut client: TestClient) {
             expected_err
         );
         assert_eq!(client.received::<ExecutionResult>().success, false);
-    }
-
-    // Test for --allow-hrtime, see https://github.com/denoland/deno/blob/v1.37/cli/tests/testdata/run/025_hrtime.ts
-    {
-        client
-            .execute_js(r#"if (performance.now() % 2 !== 0) { throw "High-res timers enabled" }"#)
-            .await
-            .unwrap();
-        assert_eq!(client.received::<ExecutionResult>().success, true);
     }
 }
 

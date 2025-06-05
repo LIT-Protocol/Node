@@ -282,6 +282,15 @@ fn validate_session_sig_resource_ability_requests(
     let (requested_resource_prefix, requested_resource_id) =
         get_resource_prefix_id_from_type(requested_lit_resource_ability.get_resource())?;
 
+    trace!(
+        "Looking for resource {:?} in resourceAbilityRequests",
+        requested_lit_resource_ability
+    );
+    trace!(
+        "resourceAbilityRequests: {:?}",
+        session_key_signed_message.resource_ability_requests
+    );
+
     // Find if corresponding resource in the resourceAbilityRequests
     for authorized_resource_ability_request in &session_key_signed_message.resource_ability_requests
     {

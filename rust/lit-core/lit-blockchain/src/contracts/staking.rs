@@ -254,6 +254,21 @@ pub mod staking {
                                             ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
                                             ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
                                             ::ethers::core::abi::ethabi::ParamType::Bool,
+                                            ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                                ::std::vec![
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                ],
+                                            ),
+                                            ::ethers::core::abi::ethabi::ParamType::Bool,
                                         ],
                                     ),
                                     internal_type: ::core::option::Option::Some(
@@ -1696,6 +1711,21 @@ pub mod staking {
                                             ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
                                             ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
                                             ::ethers::core::abi::ethabi::ParamType::Bool,
+                                            ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                                ::std::vec![
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                    ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                                ],
+                                            ),
+                                            ::ethers::core::abi::ethabi::ParamType::Bool,
                                         ],
                                     ),
                                     internal_type: ::core::option::Option::Some(
@@ -2408,6 +2438,31 @@ pub mod staking {
                                     name: ::std::borrow::ToOwned::to_owned(
                                         "newRpcHealthcheckEnabled",
                                     ),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Bool,
+                                    indexed: false,
+                                },
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned(
+                                        "newLitActionConfig",
+                                    ),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                        ::std::vec![
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                        ],
+                                    ),
+                                    indexed: false,
+                                },
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("newHeliosEnabled"),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Bool,
                                     indexed: false,
                                 },
@@ -4334,13 +4389,13 @@ pub mod staking {
                 .method_hash([220, 80, 157, 80], (reason, config))
                 .expect("method not found (this should never happen)")
         }
-        ///Calls the contract's `setConfig` (0x87389dd7) function
+        ///Calls the contract's `setConfig` (0x584ce5f5) function
         pub fn set_config(
             &self,
             new_config: Config,
         ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
-                .method_hash([135, 56, 157, 215], (new_config,))
+                .method_hash([88, 76, 229, 245], (new_config,))
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `setContractResolver` (0xf95d71b1) function
@@ -6495,7 +6550,7 @@ pub mod staking {
     )]
     #[ethevent(
         name = "ConfigSet",
-        abi = "ConfigSet(uint256,uint256[],uint256,uint256,uint256,uint256,uint256,uint256,bool)"
+        abi = "ConfigSet(uint256,uint256[],uint256,uint256,uint256,uint256,uint256,uint256,bool,(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),bool)"
     )]
     pub struct ConfigSetFilter {
         pub new_token_reward_per_token_per_epoch: ::ethers::core::types::U256,
@@ -6507,6 +6562,8 @@ pub mod staking {
         pub new_peer_checking_interval_secs: ::ethers::core::types::U256,
         pub new_max_triple_concurrency: ::ethers::core::types::U256,
         pub new_rpc_healthcheck_enabled: bool,
+        pub new_lit_action_config: LitActionConfig,
+        pub new_helios_enabled: bool,
     }
     #[derive(
         Clone,
@@ -8141,22 +8198,17 @@ pub mod staking {
         pub reason: ::ethers::core::types::U256,
         pub config: ComplaintConfig,
     }
-    ///Container type for all input parameters for the `setConfig` function with signature `setConfig((uint256,uint256,uint256,uint256[],uint256,uint256,uint256,uint256,uint256,uint256,bool))` and selector `0x87389dd7`
+    ///Container type for all input parameters for the `setConfig` function with signature `setConfig((uint256,uint256,uint256,uint256[],uint256,uint256,uint256,uint256,uint256,uint256,bool,(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),bool))` and selector `0x584ce5f5`
     #[derive(
         Clone,
         ::ethers::contract::EthCall,
         ::ethers::contract::EthDisplay,
         serde::Serialize,
         serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
     )]
     #[ethcall(
         name = "setConfig",
-        abi = "setConfig((uint256,uint256,uint256,uint256[],uint256,uint256,uint256,uint256,uint256,uint256,bool))"
+        abi = "setConfig((uint256,uint256,uint256,uint256[],uint256,uint256,uint256,uint256,uint256,uint256,bool,(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),bool))"
     )]
     pub struct SetConfigCall {
         pub new_config: Config,
@@ -8512,10 +8564,6 @@ pub mod staking {
         ::ethers::contract::EthAbiType,
         serde::Serialize,
         serde::Deserialize,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
     )]
     pub enum StakingCalls {
         AdminKickValidatorInNextEpoch(AdminKickValidatorInNextEpochCall),
@@ -9790,11 +9838,6 @@ pub mod staking {
         ::ethers::contract::EthAbiCodec,
         serde::Serialize,
         serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
     )]
     pub struct ConfigReturn(pub Config);
     ///Container type for all return fields from the `contractResolver` function with signature `contractResolver()` and selector `0x50d17b5e`
@@ -10456,7 +10499,7 @@ pub mod staking {
         pub interval_secs: ::ethers::core::types::U256,
         pub kick_penalty_percent: ::ethers::core::types::U256,
     }
-    ///`Config(uint256,uint256,uint256,uint256[],uint256,uint256,uint256,uint256,uint256,uint256,bool)`
+    ///`Config(uint256,uint256,uint256,uint256[],uint256,uint256,uint256,uint256,uint256,uint256,bool,(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),bool)`
     #[derive(
         Clone,
         ::ethers::contract::EthAbiType,
@@ -10481,6 +10524,8 @@ pub mod staking {
         pub peer_checking_interval_secs: ::ethers::core::types::U256,
         pub max_triple_concurrency: ::ethers::core::types::U256,
         pub rpc_healthcheck_enabled: bool,
+        pub lit_action_config: LitActionConfig,
+        pub helios_enabled: bool,
     }
     ///`Epoch(uint256,uint256,uint256,uint256,uint256)`
     #[derive(
@@ -10501,6 +10546,31 @@ pub mod staking {
         pub end_time: ::ethers::core::types::U256,
         pub retries: ::ethers::core::types::U256,
         pub timeout: ::ethers::core::types::U256,
+    }
+    ///`LitActionConfig(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct LitActionConfig {
+        pub timeout_ms: ::ethers::core::types::U256,
+        pub memory_limit_mb: ::ethers::core::types::U256,
+        pub max_code_length: ::ethers::core::types::U256,
+        pub max_response_length: ::ethers::core::types::U256,
+        pub max_fetch_count: ::ethers::core::types::U256,
+        pub max_sign_count: ::ethers::core::types::U256,
+        pub max_contract_call_count: ::ethers::core::types::U256,
+        pub max_broadcast_and_collect_count: ::ethers::core::types::U256,
+        pub max_call_depth: ::ethers::core::types::U256,
+        pub max_retries: ::ethers::core::types::U256,
     }
     ///`Validator(uint32,uint128,uint32,address,uint256,uint256,uint256)`
     #[derive(

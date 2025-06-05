@@ -15,7 +15,7 @@ use ethers::prelude::*;
 use ethers::providers::Provider;
 use ethers::signers::Wallet;
 use lit_blockchain::contracts::staking::staking;
-use lit_blockchain::contracts::staking::Config;
+use lit_blockchain::contracts::staking::{Config, LitActionConfig};
 use lit_blockchain::contracts::{
     backup_recovery::BackupRecovery, contract_resolver::*, lit_token::lit_token::LITToken,
     payment_delegation::PaymentDelegation, pkp_helper::pkp_helper::PKPHelper,
@@ -71,6 +71,7 @@ pub struct StakingContractConfigBuilder {
     min_triple_count: Option<U256>,
     peer_checking_interval_secs: Option<U256>,
     max_triple_concurrency: Option<U256>,
+    lit_action_config: Option<LitActionConfig>,
     complaint_reason_to_config: Option<HashMap<U256, ComplaintConfig>>,
 }
 
@@ -120,6 +121,11 @@ impl StakingContractConfigBuilder {
         self
     }
 
+    pub fn lit_action_config(mut self, value: LitActionConfig) -> Self {
+        self.lit_action_config = Some(value);
+        self
+    }
+
     pub fn complaint_reason_to_config(mut self, value: HashMap<U256, ComplaintConfig>) -> Self {
         self.complaint_reason_to_config = Some(value);
         self
@@ -136,6 +142,7 @@ impl StakingContractConfigBuilder {
             min_triple_count: self.min_triple_count,
             peer_checking_interval_secs: self.peer_checking_interval_secs,
             max_triple_concurrency: self.max_triple_concurrency,
+            lit_action_config: self.lit_action_config,
             complaint_reason_to_config: self.complaint_reason_to_config,
         }
     }
@@ -152,6 +159,7 @@ pub struct StakingContractConfig {
     min_triple_count: Option<U256>,
     peer_checking_interval_secs: Option<U256>,
     max_triple_concurrency: Option<U256>,
+    lit_action_config: Option<LitActionConfig>,
     complaint_reason_to_config: Option<HashMap<U256, ComplaintConfig>>,
 }
 
@@ -558,6 +566,7 @@ impl Contracts {
         let min_triple_count = config.min_triple_count;
         let peer_checking_interval_secs = config.peer_checking_interval_secs;
         let max_triple_concurrency = config.max_triple_concurrency;
+        let lit_action_config = config.lit_action_config;
 
         let key_types = staking
             .get_key_types()
@@ -586,6 +595,10 @@ impl Contracts {
                 .max_triple_concurrency
                 .unwrap_or(max_triple_concurrency),
             rpc_healthcheck_enabled: true,
+            lit_action_config: staking_config
+                .lit_action_config
+                .unwrap_or(lit_action_config),
+            helios_enabled: true,
         });
         if !Self::process_contract_call(cc, "updating staking config").await {
             return Err(anyhow::anyhow!("Error updating staking config"));

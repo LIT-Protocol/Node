@@ -18,7 +18,8 @@ import { PubkeyRouterFacet } from "../PubkeyRouter/PubkeyRouterFacet.sol";
 import { PKPNFTMetadata } from "../PKPNFTMetadata.sol";
 import { ContractResolver } from "../../lit-core/ContractResolver.sol";
 import { PKPPermissionsFacet } from "../PKPPermissions/PKPPermissionsFacet.sol";
-
+import { ERC2771 } from "../../common/ERC2771.sol";
+import { LibERC2771 } from "../../libraries/LibERC2771.sol";
 import "hardhat/console.sol";
 
 // TODO: tests for the mintGrantAndBurn function, withdraw function, some of the setters, transfer function, freeMint and freeMintGrantAndBurn
@@ -33,21 +34,13 @@ import "hardhat/console.sol";
 contract PKPNFTFacet is
     ERC721Upgradeable,
     ERC721BurnableUpgradeable,
-    ERC721EnumerableUpgradeable
+    ERC721EnumerableUpgradeable,
+    ERC2771
 {
     using Strings for uint256;
 
-    error CallerNotOwner();
-
     function initialize() public initializer {
         __ERC721_init("Programmable Keypair", "PKP");
-    }
-
-    /* ========== Modifiers ========== */
-
-    modifier onlyOwner() {
-        if (msg.sender != LibDiamond.contractOwner()) revert CallerNotOwner();
-        _;
     }
 
     /* ========== VIEWS ========== */
@@ -300,7 +293,9 @@ contract PKPNFTFacet is
 
     function withdraw() public onlyOwner {
         uint256 withdrawAmount = address(this).balance;
-        (bool sent, ) = payable(msg.sender).call{ value: withdrawAmount }("");
+        (bool sent, ) = payable(LibERC2771._msgSender()).call{
+            value: withdrawAmount
+        }("");
         require(sent);
         emit Withdrew(withdrawAmount);
     }

@@ -7,6 +7,7 @@ use blsful::Bls12381G2Impl;
 use ethers::signers::LocalWallet;
 use ethers::signers::Signer;
 use ethers::types::U256;
+use ipfs_hasher::IpfsHasher;
 use lit_node::auth::auth_material::AuthMaterialType;
 use lit_node::auth::auth_material::AuthSigItem;
 use lit_node::auth::lit_resource::LitResource;
@@ -36,6 +37,7 @@ use test_common::lit_actions::{
 use test_common::node_collection::get_network_pubkey;
 use test_common::pkp::add_permitted_action_to_pkp;
 use test_common::pkp::{add_permitted_address_auth_method_to_pkp, add_permitted_address_to_pkp};
+use test_common::session_sigs::SIGN_ECDSA_LIT_ACTION_CODE;
 use test_common::{
     auth_sig::{generate_authsig, generate_authsig_item},
     session_sigs::{
@@ -310,7 +312,7 @@ async fn sign_lit_actions_with_lit_action_session_sig() {
     // For signing inside Lit Actions i.e. signing anything
     assert!(add_permitted_action_to_pkp(
         &validator_collection.actions(),
-        "QmV9dkmhpDqABXZDup6GN6VNrtpXRWitCLCBdaaGDcxXan", // IPFS CID for `VALID_PKP_SIGNING_LIT_ACTION_CODE`
+        "QmVKJuxhU5V9xNTD2kMKp9EoZwSuqFHmJvdDSHGDRpee9r", // IPFS CID for `VALID_PKP_SIGNING_LIT_ACTION_CODE`
         token_id,
         &[U256::from(AuthMethodScope::SignAnything as usize)]
     )
@@ -507,7 +509,7 @@ async fn sign_lit_actions_with_custom_auth_resource_lit_action_session_sig() {
     // For signing inside Lit Actions i.e. signing anything
     assert!(add_permitted_action_to_pkp(
         &validator_collection.actions(),
-        "QmPJ36XTrrzhfXSuvgBLo7HwZpUiNmeBex6rv9GLYXopM5", // IPFS CID for `CUSTOM_AUTH_RESOURCE_VALID_PKP_SIGNING_LIT_ACTION_CODE`
+        "QmXVyzMZF1SFp6T284Mnuw1CW2VXq7Zbe1UZsX8kyXDgz5", // IPFS CID for `CUSTOM_AUTH_RESOURCE_VALID_PKP_SIGNING_LIT_ACTION_CODE`
         token_id,
         &[U256::from(AuthMethodScope::SignAnything as usize)]
     )
@@ -678,7 +680,7 @@ async fn sign_lit_actions_with_no_auth_method_lit_action_session_sig() {
     // For signing inside Lit Actions i.e. signing anything
     assert!(add_permitted_action_to_pkp(
         &validator_collection.actions(),
-        "QmY9Z2zAMhNG3r2gxiid39WdtJs5WswdpzWrZ8CkV9sWgC", // IPFS CID for `NO_AUTH_METHOD_PKP_SIGNING_LIT_ACTION_CODE`
+        "QmZiUB1YmZBqXhjQswH2bE53GRCmcgYeKeGKN6bP1Zewy4", // IPFS CID for `NO_AUTH_METHOD_PKP_SIGNING_LIT_ACTION_CODE`
         token_id,
         &[U256::from(AuthMethodScope::SignAnything as usize)]
     )
@@ -1352,6 +1354,90 @@ async fn sign_session_key_auth_method() {
     for response in &checkedsum_auth_method_to_permit_signing_resp {
         assert!(response.contains("success"));
     }
+}
+
+#[doc = "Can only run a permitted Lit Action when the resource is explicitly permitted"]
+#[tokio::test]
+async fn explicit_resource_permission_required_for_lit_action() {
+    info!("Starting test: explicit_resource_permission_required_for_lit_action");
+
+    let (_testnet, validator_collection) = init_test().await;
+
+    let (_eth_address, pubkey, token_id) = mint_pkp(&validator_collection.actions()).await;
+
+    // the lit action we're going to test is VALID_PKP_SIGNING_LIT_ACTION_CODE
+    // so let's derive the IPFS CID for it
+    let lit_action_code = SIGN_ECDSA_LIT_ACTION_CODE.to_string();
+    let ipfs_hasher = IpfsHasher::default();
+    let ipfs_cid = ipfs_hasher.compute(lit_action_code.as_bytes());
+    info!("IPFS CID that is being permitted: {:?}", ipfs_cid);
+
+    // For signing Session Key i.e. Personal Message
+    assert!(add_permitted_action_to_pkp(
+        &validator_collection.actions(),
+        &ipfs_cid,
+        token_id,
+        &[U256::from(AuthMethodScope::SignAnything as usize)]
+    )
+    .await
+    .unwrap());
+
+    let mut js_params = serde_json::Map::new();
+    js_params.insert("publicKey".to_string(), pubkey.to_string().into());
+    js_params.insert("sigName".to_string(), "sig1".into());
+
+    let non_owner_wallet = LocalWallet::new(&mut OsRng);
+
+    // get local session sigs for non owner wallet
+
+    let session_sigs = get_session_sigs_for_auth(
+        vec![
+            LitResourceAbilityRequest {
+                resource: LitResourceAbilityRequestResource {
+                    resource: "*".to_string(),
+                    resource_prefix: LitResourcePrefix::PKP.to_string(),
+                },
+                ability: LitAbility::PKPSigning.to_string(),
+            },
+            LitResourceAbilityRequest {
+                resource: LitResourceAbilityRequestResource {
+                    resource: ipfs_cid.to_string(),
+                    resource_prefix: LitResourcePrefix::LA.to_string(),
+                },
+                ability: LitAbility::LitActionExecution.to_string(),
+            },
+        ],
+        &validator_collection.addresses(),
+        Some(non_owner_wallet.clone()),
+        None,
+    );
+
+    let (lit_action_code, ipfs_id, js_params, auth_methods) =
+        sign_lit_action(SIGN_ECDSA_LIT_ACTION_CODE.to_string(), pubkey.clone())
+            .await
+            .expect("Could not get lit action params");
+
+    let execute_resp = execute_lit_action_session_sigs(
+        &validator_collection,
+        lit_action_code,
+        ipfs_id, // None
+        js_params,
+        auth_methods, // None
+        &session_sigs,
+        EndpointVersion::V1,
+        2,
+    )
+    .await
+    .expect("Could not execute lit action");
+
+    let action_result = assert_signed_action(&validator_collection, execute_resp).await;
+    assert!(action_result.is_ok());
+
+    let action_result = action_result.unwrap();
+    assert!(
+        action_result == true,
+        "The action should have returned true"
+    );
 }
 
 fn get_wallet_address_from_auth_sig_item(auth_sig_item: &AuthSigItem) -> Result<String> {

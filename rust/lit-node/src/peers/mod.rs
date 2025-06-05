@@ -22,7 +22,7 @@ use peer_item::PeerData;
 use peer_reviewer::PeerComplaint;
 use std::collections::BTreeSet;
 use std::iter::FromIterator;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use tracing::trace;
 use xor_name::XorName;
 
@@ -45,9 +45,8 @@ pub struct PeerState {
     pub public_key: VerifyingKey,
     pub node_address: Address,
     pub secret_key: SigningKey,
-    pub connecting: Mutex<bool>, // flag held while connected_nodes may be changing
     pub staking_address: Address, // address of the contract
-    pub staker_address: Address, // address of staking wallet
+    pub staker_address: Address,  // address of staking wallet
     pub rpc_url: String,
     pub backup_recovery_contract: BackupRecovery<SignerMiddleware<Provider<Http>, LocalWallet>>,
     pub staking_contract: Staking<SignerMiddleware<Provider<Http>, LocalWallet>>,
@@ -57,6 +56,7 @@ pub struct PeerState {
     pub lit_config: Arc<LitConfig>,
     pub http_client: reqwest::Client,
     pub bm_tx: flume::Sender<BeaverMessage>,
+    pub resolver: ContractResolver,
 }
 
 impl PeerState {
@@ -96,7 +96,6 @@ impl PeerState {
             public_key: *public_key,
             node_address,
             secret_key,
-            connecting: Mutex::new(false),
             staking_address: staking_contract.address(),
             staker_address,
             rpc_url: cfg.rpc_url()?,
@@ -108,6 +107,7 @@ impl PeerState {
             lit_config: cfg,
             http_client,
             bm_tx,
+            resolver,
         })
     }
 

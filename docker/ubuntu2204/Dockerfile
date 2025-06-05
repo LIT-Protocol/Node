@@ -6,7 +6,7 @@ ENV PATH=/root/yara-${YARA_TAR_VERSION}:/root/.cargo/bin:/usr/local/sbin:/usr/lo
 
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y build-essential autoconf libtool curl git libssl-dev libudev-dev pkg-config ltrace strace cmake protobuf-compiler
+RUN apt install -y build-essential autoconf libtool curl git libssl-dev libudev-dev pkg-config ltrace strace cmake protobuf-compiler clang
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 RUN cargo install cargo-audit
 

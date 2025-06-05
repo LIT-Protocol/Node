@@ -2,7 +2,10 @@ use std::path::PathBuf;
 use std::pin::Pin;
 
 use anyhow::Result;
+use deno_core::error::CoreError;
 use deno_core::futures::TryFutureExt as _;
+use deno_lib::util::result::any_and_jserrorbox_downcast_ref;
+use deno_runtime::tokio_util::create_and_run_current_thread;
 use lit_actions_grpc::{proto::*, unix};
 use lit_api_core::context::{with_context, Tracer, Tracing};
 use temp_file::TempFile;
@@ -67,12 +70,7 @@ impl Action for Server {
                     debug!("{:?}", DebugExecutionRequest::from(&req));
 
                     std::thread::spawn(move || {
-                        let rt = tokio::runtime::Builder::new_current_thread()
-                            .enable_all()
-                            .build()
-                            .expect("failed to build Tokio runtime to execute JS");
-
-                        rt.block_on(with_context(tracer.clone(), async move {
+                        create_and_run_current_thread(with_context(tracer.clone(), async move {
                             let res = crate::runtime::execute_js(
                                 req.code,
                                 req.js_params.and_then(|v| serde_json::from_slice(&v).ok()),
@@ -101,16 +99,8 @@ impl Action for Server {
                                         } else {
                                             Ok(ExecutionResult {
                                                 success: false,
-                                                error: if let Some(js_err) =
-                                                    err.downcast_ref::<deno_core::error::JsError>()
-                                                {
-                                                    deno_runtime::fmt_errors::format_js_error(
-                                                        js_err,
-                                                    )
-                                                } else {
-                                                    format!("{err:#}")
-                                                },
-                                                ..Default::default()
+                                                error: format_error(&err),
+                                                request_id: tracer.correlation_id().to_string(),
                                             }
                                             .into())
                                         }
@@ -129,21 +119,20 @@ impl Action for Server {
     }
 }
 
-pub async fn start_server(socket_path: impl Into<PathBuf>) -> Result<()> {
-    unix::start_server(
-        Server.into_service(),
-        socket_path,
-        None::<std::future::Ready<()>>,
-    )
-    .await
+fn format_error(err: &anyhow::Error) -> String {
+    if let Some(CoreError::Js(js_err)) = any_and_jserrorbox_downcast_ref::<CoreError>(err) {
+        deno_runtime::fmt_errors::format_js_error(js_err)
+    } else {
+        format!("{err:#}")
+    }
 }
 
-pub async fn start_server_with_shutdown<P, S>(socket_path: P, signal: S) -> Result<()>
+pub async fn start_server<P, S>(socket_path: P, shutdown_signal: Option<S>) -> Result<()>
 where
     P: Into<PathBuf>,
     S: std::future::Future<Output = ()>,
 {
-    unix::start_server(Server.into_service(), socket_path, Some(signal)).await
+    unix::start_server(Server.into_service(), socket_path, shutdown_signal).await
 }
 
 pub struct TestServer {
@@ -156,11 +145,13 @@ impl TestServer {
         let socket_path = socket_file.path().to_path_buf();
 
         std::thread::spawn(|| {
-            let rt = tokio::runtime::Runtime::new().expect("failed to create runtime");
-            rt.block_on(async move {
-                start_server(socket_path)
+            create_and_run_current_thread(async move {
+                let signal = async {
+                    let _ = tokio::signal::ctrl_c().await;
+                };
+                start_server(socket_path, Some(signal))
                     .await
-                    .expect("failed to start action server");
+                    .expect("failed to start action server")
             });
         });
 

@@ -2,4 +2,4 @@
 
 sudo systemctl stop lit-node@{0..2}
 
-sudo systemctl stop lit-actions
+sudo systemctl stop lit-actions@{0..2}

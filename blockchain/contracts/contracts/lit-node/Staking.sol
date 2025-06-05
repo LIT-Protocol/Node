@@ -61,7 +61,22 @@ contract Staking {
             minTripleCount: 10,
             peerCheckingIntervalSecs: 10000,
             maxTripleConcurrency: 2,
-            rpcHealthcheckEnabled: true
+            rpcHealthcheckEnabled: true,
+            litActionConfig: LibStakingStorage.LitActionConfig({
+                timeoutMs: 30000,
+                memoryLimitMb: 256,
+                maxCodeLength: 16 * 1024 * 1024,
+                maxResponseLength: 100 * 1024,
+                maxFetchCount: 50,
+                maxSignCount: 10,
+                maxContractCallCount: 30,
+                maxBroadcastAndCollectCount: 30,
+                maxCallDepth: 5,
+                maxRetries: 3
+            }),
+            // NOTE: heliosEnabled currently unused in node code,
+            // see:  https://github.com/LIT-Protocol/lit-assets/pull/1981
+            heliosEnabled: true
         });
         uint256 epochLengthSeconds = 1;
         LibStakingStorage.getStorage().epochs[0] = LibStakingStorage.Epoch({

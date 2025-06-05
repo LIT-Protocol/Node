@@ -297,6 +297,9 @@ pub(crate) enum EC {
     /// Your request as a node admin is unauthorized
     #[code(kind = Validation, http_status = 401)]
     NodeAdminUnauthorized,
+    /// Operation on protected RPC config is forbidden
+    #[code(kind = Validation, http_status = 403)]
+    NodeRpcConfigForbidden,
     /// Could not find PKP token ID.
     #[code(kind = Validation, http_status = 400)]
     NodePKPTokenIdNotFound,

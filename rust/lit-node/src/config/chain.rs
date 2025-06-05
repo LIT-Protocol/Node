@@ -35,6 +35,7 @@ pub struct RateLimitDataConfig {
     pub rli_holder_window_duration_secs: Duration,
 }
 
+// If you add a new field to the chain config, and here, you must also make sure it is set inside of set_all_config_from_chain()
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct GenericConfig {
     pub token_reward_per_token_per_epoch: u64,
@@ -45,6 +46,22 @@ pub struct GenericConfig {
     pub peer_checking_interval_secs: u64,
     pub max_triple_concurrency: u64,
     pub rpc_healthcheck_enabled: bool,
+    pub lit_action_config: LitActionConfig,
+    pub helios_enabled: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LitActionConfig {
+    pub timeout_ms: u64,
+    pub memory_limit_mb: u64,
+    pub max_code_length: u64,
+    pub max_response_length: u64,
+    pub max_fetch_count: u64,
+    pub max_sign_count: u64,
+    pub max_contract_call_count: u64,
+    pub max_broadcast_and_collect_count: u64,
+    pub max_call_depth: u64,
+    pub max_retries: u64,
 }
 
 #[derive(Debug, Clone)]
@@ -122,6 +139,19 @@ impl ChainDataConfigManager {
                 peer_checking_interval_secs: 5,
                 max_triple_concurrency: 2,
                 rpc_healthcheck_enabled: true,
+                lit_action_config: LitActionConfig {
+                    timeout_ms: 30000,
+                    memory_limit_mb: 256,
+                    max_code_length: 16 * 1024 * 1024,
+                    max_response_length: 100 * 1024,
+                    max_fetch_count: 50,
+                    max_sign_count: 10,
+                    max_contract_call_count: 30,
+                    max_broadcast_and_collect_count: 30,
+                    max_call_depth: 5,
+                    max_retries: 3,
+                },
+                helios_enabled: true,
             }),
             complaint_reason_to_config,
             version_requirements: Cache::builder().build(),
@@ -172,6 +202,12 @@ impl ChainDataConfigManager {
                 warn!("Error setting complaint config from chain: {e:?}");
             }
 
+            // this is the last operation we run, and we run it last on purpose
+            // because in fsm.rs we gate the FSM on the version requirements.
+            // so the FSM will just loop and continue until the version requirements are set
+            // and the FSM can confirm that it's running a compatible version of the node.
+            // the FSM needs the data above, so this functions as a kind of "don't run the FSM until we have all the data we need" requirement.
+            // we should probably formalize this as a requirement in the FSM tho.
             let res = self.set_version_requirements(None).await;
             if let Err(e) = res {
                 warn!("Error setting version requirements from chain: {e:?}");
@@ -377,6 +413,23 @@ impl ChainDataConfigManager {
             staking_contract_config.peer_checking_interval_secs.as_u64();
         let max_triple_concurrency = staking_contract_config.max_triple_concurrency.as_u64();
         let rpc_healthcheck_enabled = staking_contract_config.rpc_healthcheck_enabled;
+        let lit_action_config = staking_contract_config.lit_action_config;
+        let helios_enabled = staking_contract_config.helios_enabled;
+
+        let lit_action_config = LitActionConfig {
+            timeout_ms: lit_action_config.timeout_ms.as_u64(),
+            memory_limit_mb: lit_action_config.memory_limit_mb.as_u64(),
+            max_code_length: lit_action_config.max_code_length.as_u64(),
+            max_response_length: lit_action_config.max_response_length.as_u64(),
+            max_fetch_count: lit_action_config.max_fetch_count.as_u64(),
+            max_sign_count: lit_action_config.max_sign_count.as_u64(),
+            max_contract_call_count: lit_action_config.max_contract_call_count.as_u64(),
+            max_broadcast_and_collect_count: lit_action_config
+                .max_broadcast_and_collect_count
+                .as_u64(),
+            max_call_depth: lit_action_config.max_call_depth.as_u64(),
+            max_retries: lit_action_config.max_retries.as_u64(),
+        };
 
         let mut generic_config = self.generic_config.write().await;
         generic_config.key_types = key_types;
@@ -386,6 +439,8 @@ impl ChainDataConfigManager {
         generic_config.peer_checking_interval_secs = peer_checking_interval_secs;
         generic_config.max_triple_concurrency = max_triple_concurrency;
         generic_config.rpc_healthcheck_enabled = rpc_healthcheck_enabled;
+        generic_config.lit_action_config = lit_action_config;
+        generic_config.helios_enabled = helios_enabled;
 
         // Set complaint configs from chain - we want to fetch for reasons from 1 to MAX_COMPLAINT_REASON_VALUE.
         for i in 1..=MAX_COMPLAINT_REASON_VALUE {

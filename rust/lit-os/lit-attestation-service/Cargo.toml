@@ -9,13 +9,13 @@ derive_more = { version = "0.99.17" }
 hyper = { version = "0.14" }
 hyperlocal = { version = "0.8" }
 log = { version = "0.4.20", features = ["kv_unstable"] }
-moka = { version = "0.12.3", features = ["future"] }
+moka = { version = "0.12.10", features = ["future"] }
 once_cell = { version = "1.18.0" }
 rand_chacha = { version = "0.3.1" }
 serde = { version = "1.0.189", features = ["derive"] }
 serde_bytes_base64 = { version = "0.1.1" }
 serde_json = { version = "1.0.107" }
-sev-snp-utilities = { version = "1.4.9" }
+sev-snp-utilities = { version = "1.6.0" }
 tempfile = { version = "3.8" }
 tokio = { version = "1.33.0", features = ["full"] }
 futures = { version = "0.3.28" }

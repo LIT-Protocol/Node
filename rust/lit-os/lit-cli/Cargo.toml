@@ -2,7 +2,7 @@
 name = "lit-cli"
 description = "Lit CLI"
 authors = ["David Radunz <david.radunz@litprotocol.com>"]
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 
 [[bin]]
@@ -22,7 +22,7 @@ os-full = ["os", "lit-cli-os/full"]
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
 clap_complete = { version = "4.4.4" }
-tokio = { version = "1.33.0",  features = ["full"] }
+tokio = { version = "1.33.0", features = ["full"] }
 
 [dependencies.lit-core]
 path = "../../lit-core/lit-core"
